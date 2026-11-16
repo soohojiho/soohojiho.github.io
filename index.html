@@ -682,6 +682,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
   border:1px solid #e4ebf7;background:#fff;color:#5b6b83;cursor:pointer;white-space:nowrap;transition:.15s}
 .sync-pill:hover{border-color:#b9ccff;color:var(--brand)}
 .sync-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;flex:0 0 7px}
+.sync-pill .sync-ico{font-size:12px;line-height:1}
 .sync-pill.ok{background:#effbf6;border-color:#c8efd9;color:#0f9e84}
 .sync-pill.busy{background:#f2f7ff;border-color:#cfe0ff;color:#3b6ae0}
 .sync-pill.err{background:#fff7f7;border-color:#ffd6d6;color:#e04b4b}
@@ -757,7 +758,7 @@ label.sync-check input{width:auto}
             <option value="가족 공통">가족 공통</option>
           </select>
         </div>
-        <button class="sync-pill" id="syncPill" title="기기 동기화"><span class="dot"></span><span id="syncPillText">로컬 저장 중</span></button>
+        <button class="sync-pill" id="syncPill" title="기기 동기화"><span class="sync-ico">🔄</span><span id="syncPillText">로컬 저장 중</span></button>
         <button class="btn ghost" id="ambientBtn">🖥 대기화면</button>
       </div>
     </header>
