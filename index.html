@@ -659,6 +659,50 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
   .meal{grid-template-columns:1fr 1fr}
   .clock-line{font-size:11.5px}
 }
+/* ============ 프로필 상단 배치 · 키·몸무게 ============ */
+.profile-row{margin-top:2px}
+.profile-row > div{min-width:0}
+.profile-row .pk-card{padding:16px}
+.profile-row .pk-art{width:92px;height:92px;flex:0 0 92px}
+.profile-row .pk-art img{width:82px;height:82px}
+.profile-row .pk-info h3{font-size:17px}
+.growth-pill{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12.5px;font-weight:900;color:#39465c;
+  background:rgba(255,255,255,.94);border:1px solid rgba(28,52,98,.12);border-radius:11px;padding:6px 11px;cursor:pointer;transition:.15s;line-height:1.2}
+.growth-pill:hover{background:#fff;border-color:#b9ccff;color:var(--brand);transform:translateY(-1px);box-shadow:0 6px 14px rgba(28,52,98,.08)}
+.growth-pill.empty{color:#8b96a8;border-style:dashed;background:rgba(255,255,255,.72)}
+.growth-pill .g-d{font-size:10.5px;font-weight:800;color:#96a1b2;margin-left:3px}
+.growth-hist{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:12px;background:#fbfdff;border:1px solid var(--line2);font-size:12px;font-weight:800;color:#4a586d}
+.growth-hist .g-date{font-size:11px;font-weight:900;color:#96a1b2;flex:0 0 76px}
+.growth-hist .x-btn{margin-left:auto}
+.growth-empty{padding:14px 10px;text-align:center;color:#9aa6b8;font-size:12px;font-weight:700}
+#homeToday.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+
+/* ============ 기기 동기화 ============ */
+.sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:900;border-radius:11px;padding:9px 12px;
+  border:1px solid #e4ebf7;background:#fff;color:#5b6b83;cursor:pointer;white-space:nowrap;transition:.15s}
+.sync-pill:hover{border-color:#b9ccff;color:var(--brand)}
+.sync-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;flex:0 0 7px}
+.sync-pill.ok{background:#effbf6;border-color:#c8efd9;color:#0f9e84}
+.sync-pill.busy{background:#f2f7ff;border-color:#cfe0ff;color:#3b6ae0}
+.sync-pill.err{background:#fff7f7;border-color:#ffd6d6;color:#e04b4b}
+.sync-card-state{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:13px;background:#fbfdff;border:1px solid var(--line2);font-size:12px;font-weight:800;color:#5b6b83}
+.sync-card-state b{font-size:12.5px;color:var(--ink)}
+.sync-steps{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:700;color:#4a586d;line-height:1.55}
+.sync-steps > div{display:flex;gap:9px;align-items:flex-start}
+.sync-steps .n{flex:0 0 20px;height:20px;border-radius:50%;background:#eaf1ff;color:#3b6ae0;display:grid;place-items:center;font-size:10.5px;font-weight:900;margin-top:1px}
+.sync-steps a{color:#3b6ae0;font-weight:900;text-decoration:underline;text-underline-offset:2px}
+.sync-note{padding:10px 12px;border-radius:12px;background:#fffbf3;border:1px solid #ffe9c2;font-size:11.5px;font-weight:800;color:#8a6420;line-height:1.55}
+.sync-note.blue{background:#f4f9ff;border-color:#dbe9ff;color:#39628f}
+.sync-line{font-size:11.5px;font-weight:800;color:#6b7a90}
+.sync-line.err{color:#e04b4b}
+.sync-line.ok{color:#0f9e84}
+label.sync-check{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:#5b6b83}
+label.sync-check input{width:auto}
+@media (max-width:760px){
+  #homeToday.grid2{grid-template-columns:1fr}
+  .profile-row .pk-art{width:82px;height:82px;flex:0 0 82px}
+  .profile-row .pk-art img{width:72px;height:72px}
+}
 @media print{.sidebar,.topbar,.btn{display:none}}
 </style>
 </head>
@@ -713,6 +757,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
             <option value="가족 공통">가족 공통</option>
           </select>
         </div>
+        <button class="sync-pill" id="syncPill" title="기기 동기화"><span class="dot"></span><span id="syncPillText">로컬 저장 중</span></button>
         <button class="btn ghost" id="ambientBtn">🖥 대기화면</button>
       </div>
     </header>
@@ -721,7 +766,13 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
 
       <!-- ============ HOME ============ -->
       <section class="view active" id="view-home">
-        <div class="hero">
+        <!-- 맨 위: 아이들 프로필 카드 (포켓몬 + 키·몸무게) -->
+        <div class="grid g12 profile-row" id="homeProfiles">
+          <div class="span-6" id="homePkSuho"></div>
+          <div class="span-6" id="homePkJiho"></div>
+        </div>
+
+        <div class="hero" style="margin-top:16px">
           <div>
             <div class="hi" id="heroHi">안녕하세요, 오늘도 화이팅!</div>
             <h2 id="heroTitle">우리 가족의 오늘</h2>
@@ -753,9 +804,6 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
             <div id="homeWx"><div class="empty"><b>🌥</b>날씨를 불러오는 중…</div></div>
           </div>
 
-          <div class="span-4" id="homePkSuho"></div>
-          <div class="span-4" id="homePkJiho"></div>
-
           <div class="card span-4">
             <div class="card-head"><h3><span class="ico">🛒</span>이거 사주세요</h3><div class="right"><span class="sub" id="wishCount"></span></div></div>
             <div class="wish-list" id="homeWish"></div>
@@ -774,14 +822,14 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
             <p class="muted" style="font-size:10.5px;font-weight:700;margin-top:8px">적어두면 다음 선물 목록이 돼요 🎁</p>
           </div>
 
-          <div class="card span-7">
+          <div class="card span-8">
             <div class="card-head"><h3><span class="ico">📌</span>다가오는 일정</h3><div class="right"><button class="btn sm ghost" data-goto="schedule">전체 보기 →</button></div></div>
             <div class="stack" id="homeUpcoming"></div>
           </div>
 
-          <div class="card span-5">
+          <div class="card span-12">
             <div class="card-head"><h3><span class="ico">✨</span>오늘 한눈에</h3></div>
-            <div class="stack" id="homeToday"></div>
+            <div id="homeToday" class="grid2"></div>
           </div>
         </div>
       </section>
@@ -1043,10 +1091,11 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
           <div class="card span-6">
             <div class="card-head"><h3><span class="ico">💾</span>데이터 백업</h3></div>
             <div class="stack">
-              <p class="muted" style="font-size:12px">모든 기록은 이 브라우저에 저장돼요. 다른 기기로 옮기려면 JSON으로 내보내세요.</p>
+              <p class="muted" style="font-size:12px">모든 기록은 이 브라우저에 저장돼요. 다른 기기와 자동으로 맞추려면 아래 <b>기기 동기화</b>를 켜고, 파일로 백업하려면 JSON을 내보내세요.</p>
               <div class="row" style="gap:8px;flex-wrap:wrap">
                 <button class="btn primary" id="exportBtn">📤 JSON 내보내기</button>
                 <button class="btn ghost" id="importBtn">📥 JSON 불러오기</button>
+                <button class="btn ghost" id="copyJsonBtn">📋 JSON 복사</button>
                 <input type="file" id="importFile" accept="application/json,.json" class="hidden">
               </div>
               <div class="divider"></div>
@@ -1054,6 +1103,10 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
               <div class="storage-bar"><i id="storageBar" style="width:0%"></i></div>
               <p class="muted" style="font-size:10.5px">사진이 많으면 브라우저 저장 공간(약 5MB)이 부족할 수 있어요.</p>
             </div>
+          </div>
+          <div class="card span-6">
+            <div class="card-head"><h3><span class="ico">🔄</span>기기 동기화</h3><div class="right"><span class="chip" id="syncCardChip">로컬 저장 중</span></div></div>
+            <div id="syncCardBody"></div>
           </div>
           <div class="card span-6">
             <div class="card-head"><h3><span class="ico">🔗</span>바로가기 · 안내</h3></div>
@@ -1114,6 +1167,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
 'use strict';
 
 var STORAGE_KEY = 'suho_jiho_family_dashboard_v1';
+var SYNC_KEY = STORAGE_KEY + '_sync';
 var APP_TITLE_DEFAULT = '수호&지호 가족대시보드';
 var ART = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 var SPR = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
@@ -1367,6 +1421,7 @@ function defaultState(){
 
   return {
     version: 1,
+    updatedAt: '',
     settings: {
       title: APP_TITLE_DEFAULT,
       region: '부산 해운대구',
@@ -1377,9 +1432,9 @@ function defaultState(){
     },
     members: [
       { id:'suho', name:'김수호', label:'8세 · 초1', partner:4, caught:[4,16,19,10], level:3, xp:65,
-        hatchedDate:'', lastReset:today, quests: suhoQuests.map(withId) },
+        hatchedDate:'', lastReset:today, growth:{ height:null, weight:null, date:'', history:[] }, quests: suhoQuests.map(withId) },
       { id:'jiho', name:'김지호', label:'6세 · 어린이집', partner:25, caught:[25,133,39,52], level:2, xp:40,
-        hatchedDate:'', lastReset:today, quests: jihoQuests.map(withId) }
+        hatchedDate:'', lastReset:today, growth:{ height:null, weight:null, date:'', history:[] }, quests: jihoQuests.map(withId) }
     ],
     ddays: [
       { id: uid('dd'), title:'지호 어린이집 발표회', date: shiftDate(14) },
@@ -1581,51 +1636,623 @@ function deepDefaults(target, def){
 }
 
 function loadState(){
-  var def = defaultState();
   var raw = null;
   try { raw = window.localStorage.getItem(STORAGE_KEY); } catch(e){ raw = null; }
   if (!raw){
-    State = def;
+    State = defaultState();
     return;
   }
   try {
-    var parsed = JSON.parse(raw);
-    State = deepDefaults(parsed, def);
-    // 배열은 사용자 데이터를 그대로 신뢰
-    if (!Array.isArray(State.members) || State.members.length < 2) State.members = def.members;
-    if (!Array.isArray(State.events)) State.events = def.events;
-    if (!Array.isArray(State.academies)) State.academies = def.academies;
-    if (!Array.isArray(State.diary)) State.diary = def.diary;
-    if (!Array.isArray(State.ddays)) State.ddays = def.ddays;
-    if (!Array.isArray(State.wishes)) State.wishes = def.wishes;
-    if (!Array.isArray(State.notices)) State.notices = def.notices;
-    if (!Array.isArray(State.preps)) State.preps = def.preps;
-    if (!State.meals || typeof State.meals !== 'object') State.meals = {};
-    if (!State.tt) State.tt = def.tt;
+    normalizeState(JSON.parse(raw));
   } catch(e){
-    State = def;
+    State = defaultState();
   }
+}
+
+/* 저장된 JSON(로컬·동기화)을 현재 앱 구조에 맞춰 정리 */
+function normalizeState(parsed){
+  var def = defaultState();
+  State = deepDefaults(parsed, def);
+  // 배열은 사용자 데이터를 그대로 신뢰
+  if (!Array.isArray(State.members) || State.members.length < 2) State.members = def.members;
+  if (!Array.isArray(State.events)) State.events = def.events;
+  if (!Array.isArray(State.academies)) State.academies = def.academies;
+  if (!Array.isArray(State.diary)) State.diary = def.diary;
+  if (!Array.isArray(State.ddays)) State.ddays = def.ddays;
+  if (!Array.isArray(State.wishes)) State.wishes = def.wishes;
+  if (!Array.isArray(State.notices)) State.notices = def.notices;
+  if (!Array.isArray(State.preps)) State.preps = def.preps;
+  if (!State.meals || typeof State.meals !== 'object') State.meals = {};
+  if (!State.tt) State.tt = def.tt;
+  State.members.forEach(function(m){
+    if (!m.growth || typeof m.growth !== 'object' || Array.isArray(m.growth)) m.growth = { height:null, weight:null, date:'', history:[] };
+    if (!Array.isArray(m.growth.history)) m.growth.history = [];
+  });
+  return State;
 }
 
 var saveTimer = null;
 function save(){
+  touchState();
   if (saveTimer) window.clearTimeout(saveTimer);
   saveTimer = window.setTimeout(function(){
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
+      syncAfterChange();
     } catch(e){
       toast('저장 공간이 부족해요. 사진이 많은 일기를 지우거나 JSON으로 백업해 주세요.', 'warn', 5200);
     }
   }, 120);
 }
 function saveNow(){
+  touchState();
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(State));
+    syncAfterChange();
     return true;
   } catch(e){
     toast('저장 공간이 부족해요. JSON으로 백업한 뒤 사진을 정리해 주세요.', 'warn', 5200);
     return false;
   }
+}
+
+/* =========================================================
+   키 · 몸무게 기록
+   ========================================================= */
+function memberGrowth(m){
+  if (!m.growth || typeof m.growth !== 'object' || Array.isArray(m.growth)) m.growth = { height:null, weight:null, date:'', history:[] };
+  if (!Array.isArray(m.growth.history)) m.growth.history = [];
+  return m.growth;
+}
+function growthSortDesc(a, b){ return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0); }
+function growthLatest(m){
+  var g = memberGrowth(m);
+  var hist = g.history.slice().sort(growthSortDesc);
+  if (hist.length) return hist[0];
+  if (g.height != null || g.weight != null) return { date: g.date || '', height: g.height, weight: g.weight };
+  return null;
+}
+function growthPillHTML(m){
+  var l = growthLatest(m);
+  if (!l || (l.height == null && l.weight == null)){
+    return '<button class="growth-pill empty" data-action="growth-edit" data-mid="' + m.id + '">📏 키·몸무게 입력하기</button>';
+  }
+  var parts = [];
+  if (l.height != null) parts.push(Number(l.height).toFixed(1) + 'cm');
+  if (l.weight != null) parts.push(Number(l.weight).toFixed(1) + 'kg');
+  return '<button class="growth-pill" data-action="growth-edit" data-mid="' + m.id + '" title="키·몸무게 수정' +
+    (l.date ? ' (' + esc(dateKo(l.date)) + ' 측정)' : '') + '">📏 ' + parts.join(' · ') + '</button>';
+}
+function recordGrowth(m, date, height, weight){
+  var g = memberGrowth(m);
+  var h = (height === '' || height === null || height === undefined) ? null : Number(height);
+  var w = (weight === '' || weight === null || weight === undefined) ? null : Number(weight);
+  if (h !== null && (isNaN(h) || h <= 0)) h = null;
+  if (w !== null && (isNaN(w) || w <= 0)) w = null;
+  if (h === null && w === null) return false;
+  g.history = g.history.filter(function(x){ return x.date !== date; });
+  g.history.push({ date: date, height: h, weight: w });
+  g.history.sort(growthSortDesc);
+  var l = g.history[0];
+  g.date = l.date; g.height = l.height; g.weight = l.weight;
+  return true;
+}
+function deleteGrowth(m, date){
+  if (!m) return;
+  var g = memberGrowth(m);
+  g.history = g.history.filter(function(x){ return x.date !== (date || ''); });
+  g.history.sort(growthSortDesc);
+  var l = g.history[0];
+  g.date = l ? l.date : ''; g.height = l ? l.height : null; g.weight = l ? l.weight : null;
+  save();
+  renderAll();
+  if (modalOpen()) openGrowthModal(m.id);
+  toast('기록을 지웠어요');
+}
+function openGrowthModal(mid){
+  var m = memberById(mid);
+  if (!m) return;
+  var g = memberGrowth(m);
+  var latest = growthLatest(m) || { date:'', height:null, weight:null };
+  var hist = g.history.slice().sort(growthSortDesc);
+  var histHTML = hist.length ? hist.map(function(h){
+    var p = [];
+    if (h.height != null) p.push(Number(h.height).toFixed(1) + 'cm');
+    if (h.weight != null) p.push(Number(h.weight).toFixed(1) + 'kg');
+    return '<div class="growth-hist"><span class="g-date">' +
+      esc(h.date ? shortDate(h.date) + ' (' + weekdayKo(h.date) + ')' : '날짜 없음') + '</span><span>' + (p.join(' · ') || '-') + '</span>' +
+      '<button class="x-btn" data-action="growth-del" data-mid="' + m.id + '" data-date="' + esc(h.date || '') + '">✕</button></div>';
+  }).join('') : '<div class="growth-empty">아직 기록이 없어요. 오늘 재어서 적어 보세요!</div>';
+
+  openModal(
+    modalHead('📏 ' + esc(m.name) + ' 키 · 몸무게', '측정한 날짜와 함께 적으면 기록이 차곡차곡 쌓여요') +
+    '<div class="modal-body"><div class="stack">' +
+      '<form data-form="growth-save" data-mid="' + m.id + '"><div class="stack">' +
+        '<div class="form-row">' +
+          '<div class="field"><label>잰 날짜</label><input type="date" name="date" value="' + esc(latest.date || todayISO()) + '" required></div>' +
+          '<div class="field"><label>키 (cm)</label><input type="number" name="height" step="0.1" min="0" max="250" inputmode="decimal" placeholder="예: 128.0" value="' + (latest.height != null ? Number(latest.height).toFixed(1) : '') + '"></div>' +
+          '<div class="field"><label>몸무게 (kg)</label><input type="number" name="weight" step="0.1" min="0" max="150" inputmode="decimal" placeholder="예: 26.0" value="' + (latest.weight != null ? Number(latest.weight).toFixed(1) : '') + '"></div>' +
+        '</div>' +
+        '<button class="btn primary" type="submit">저장</button>' +
+      '</div></form>' +
+      '<div class="divider"></div>' +
+      '<div class="between"><b style="font-size:12px">이전 기록</b><span class="sync-line">' + hist.length + '개</span></div>' +
+      '<div class="stack">' + histHTML + '</div>' +
+    '</div></div>'
+  );
+}
+
+/* =========================================================
+   기기 동기화 — GitHub 비공개 저장소 (토큰은 이 기기에만 저장)
+   ========================================================= */
+var SYNC_DEFAULT_REPO = { owner:'soohojiho', repo:'Family-board', path:'dashboard-data.json', branch:'main' };
+
+var Sync = {
+  cfg: null,
+  status: 'local',   // local | ready | busy | ok | err | offline
+  msg: '',
+  lastSync: '',
+  applying: false,
+  busy: false,
+  pushTimer: null,
+  lastPullTry: 0,
+  queue: false
+};
+
+function deviceLabel(){
+  var ua = (navigator.userAgent || '');
+  if (/iPad/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua)) || (/Tablet/i.test(ua))) return '태블릿';
+  if (/iPhone|iPod|Android.*Mobile|Mobile.*Android/i.test(ua)) return '휴대폰';
+  return 'PC';
+}
+function syncDefaults(){
+  return {
+    owner: SYNC_DEFAULT_REPO.owner, repo: SYNC_DEFAULT_REPO.repo,
+    path: SYNC_DEFAULT_REPO.path, branch: SYNC_DEFAULT_REPO.branch,
+    token: '', auto: true, deviceId: '', deviceName: deviceLabel(), lastSync: ''
+  };
+}
+function syncLoad(){
+  var cfg = syncDefaults();
+  try {
+    var raw = window.localStorage.getItem(SYNC_KEY);
+    if (raw){
+      var p = JSON.parse(raw);
+      for (var k in p){ if (Object.prototype.hasOwnProperty.call(p, k)) cfg[k] = p[k]; }
+    }
+  } catch(e){}
+  if (!cfg.deviceId) cfg.deviceId = 'dev_' + Math.random().toString(36).slice(2, 10);
+  if (!cfg.deviceName) cfg.deviceName = deviceLabel();
+  Sync.cfg = cfg;
+  Sync.lastSync = cfg.lastSync || '';
+  return cfg;
+}
+function syncSaveCfg(){
+  try { window.localStorage.setItem(SYNC_KEY, JSON.stringify(Sync.cfg)); } catch(e){}
+}
+function syncConfigured(){ return !!(Sync.cfg && Sync.cfg.token && Sync.cfg.owner && Sync.cfg.repo); }
+function syncOnline(){ return navigator.onLine !== false; }
+
+function stateUpdatedAt(){ return (State && State.updatedAt) ? String(State.updatedAt) : ''; }
+function touchState(){
+  if (Sync.applying) return;
+  if (!State) return;
+  State.updatedAt = new Date().toISOString();
+}
+function syncStamp(iso){ return syncTimeLabel(iso || new Date().toISOString()); }
+function syncTimeLabel(iso){
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  var h = d.getHours(), hh = h % 12; if (hh === 0) hh = 12;
+  return (h < 12 ? '오전 ' : '오후 ') + hh + ':' + pad2(d.getMinutes());
+}
+
+/* ---- base64 (UTF-8 안전) ---- */
+function b64encodeUtf8(str){
+  var bytes = new TextEncoder().encode(String(str));
+  var bin = '', chunk = 0x8000;
+  for (var i = 0; i < bytes.length; i += chunk){
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+}
+function b64decodeUtf8(b64){
+  var bin = atob(String(b64 || '').replace(/\s/g, ''));
+  var bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+/* ---- GitHub API ---- */
+function syncRepoUrl(){
+  return 'https://api.github.com/repos/' + encodeURIComponent(Sync.cfg.owner) + '/' + encodeURIComponent(Sync.cfg.repo);
+}
+function syncFileUrl(){
+  var p = String(Sync.cfg.path || SYNC_DEFAULT_REPO.path).split('/').map(encodeURIComponent).join('/');
+  return syncRepoUrl() + '/contents/' + p;
+}
+function syncHeaders(){
+  return {
+    'Authorization': 'Bearer ' + Sync.cfg.token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
+function syncFetch(url, opts){
+  opts = opts || {};
+  opts.headers = opts.headers || syncHeaders();
+  opts.cache = 'no-store';
+  return fetch(url, opts);
+}
+function syncErrorText(code, fallback){
+  if (code === 401) return '토큰이 올바르지 않아요. 새 토큰을 발급해 다시 넣어 주세요.';
+  if (code === 403) return '권한이 부족해요. 토큰에 Contents: Read and write 권한이 있는지 확인해 주세요.';
+  if (code === 404) return '저장소나 파일을 찾을 수 없어요. 저장소 이름과 토큰 권한(Contents)을 확인해 주세요.';
+  if (code === 409 || code === 422) return '다른 기기가 먼저 올렸어요. 잠시 뒤 다시 시도해 주세요.';
+  if (code === 429) return '요청이 너무 잦아요. 잠시 뒤 다시 시도해 주세요.';
+  return fallback || ('동기화에 실패했어요 (HTTP ' + code + ')');
+}
+function syncNetworkText(){
+  return syncOnline() ? 'GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.' : '오프라인이에요. 연결되면 자동으로 다시 맞춰요.';
+}
+
+/* ---- 상태 표시 ---- */
+function syncStatusInfo(){
+  var configured = syncConfigured();
+  var repo = Sync.cfg ? (Sync.cfg.owner + '/' + Sync.cfg.repo) : '';
+  if (!configured) return { cls:'', chip:'로컬 저장 중', text:'로컬 저장 중',
+    line:'이 기기 브라우저에만 저장하고 있어요. 토큰을 한 번 넣으면 기기끼리 자동으로 맞춰져요.' };
+  if (Sync.status === 'busy') return { cls:'busy', chip:'동기화 중', text:'동기화 중…', line:'GitHub 저장소와 주고받는 중이에요.' };
+  if (!syncOnline() || Sync.status === 'offline') return { cls:'', chip:'오프라인', text:'오프라인 · 로컬 저장',
+    line:'지금은 오프라인이라 이 기기에만 저장해요. 연결되면 자동으로 올라가요.' };
+  if (Sync.status === 'err') return { cls:'err', chip:'동기화 오류', text:'동기화 오류', line: Sync.msg || '동기화에 실패했어요.' };
+  if (Sync.status === 'ok') return { cls:'ok', chip:'동기화 완료', text:'동기화 완료' + (Sync.lastSync ? ' ' + syncStamp(Sync.lastSync) : ''),
+    line: Sync.msg || '동기화 완료' };
+  if (Sync.status === 'ready') return { cls:'', chip:'연결됨', text:'동기화 준비됨', line: Sync.msg || (repo + ' 저장소에 연결돼 있어요.') };
+  return { cls:'', chip:'연결됨', text:'연결됨', line: Sync.msg || (repo + ' 저장소에 연결돼 있어요.') };
+}
+function syncMetaHTML(){
+  var c = Sync.cfg || {};
+  var repo = c.owner ? (c.owner + '/' + c.repo) : (SYNC_DEFAULT_REPO.owner + '/' + SYNC_DEFAULT_REPO.repo);
+  return '<div class="sync-line">저장소 <b>' + esc(repo) + '</b> · 파일 ' + esc(c.path || SYNC_DEFAULT_REPO.path) +
+    ' · 이 기기 <b>' + esc(c.deviceName || deviceLabel()) + '</b>' +
+    (Sync.lastSync ? ' · 마지막 동기화 ' + esc(syncStamp(Sync.lastSync)) : '') + '</div>';
+}
+function syncCardHTML(info){
+  var configured = syncConfigured();
+  return '<div class="stack">' +
+    '<div class="sync-card-state"><span class="sync-pill ' + info.cls + '" style="pointer-events:none;padding:5px 9px;font-size:10.5px">' + esc(info.chip) + '</span>' +
+      '<div class="sync-line" style="flex:1;min-width:0">' + esc(info.line) + '</div></div>' +
+    '<div class="row" style="gap:8px;flex-wrap:wrap">' +
+      '<button class="btn primary" data-action="sync-open">' + (configured ? '⚙️ 동기화 설정' : '🔄 동기화 켜기') + '</button>' +
+      (configured ? '<button class="btn ghost" data-action="sync-push">⬆ 지금 올리기</button>' +
+        '<button class="btn ghost" data-action="sync-pull">⬇ 지금 가져오기</button>' : '') +
+    '</div>' +
+    syncMetaHTML() +
+    '<p class="muted" style="font-size:11px;line-height:1.6">태블릿 · 엄마 폰 · 아빠 폰에서 같은 토큰을 한 번씩 넣으면 기록이 자동으로 맞춰져요. 토큰은 그 기기 브라우저에만 저장되고 사이트 파일에는 남지 않아요.</p>' +
+  '</div>';
+}
+function renderSyncUI(){
+  var info = syncStatusInfo();
+  var pill = $('#syncPill');
+  if (pill){
+    pill.className = 'sync-pill' + (info.cls ? ' ' + info.cls : '');
+    pill.setAttribute('title', '기기 동기화 · ' + info.line);
+  }
+  var pt = $('#syncPillText');
+  if (pt) pt.textContent = info.text;
+  var chip = $('#syncCardChip');
+  if (chip) chip.textContent = info.chip;
+  var body = $('#syncCardBody');
+  if (body) body.innerHTML = syncCardHTML(info);
+  var line = $('#syncStatusLine');
+  if (line){ line.textContent = info.line; line.className = 'sync-line' + (info.cls === 'err' ? ' err' : (info.cls === 'ok' ? ' ok' : '')); }
+  var mstate = $('#syncModalState');
+  if (mstate) mstate.textContent = info.chip;
+  var meta = $('#syncMetaLine');
+  if (meta) meta.innerHTML = syncMetaHTML();
+}
+function syncSetStatus(status, msg){
+  Sync.status = status;
+  if (msg !== undefined) Sync.msg = msg;
+  renderSyncUI();
+}
+
+/* ---- 주고받기 ---- */
+function syncEnvelope(){
+  if (!stateUpdatedAt() && State) State.updatedAt = new Date().toISOString();
+  return JSON.stringify({
+    app: 'suho-jiho-family-dashboard', schema: 1,
+    updatedAt: stateUpdatedAt(),
+    device: (Sync.cfg && Sync.cfg.deviceId) || '',
+    deviceName: (Sync.cfg && Sync.cfg.deviceName) || deviceLabel(),
+    savedAt: new Date().toISOString(),
+    data: State
+  });
+}
+function syncRemoteMeta(){
+  return syncFetch(syncFileUrl() + '?ref=' + encodeURIComponent(Sync.cfg.branch || 'main'))
+    .then(function(res){
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(syncErrorText(res.status));
+      return res.json();
+    });
+}
+function syncDecodeMeta(meta){
+  var readText = (meta && meta.content)
+    ? Promise.resolve(b64decodeUtf8(meta.content))
+    : syncFetch(syncRepoUrl() + '/git/blobs/' + encodeURIComponent(meta.sha))
+        .then(function(res){
+          if (!res.ok) throw new Error(syncErrorText(res.status));
+          return res.json();
+        })
+        .then(function(b){ return b64decodeUtf8(b.content || ''); });
+  return readText.then(function(text){
+    var env = null;
+    try { env = JSON.parse(text); } catch(e){ env = null; }
+    if (!env || (env.data ? !env.data.members : !env.members)) throw new Error('GitHub에 저장된 데이터를 읽을 수 없어요.');
+    return env;
+  });
+}
+function syncApplyEnvelope(env){
+  var data = env && env.data ? env.data : env;
+  if (!data || !Array.isArray(data.members)) return false;
+  Sync.applying = true;
+  try {
+    normalizeState(data);
+    if (env && env.updatedAt) State.updatedAt = env.updatedAt;
+    saveNow();
+    renderAll();
+  } finally {
+    Sync.applying = false;
+  }
+  return true;
+}
+function syncCheck(){
+  if (!syncConfigured()) return Promise.reject(new Error('먼저 토큰을 넣어 주세요.'));
+  if (!syncOnline()){
+    syncSetStatus('offline');
+    return Promise.reject(new Error(syncNetworkText()));
+  }
+  syncSetStatus('busy', '연결을 확인하는 중…');
+  return syncFetch(syncRepoUrl())
+    .then(function(res){
+      if (!res.ok) throw new Error(syncErrorText(res.status));
+      return res.json();
+    })
+    .then(function(repo){
+      Sync.repoInfo = repo;
+      syncSetStatus('ready', (Sync.cfg.owner + '/' + Sync.cfg.repo) + ' 저장소에 연결됐어요.');
+      return repo;
+    })
+    .catch(function(err){
+      syncSetStatus('err', err && err.message ? err.message : syncNetworkText());
+      throw err;
+    });
+}
+function syncPush(opts){
+  opts = opts || {};
+  if (!syncConfigured()){
+    if (opts.manual) syncOpenModal();
+    return Promise.resolve(false);
+  }
+  if (!syncOnline()){
+    syncSetStatus('offline');
+    if (opts.manual) toast(syncNetworkText(), 'warn', 4200);
+    return Promise.resolve(false);
+  }
+  if (Sync.busy){ Sync.queue = true; return Promise.resolve(false); }
+  Sync.busy = true;
+  syncSetStatus('busy', opts.manual ? '이 기기 기록을 올리는 중…' : '자동으로 올리는 중…');
+  var body = {
+    message: '가족 대시보드 동기화 · ' + ((Sync.cfg.deviceName || deviceLabel())) + ' · ' + new Date().toISOString(),
+    content: b64encodeUtf8(syncEnvelope()),
+    branch: Sync.cfg.branch || 'main'
+  };
+  return syncRemoteMeta()
+    .then(function(meta){
+      if (meta && meta.sha) body.sha = meta.sha;
+      return syncFetch(syncFileUrl(), { method: 'PUT', headers: syncHeaders(), body: JSON.stringify(body) });
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error(syncErrorText(res.status, '올리지 못했어요 (HTTP ' + res.status + ')'));
+      Sync.busy = false;
+      Sync.lastSync = new Date().toISOString();
+      Sync.cfg.lastSync = Sync.lastSync;
+      syncSaveCfg();
+      syncSetStatus('ok', '이 기기 기록을 GitHub에 올렸어요.');
+      if (opts.manual) toast('GitHub에 올렸어요 ⬆️', 'ok');
+      if (Sync.queue){ Sync.queue = false; window.setTimeout(function(){ syncPush({}); }, 900); }
+      return true;
+    })
+    .catch(function(err){
+      Sync.busy = false;
+      var msg = (err && err.message) ? err.message : syncNetworkText();
+      if (!/[\u3131-\ud7a3]/.test(msg)) msg = syncNetworkText();
+      syncSetStatus('err', msg);
+      if (opts.manual) toast(msg, 'warn', 4600);
+      return false;
+    });
+}
+function syncPull(opts){
+  opts = opts || {};
+  if (!syncConfigured()){
+    if (opts.manual) syncOpenModal();
+    return Promise.resolve(false);
+  }
+  if (!syncOnline()){
+    syncSetStatus('offline');
+    if (opts.manual) toast(syncNetworkText(), 'warn', 4200);
+    return Promise.resolve(false);
+  }
+  if (Sync.busy){ Sync.queue = true; return Promise.resolve(false); }
+  Sync.busy = true;
+  Sync.lastPullTry = Date.now();
+  syncSetStatus('busy', '다른 기기 기록을 확인하는 중…');
+  return syncRemoteMeta()
+    .then(function(meta){
+      if (!meta){
+        Sync.busy = false;
+        syncSetStatus('ready', '아직 GitHub에 올린 기록이 없어요. 이 기기 기록을 올려 주세요.');
+        if (opts.manual) toast('아직 GitHub에 올린 기록이 없어요. “지금 올리기”를 눌러 주세요.', 'warn', 4600);
+        return false;
+      }
+      return syncDecodeMeta(meta).then(function(env){
+        var remoteAt = env.updatedAt || '';
+        var localAt = stateUpdatedAt();
+        var remoteNewer = !localAt || (!!remoteAt && new Date(remoteAt).getTime() > new Date(localAt).getTime());
+        if (!remoteNewer && !opts.force){
+          Sync.busy = false;
+          syncSetStatus('ok', '이 기기 기록이 이미 최신이에요.');
+          if (opts.manual) toast('이미 최신 상태예요 👍', 'ok');
+          return false;
+        }
+        if (!remoteNewer && opts.manual && !opts.force){
+          // 여기에는 도달하지 않지만 안전장치
+          Sync.busy = false; return false;
+        }
+        if (opts.force && !remoteNewer && opts.confirm){
+          if (!window.confirm('이 기기 기록이 더 최신이에요.\n다른 기기 기록으로 바꾸면 지금 기록이 사라져요. 계속할까요?')){
+            Sync.busy = false;
+            syncSetStatus('ok', '가져오기를 취소했어요.');
+            return false;
+          }
+        }
+        var ok = syncApplyEnvelope(env);
+        Sync.busy = false;
+        if (ok){
+          Sync.lastSync = new Date().toISOString();
+          Sync.cfg.lastSync = Sync.lastSync;
+          syncSaveCfg();
+          syncSetStatus('ok', '다른 기기의 최신 기록을 가져왔어요.');
+          if (opts.manual || opts.notify) toast('다른 기기 기록을 가져왔어요 ⬇️', 'ok');
+        }
+        return ok;
+      });
+    })
+    .catch(function(err){
+      Sync.busy = false;
+      var msg = (err && err.message) ? err.message : syncNetworkText();
+      if (!/[\u3131-\ud7a3]/.test(msg)) msg = syncNetworkText();
+      syncSetStatus('err', msg);
+      if (opts.manual) toast(msg, 'warn', 4600);
+      return false;
+    });
+}
+function syncAfterChange(){
+  if (!syncConfigured() || Sync.applying) return;
+  if (!Sync.cfg.auto) return;
+  if (Sync.pushTimer) window.clearTimeout(Sync.pushTimer);
+  Sync.pushTimer = window.setTimeout(function(){ syncPush({}); }, 2500);
+}
+function syncMaybePull(){
+  if (!syncConfigured() || !syncOnline()) return;
+  if (!Sync.cfg.auto) return;
+  if (Sync.busy) return;
+  if (Date.now() - Sync.lastPullTry < 30000) return;
+  syncPull({});
+}
+function syncConnect(){
+  var localAt = stateUpdatedAt();
+  toast('GitHub 저장소를 확인하는 중…', '', 1600);
+  return syncCheck()
+    .then(function(){ return syncRemoteMeta(); })
+    .then(function(meta){
+      if (!meta){ return syncPush({ manual: true }); }        // 이 기기가 처음
+      return syncDecodeMeta(meta).then(function(env){
+        var remoteAt = env.updatedAt || '';
+        var localNewer = !!localAt && (!remoteAt || new Date(localAt).getTime() > new Date(remoteAt).getTime());
+        if (localNewer){
+          var up = window.confirm('다른 기기에 저장된 기록이 있어요.\n\n확인 = 이 기기 기록으로 올리기\n취소 = 다른 기기 기록 가져오기');
+          if (up) return syncPush({ manual: true });
+          return syncPull({ force: true });
+        }
+        return syncPull({ force: true, notify: true });
+      });
+    })
+    .then(function(){
+      Sync.busy = false;
+      if (Sync.status !== 'err'){
+        Sync.lastSync = new Date().toISOString();
+        Sync.cfg.lastSync = Sync.lastSync;
+        syncSaveCfg();
+        syncSetStatus('ok', '기기 동기화를 켰어요. 이제 자동으로 맞춰져요.');
+        toast('기기 동기화를 켰어요 🔄', 'ok');
+      }
+      renderSyncUI();
+      return true;
+    })
+    .catch(function(err){
+      Sync.busy = false;
+      toast((err && err.message) ? err.message : '연결하지 못했어요.', 'warn', 4800);
+      renderSyncUI();
+      return false;
+    });
+}
+function syncUnlink(){
+  if (!window.confirm('이 기기의 동기화를 끌까요?\n토큰이 이 기기에서 지워지고, 기록은 이 기기에만 저장돼요.')) return;
+  Sync.cfg.token = '';
+  Sync.cfg.lastSync = '';
+  Sync.lastSync = '';
+  syncSaveCfg();
+  syncSetStatus('local', '이 기기 동기화를 껐어요. 토큰을 지웠어요.');
+  renderSyncUI();
+  toast('이 기기 동기화를 껐어요');
+}
+
+/* ---- 동기화 화면 ---- */
+function syncStepsHTML(){
+  return '<div class="sync-steps">' +
+    '<div><span class="n">1</span><div>GitHub에 로그인한 뒤 <a href="https://github.com/settings/tokens/new?scopes=repo&description=Family%20Dashboard%20Sync" target="_blank" rel="noopener">토큰 만들기 (classic)</a> 또는 ' +
+      '<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Fine-grained 토큰</a>을 엽니다.</div></div>' +
+    '<div><span class="n">2</span><div>classic은 <b>repo</b> 권한을 체크하거나, Fine-grained는 <b>Only select repositories → Family-board</b>를 고르고 ' +
+      '<b>Repository permissions → Contents: Read and write</b>를 선택합니다.</div></div>' +
+    '<div><span class="n">3</span><div>만든 토큰(<b>ghp_…</b> 또는 <b>github_pat_…</b>)을 복사해 아래에 붙여넣고 <b>토큰 저장하고 연결</b>을 누릅니다.</div></div>' +
+    '<div><span class="n">4</span><div>태블릿·엄마 폰·아빠 폰에서 <b>같은 방법으로 한 번씩만</b> 하면, 이후에는 자동으로 맞춰져요.</div></div>' +
+  '</div>';
+}
+function syncFormHTML(){
+  var c = Sync.cfg || {};
+  var hasToken = !!(c.token);
+  return '<form data-form="sync-save" id="syncForm"><div class="stack">' +
+    '<div class="field"><label>GitHub 토큰 (Personal access token)</label>' +
+      '<input type="password" name="token" autocomplete="off" spellcheck="false" placeholder="' +
+      (hasToken ? '저장된 토큰 사용 중 · 바꾸려면 새 토큰을 붙여넣으세요' : 'ghp_… 또는 github_pat_… 붙여넣기') + '"></div>' +
+    '<div class="form-row">' +
+      '<div class="field"><label>저장소 (비공개)</label><input type="text" name="repo" spellcheck="false" value="' +
+        esc((c.owner || SYNC_DEFAULT_REPO.owner) + '/' + (c.repo || SYNC_DEFAULT_REPO.repo)) + '"></div>' +
+      '<div class="field"><label>브랜치</label><input type="text" name="branch" spellcheck="false" value="' + esc(c.branch || 'main') + '"></div>' +
+    '</div>' +
+    '<label class="sync-check"><input type="checkbox" name="auto"' + (c.auto !== false ? ' checked' : '') + '> 바뀌면 자동으로 올리고, 앱을 열 때 최신 기록 가져오기</label>' +
+    '<div class="row" style="gap:8px;flex-wrap:wrap">' +
+      '<button class="btn primary" type="submit">토큰 저장하고 연결</button>' +
+      (hasToken ? '<span class="chip family">토큰 저장됨</span>' : '') +
+    '</div>' +
+    '<div class="sync-note blue">토큰은 이 기기의 브라우저(localStorage)에만 저장돼요. 사이트 파일이나 GitHub 저장소에는 올라가지 않아요.</div>' +
+  '</div></form>';
+}
+function syncOpenModal(){
+  if (!Sync.cfg) syncLoad();
+  var info = syncStatusInfo();
+  openModal(
+    '<div class="modal-head"><div><h3>🔄 기기 동기화</h3><div class="sub">태블릿 · 엄마 폰 · 아빠 폰이 같은 기록을 봐요</div></div>' +
+      '<button class="x-btn" style="margin-left:auto" data-action="close-modal">✕</button></div>' +
+    '<div class="modal-body"><div class="stack">' +
+      '<div class="sync-card-state"><div style="flex:1;min-width:0"><b id="syncModalState">' + esc(info.chip) + '</b>' +
+        '<div class="sync-line" id="syncStatusLine">' + esc(info.line) + '</div></div></div>' +
+      syncStepsHTML() +
+      syncFormHTML() +
+      '<div class="row" style="gap:8px;flex-wrap:wrap">' +
+        '<button class="btn primary" data-action="sync-pull">⬇ 지금 가져오기</button>' +
+        '<button class="btn ghost" data-action="sync-push">⬆ 지금 올리기</button>' +
+        '<button class="btn ghost" data-action="sync-test">🔌 연결 확인</button>' +
+        (syncConfigured() ? '<button class="btn ghost" data-action="sync-unlink" style="color:#e04b4b;border-color:#ffd6d6;background:#fff7f7">🔓 이 기기 연결 해제</button>' : '') +
+      '</div>' +
+      '<div class="divider"></div>' +
+      '<div id="syncMetaLine">' + syncMetaHTML() + '</div>' +
+      '<div class="sync-note">가족 기록은 <b>' + esc((Sync.cfg.owner || SYNC_DEFAULT_REPO.owner) + '/' + (Sync.cfg.repo || SYNC_DEFAULT_REPO.repo)) + '</b> 비공개 저장소에만 보관돼요. 두 기기에서 동시에 고치면 마지막에 저장한 기록이 남아요.</div>' +
+    '</div></div>'
+  );
 }
 
 /* ---------- 토스트 ---------- */
@@ -1789,6 +2416,7 @@ function renderAll(){
   renderSettings();
   renderBadges();
   renderAmbient();
+  renderSyncUI();
 }
 
 /* ---------- 시계 ---------- */
@@ -2037,6 +2665,7 @@ function pokemonCardHTML(m){
         '<h3>' + esc(m.name) + ' <small>' + esc(m.label) + '</small></h3>' +
         '<div class="pk-partner"><span class="nm">' + esc(partnerName(m)) + '</span>' +
           '<button class="dex-btn" data-action="dex" data-mid="' + m.id + '">도감 ' + m.caught.length + '/151</button></div>' +
+        growthPillHTML(m) +
         '<div class="xp"><div class="xp-bar"><i style="width:' + pct + '%"></i></div>' +
           '<div class="xp-meta"><span>XP</span><span>' + Number(m.xp) + ' / ' + need + '</span></div></div>' +
       '</div>' +
@@ -3510,7 +4139,7 @@ function importJSON(file){
     try {
       var parsed = JSON.parse(e.target.result);
       if (!parsed || !parsed.members) throw new Error('bad');
-      State = deepDefaults(parsed, defaultState());
+      normalizeState(parsed);
       saveNow();
       renderAll();
       toast('데이터를 불러왔어요 📥', 'ok');
@@ -3623,6 +4252,16 @@ function bindEvents(){
 
     switch (act){
       case 'close-modal': closeModal(); break;
+      case 'growth-edit': openGrowthModal(el.getAttribute('data-mid')); break;
+      case 'growth-del': deleteGrowth(memberById(el.getAttribute('data-mid')), el.getAttribute('data-date')); break;
+      case 'sync-open': syncOpenModal(); break;
+      case 'sync-pull': syncPull({ manual: true }); break;
+      case 'sync-push': syncPush({ manual: true }); break;
+      case 'sync-test':
+        syncCheck().then(function(){ toast('GitHub 저장소에 연결됐어요 ✅', 'ok'); })
+          .catch(function(err){ toast((err && err.message) || '연결하지 못했어요.', 'warn', 4400); });
+        break;
+      case 'sync-unlink': syncUnlink(); break;
       case 'cal-select': {
         UI.selDate = el.getAttribute('data-date');
         renderHomeCalendar(); renderBigCalendar(); renderDayPanel();
@@ -3748,6 +4387,44 @@ function bindEvents(){
       txtInput.value = '';
       save(); renderAll();
       toast('퀘스트를 추가했어요', 'ok');
+      return;
+    }
+
+    if (df === 'growth-save'){
+      e.preventDefault();
+      var gm = memberById(f.getAttribute('data-mid'));
+      var gDate = (f.elements.date && f.elements.date.value) || todayISO();
+      var gH = f.elements.height ? f.elements.height.value.trim() : '';
+      var gW = f.elements.weight ? f.elements.weight.value.trim() : '';
+      if (!gH && !gW){ toast('키나 몸무게 중 하나는 적어 주세요 📏', 'warn'); return; }
+      if (!gm) return;
+      recordGrowth(gm, gDate, gH, gW);
+      save();
+      closeModal();
+      renderAll();
+      toast(gm.name + ' 키·몸무게를 저장했어요 📏', 'ok');
+      return;
+    }
+
+    if (df === 'sync-save'){
+      e.preventDefault();
+      var fe2 = f.elements;
+      var token = fe2.token ? String(fe2.token.value || '').trim() : '';
+      var repoRaw = String((fe2.repo && fe2.repo.value) || '').trim()
+        .replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\.git$/i, '').replace(/\/+$/, '');
+      var parts = repoRaw.split('/').filter(function(x){ return !!x; });
+      var cfg = Sync.cfg || syncDefaults();
+      if (token) cfg.token = token;
+      if (parts.length >= 2){ cfg.owner = parts[0]; cfg.repo = parts[1]; }
+      else if (repoRaw){ toast('저장소는 “아이디/저장소” 형식으로 적어 주세요. 예: soohojiho/Family-board', 'warn', 4600); return; }
+      cfg.branch = String((fe2.branch && fe2.branch.value) || 'main').trim() || 'main';
+      cfg.auto = !!(fe2.auto && fe2.auto.checked);
+      cfg.deviceName = cfg.deviceName || deviceLabel();
+      Sync.cfg = cfg;
+      if (!cfg.token){ toast('토큰을 붙여넣어 주세요. 위 1~3번 안내를 따라 만들 수 있어요.', 'warn', 4600); return; }
+      syncSaveCfg();
+      renderSyncUI();
+      syncConnect();
       return;
     }
 
@@ -3938,6 +4615,25 @@ function bindEvents(){
 
   $('#exportBtn').addEventListener('click', exportJSON);
   $('#importBtn').addEventListener('click', function(){ $('#importFile').click(); });
+  var cjb = $('#copyJsonBtn');
+  if (cjb) cjb.addEventListener('click', function(){
+    var text = JSON.stringify(State);
+    function done(){ toast('JSON을 클립보드에 복사했어요 📋', 'ok'); }
+    function fallback(){
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta); done();
+      } catch(err){ toast('복사하지 못했어요. JSON 내보내기를 이용해 주세요.', 'warn', 4200); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else fallback();
+  });
+  var sp = $('#syncPill');
+  if (sp) sp.addEventListener('click', syncOpenModal);
   $('#resetBtn').addEventListener('click', function(){
     if (!window.confirm('모든 기록(일정·일기·퀘스트·도감)을 지우고 처음 상태로 돌아갈까요?')) return;
     if (!window.confirm('정말요? 이 작업은 되돌릴 수 없어요. (먼저 JSON으로 백업하는 것을 추천해요)')) return;
@@ -3978,6 +4674,7 @@ var handleDiaryImage = function(){};
 /* ---------- 시작 ---------- */
 function boot(){
   loadState();
+  syncLoad();
   UI.calMonth = firstOfMonth(new Date());
   UI.selDate = todayISO();
   UI.diaryMonth = firstOfMonth(new Date());
@@ -4000,6 +4697,21 @@ function boot(){
   fetchNeisMeals(true).catch(function(){});
   fetchNeisSchedule(true).catch(function(){});
   fetchNeisTimetable(true).catch(function(){});
+
+  // 기기 동기화: 연결돼 있으면 앱을 열 때 최신 기록을 가져옴
+  window.addEventListener('online', function(){
+    if (syncConfigured()){ syncSetStatus('ready', '다시 연결됐어요.'); syncMaybePull(); }
+  });
+  window.addEventListener('offline', function(){
+    if (syncConfigured()) syncSetStatus('offline');
+  });
+  window.addEventListener('focus', syncMaybePull);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) syncMaybePull(); });
+  if (syncConfigured()){
+    window.setTimeout(function(){
+      if (syncOnline()) syncPull({ notify: false });
+    }, 1500);
+  }
 }
 
 if (document.readyState === 'loading'){
