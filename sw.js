@@ -1,5 +1,5 @@
 /* 수호&지호 가족대시보드 — 오프라인 캐시 (앱처럼 쓰기) */
-const CACHE = 'suho-jiho-dashboard-v4';
+const CACHE = 'suho-jiho-dashboard-v5';
 const ASSETS = [
   './',
   './index.html',

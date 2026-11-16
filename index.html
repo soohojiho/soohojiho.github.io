@@ -1875,6 +1875,7 @@ function syncHeaders(){
   return {
     'Authorization': 'Bearer ' + Sync.cfg.token,
     'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
     'X-GitHub-Api-Version': '2022-11-28'
   };
 }
@@ -2055,7 +2056,11 @@ function syncPush(opts){
       return syncFetch(syncFileUrl(), { method: 'PUT', headers: syncHeaders(), body: JSON.stringify(body) });
     })
     .then(function(res){
-      if (!res.ok) throw new Error(syncErrorText(res.status, '올리지 못했어요 (HTTP ' + res.status + ')'));
+      if (!res.ok){
+        var ePut = new Error(syncErrorText(res.status, '올리지 못했어요 (HTTP ' + res.status + ')'));
+        ePut.status = res.status;
+        throw ePut;
+      }
       Sync.busy = false;
       Sync.lastSync = new Date().toISOString();
       Sync.cfg.lastSync = Sync.lastSync;
@@ -2067,6 +2072,12 @@ function syncPush(opts){
     })
     .catch(function(err){
       Sync.busy = false;
+      // 다른 기기가 먼저 올려 sha가 바뀐 경우(409) 한 번만 자동 재시도
+      if (err && err.status === 409 && !opts._retry){
+        syncSetStatus('busy', '다른 기기 기록을 반영해 다시 올리는 중…');
+        window.setTimeout(function(){ syncPush({ manual: !!opts.manual, _retry: true }); }, 1500);
+        return false;
+      }
       var msg = (err && err.message) ? err.message : syncNetworkText();
       if (!/[\u3131-\ud7a3]/.test(msg)) msg = syncNetworkText();
       syncSetStatus('err', msg);
