@@ -382,6 +382,38 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
 .acad-block.family{background:linear-gradient(150deg,#d6f7ed,#bff0e2);color:#0b7f6b}
 .acad-scroll{overflow:auto}
 
+/* ============ 나란히 보기 (학원·시간표) ============ */
+.subnav button[disabled]{opacity:.42;cursor:not-allowed}
+.acad-split,.tt-split{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:760px){
+  .acad-split.two,.tt-split.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.acad-pane,.tt-pane{min-width:0;padding:10px 10px 8px;border:1px solid var(--line2);border-radius:15px;background:#fbfdff}
+.acad-pane-head,.tt-pane-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.acad-pane-head b,.tt-pane-head b{font-size:12.5px;letter-spacing:-.01em}
+.acad-pane-head .sub,.tt-pane-head .sub{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--muted)}
+.acad-pane .acad-scroll{overflow:auto}
+.acad-grid.compact{min-width:0;grid-template-columns:36px repeat(7,minmax(0,1fr));border-radius:12px}
+.acad-grid.compact .h{padding:6px 1px;font-size:9.5px}
+.acad-grid.compact .acad-labels div{font-size:8.5px;padding-right:2px}
+.acad-grid.compact .acad-block{left:1px;right:1px;padding:3px 1px;font-size:9px;border-radius:6px;text-align:center;line-height:1.2;word-break:break-all}
+.acad-grid.compact .acad-block small{font-size:8px;margin-top:1px;letter-spacing:-.02em}
+.acad-others{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;padding:9px 11px;border:1px dashed var(--line);border-radius:12px;background:#fbfdff}
+.acad-others .lbl{font-size:11px;font-weight:900;color:#7b879a}
+.acad-others .chip{cursor:pointer}
+.tt-pane .tt-wrap{border-radius:12px}
+.tt.compact{table-layout:fixed;width:100%;min-width:0}
+.tt.compact th,.tt.compact td{font-size:10px}
+.tt.compact th{padding:7px 2px;font-size:10px}
+.tt.compact th:first-child,.tt.compact td:first-child{width:44px;font-size:8px;padding:0 1px;line-height:1.15;word-break:keep-all}
+.tt.compact td.cell{height:46px}
+.tt.compact td.cell .s{font-size:9.5px;padding:1px 1px;border-radius:5px;word-break:break-all}
+#sub-academy .card-head,#sub-tt .card-head{flex-wrap:wrap}
+#sub-academy .card-head .right,#sub-tt .card-head .right{flex-wrap:wrap;row-gap:6px}
+@media (max-width:520px){
+  #sub-tt .subnav button,#acadViewNav button{padding:7px 10px;font-size:12px}
+}
+
 /* ============ Todo tab ============ */
 .todo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:1100px){.todo-grid{grid-template-columns:1fr}}
@@ -880,11 +912,19 @@ label.sync-check input{width:auto}
             <div class="card span-12">
               <div class="card-head">
                 <h3><span class="ico">🎒</span>학원·학습 일정 (주간)</h3>
-                <div class="right"><span class="sub" id="acadCount"></span></div>
+                <div class="right">
+                  <div class="subnav" id="acadViewNav" style="box-shadow:none;padding:3px">
+                    <button type="button" data-acadview="split" class="active">나란히</button>
+                    <button type="button" data-acadview="all">합쳐서</button>
+                  </div>
+                  <span class="sub" id="acadCount"></span>
+                </div>
               </div>
-              <div class="acad-scroll">
+              <div class="acad-scroll" id="acadSingle">
                 <div class="acad-grid" id="acadGrid"></div>
               </div>
+              <div class="acad-split two" id="acadSplit"></div>
+              <div class="acad-others hidden" id="acadOthers"></div>
               <form class="inline-form" id="acadForm" style="margin-top:14px">
                 <input type="text" id="acadName" placeholder="학원/수업 이름 (예: 태권도)" maxlength="24" required>
                 <select id="acadWho" style="flex:0 1 96px"><option>김수호</option><option>김지호</option><option>엄마</option><option>아빠</option><option>가족 공통</option></select>
@@ -894,7 +934,7 @@ label.sync-check input{width:auto}
                 <input type="text" id="acadPlace" placeholder="장소" maxlength="20" style="flex:0 1 110px">
                 <button class="btn primary" type="submit">추가</button>
               </form>
-              <p class="muted" style="font-size:11px;margin-top:8px">※ 표의 수업을 누르면 삭제할 수 있어요.</p>
+              <p class="muted" style="font-size:11px;margin-top:8px">※ 표의 수업을 누르면 삭제할 수 있어요. '합쳐서'는 온 가족 학원을 한 표에 모아 봅니다.</p>
             </div>
           </div>
         </div>
@@ -903,17 +943,19 @@ label.sync-check input{width:auto}
           <div class="grid g12">
             <div class="card span-12">
               <div class="card-head">
-                <h3><span class="ico">🏫</span><span id="ttTitle">김수호 시간표</span></h3>
+                <h3><span class="ico">🏫</span><span id="ttTitle">김수호 · 김지호 시간표</span></h3>
                 <div class="right">
-                  <div class="subnav" style="box-shadow:none;padding:3px">
-                    <button data-ttmember="김수호" class="active">김수호</button>
-                    <button data-ttmember="김지호">김지호</button>
+                  <div class="subnav" id="ttMemberNav" style="box-shadow:none;padding:3px">
+                    <button type="button" data-ttmember="나란히" class="active">나란히</button>
+                    <button type="button" data-ttmember="김수호">김수호</button>
+                    <button type="button" data-ttmember="김지호">김지호</button>
                   </div>
                   <button class="btn sm ghost" id="ttRefresh" title="NEIS에서 다시 불러오기">↻ NEIS</button>
                 </div>
               </div>
-              <div class="tt-wrap"><table class="tt" id="ttTable"></table></div>
-              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 바꿀 수 있어요. 김수호 시간표는 NEIS(장산초등학교 1학년) 실제 시간표를 불러옵니다.</p>
+              <div class="tt-wrap" id="ttSingle"><table class="tt" id="ttTable"></table></div>
+              <div class="tt-split two" id="ttSplit"></div>
+              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 바꿀 수 있어요. 김수호 시간표는 NEIS(장산초등학교 1학년)에서, 김지호는 어린이집 하루 흐름으로 저장돼요.</p>
             </div>
           </div>
         </div>
@@ -1429,6 +1471,7 @@ function defaultState(){
       lat: 35.1631, lon: 129.1635,
       school: { name:'장산초등학교', atpt:'C10', code:'7211070', grade:'1', cls:'1' },
       filter: '전체',
+      acadView: 'split',
       firstRun: today
     },
     members: [
@@ -1528,7 +1571,7 @@ var UI = {
   selDate: '',
   diaryMonth: null,
   diaryDate: '',
-  ttMember: '김수호',
+  ttMember: '나란히',
   mealWeek: 'this',
   diaryQuery: ''
 };
@@ -3034,14 +3077,37 @@ function renderDayPanel(){
 
 /* ---------- 학원 주간 그리드 ---------- */
 var ACAD_START_H = 9, ACAD_END_H = 22, ACAD_PX = 48;
+var ACAD_DAYS = ['월','화','수','목','금','토','일'];
+var KID_NAMES = ['김수호','김지호'];
 
-function renderAcademyGrid(){
-  var grid = $('#acadGrid');
-  if (!grid) return;
-  var days = ['월','화','수','목','금','토','일'];
-  var hours = ACAD_END_H - ACAD_START_H;
-  var html = '<div class="h" style="font-size:10px">시간</div>';
-  days.forEach(function(d){ html += '<div class="h">' + d + '</div>'; });
+function acadViewMode(){
+  var v = (State && State.settings && State.settings.acadView) || 'split';
+  return v === 'all' ? 'all' : 'split';
+}
+/* 나란히 모드에서 옆으로 나란히 놓을 사람. 전체 = 수호·지호 / 한 명만 고르면 그 사람 / 엄마·아빠 = 합쳐서 */
+function acadSplitMembers(){
+  var f = currentFilter();
+  if (KID_NAMES.indexOf(f) >= 0) return [f];
+  if (f && f !== '전체') return [];
+  return KID_NAMES.slice();
+}
+function acadBlockHTML(a, compact){
+  var sp = String(a.start || '09:00').split(':');
+  var ep = String(a.end || '10:00').split(':');
+  var sm = Number(sp[0]) * 60 + Number(sp[1] || 0);
+  var em = Number(ep[0]) * 60 + Number(ep[1] || 0);
+  if (em <= sm) em = sm + 60;
+  var top = (sm - ACAD_START_H * 60) / 60 * ACAD_PX;
+  var hgt = Math.max(compact ? 24 : 26, (em - sm) / 60 * ACAD_PX - 3);
+  if (top < 0){ hgt = Math.max(compact ? 18 : 20, hgt + top); top = 0; }
+  var tip = a.name + ' · ' + a.who + ' ' + shortTime(a.start) + '~' + shortTime(a.end) + (a.place ? ' · ' + a.place : '') + ' (눌러서 삭제)';
+  return '<div class="acad-block ' + (OWNER_CLASS[a.who] || 'family') + '" style="top:' + top + 'px;height:' + hgt + 'px" ' +
+    'data-action="acad-del" data-id="' + a.id + '" title="' + esc(tip) + '">' +
+    esc(a.name) + '<small>' + shortTime(a.start) + (compact ? '' : ' ' + esc(a.who)) + '</small></div>';
+}
+function acadGridHTML(items, compact){
+  var html = '<div class="h"' + (compact ? '' : ' style="font-size:10px"') + '>시간</div>';
+  ACAD_DAYS.forEach(function(d){ html += '<div class="h">' + d + '</div>'; });
 
   html += '<div class="acad-labels">';
   for (var h = ACAD_START_H; h < ACAD_END_H; h++){
@@ -3049,28 +3115,88 @@ function renderAcademyGrid(){
   }
   html += '</div>';
 
-  days.forEach(function(d){
+  ACAD_DAYS.forEach(function(d){
     html += '<div class="acad-col">';
-    State.academies.forEach(function(a){
+    items.forEach(function(a){
       if (a.day !== d) return;
-      if (!passFilter(a.who)) return;
-      var sp = String(a.start || '09:00').split(':');
-      var ep = String(a.end || '10:00').split(':');
-      var sm = Number(sp[0]) * 60 + Number(sp[1] || 0);
-      var em = Number(ep[0]) * 60 + Number(ep[1] || 0);
-      if (em <= sm) em = sm + 60;
-      var top = (sm - ACAD_START_H * 60) / 60 * ACAD_PX;
-      var hgt = Math.max(26, (em - sm) / 60 * ACAD_PX - 3);
-      if (top < 0){ top = 0; hgt = Math.max(20, hgt + top); }
-      html += '<div class="acad-block ' + (OWNER_CLASS[a.who] || 'family') + '" style="top:' + top + 'px;height:' + hgt + 'px" ' +
-        'data-action="acad-del" data-id="' + a.id + '" title="눌러서 삭제">' +
-        esc(a.name) + '<small>' + shortTime(a.start) + ' ' + esc(a.who) + '</small></div>';
+      html += acadBlockHTML(a, compact);
     });
     html += '</div>';
   });
-  grid.innerHTML = html;
+  return html;
+}
+function acadSetView(v){
+  State.settings.acadView = (v === 'all') ? 'all' : 'split';
+  save();
+  renderAcademyGrid();
+}
+function renderAcademyGrid(){
+  var combined = $('#acadGrid');
+  if (!combined) return;
+  var all = State.academies || [];
+  var mode = acadViewMode();
+  var members = acadSplitMembers();
+  var splitOn = mode === 'split' && members.length > 0;
+
+  // 합쳐서 그리드 (나란히 모드에서도 숨김 상태로 최신 유지)
+  combined.innerHTML = acadGridHTML(all.filter(function(a){ return passFilter(a.who); }), false);
+
+  var splitWrap = $('#acadSplit');
+  var single = $('#acadSingle');
+  if (splitWrap){
+    if (!splitOn){
+      splitWrap.innerHTML = '';
+    } else {
+      splitWrap.className = 'acad-split' + (members.length > 1 ? ' two' : '');
+      splitWrap.innerHTML = members.map(function(name){
+        var items = all.filter(function(a){ return a.who === name; });
+        return '<div class="acad-pane" data-pane="' + esc(name) + '">' +
+          '<div class="acad-pane-head"><span class="chip ' + (OWNER_CLASS[name] || 'family') + '">' + esc(name) + '</span>' +
+          '<span class="sub">' + items.length + '개 수업</span></div>' +
+          '<div class="acad-scroll"><div class="acad-grid compact">' + acadGridHTML(items, members.length > 1) + '</div></div>' +
+          '</div>';
+      }).join('');
+    }
+    splitWrap.classList.toggle('hidden', !splitOn);
+  }
+  if (single) single.classList.toggle('hidden', splitOn);
+
+  // 엄마·아빠 학원이 있으면 나란히 모드 아래에 한 줄로
+  var others = $('#acadOthers');
+  if (others){
+    var extra = all.filter(function(a){ return KID_NAMES.indexOf(a.who) < 0 && passFilter(a.who); });
+    if (splitOn && extra.length){
+      extra = extra.slice().sort(function(a, b){
+        return ACAD_DAYS.indexOf(a.day) - ACAD_DAYS.indexOf(b.day) || String(a.start).localeCompare(String(b.start));
+      });
+      others.innerHTML = '<span class="lbl">기타</span>' + extra.map(function(a){
+        return '<span class="chip ' + (OWNER_CLASS[a.who] || 'family') + '" data-action="acad-del" data-id="' + a.id + '" ' +
+          'title="눌러서 삭제">' + esc(a.who) + ' · ' + esc(a.day) + ' ' + shortTime(a.start) + ' ' + esc(a.name) + '</span>';
+      }).join('');
+      others.classList.remove('hidden');
+    } else {
+      others.innerHTML = '';
+      others.classList.add('hidden');
+    }
+  }
+
+  $$('#acadViewNav button').forEach(function(b){
+    var v = b.getAttribute('data-acadview');
+    if (v === 'split') b.disabled = members.length === 0;
+    b.classList.toggle('active', v === (splitOn ? 'split' : 'all'));
+  });
+
   var cnt = $('#acadCount');
-  if (cnt) cnt.textContent = State.academies.filter(function(a){ return passFilter(a.who); }).length + '개 수업';
+  if (cnt){
+    if (splitOn){
+      cnt.textContent = members.map(function(n){
+        return (n === '김수호' ? '수호' : n === '김지호' ? '지호' : n) + ' ' +
+          all.filter(function(a){ return a.who === n; }).length;
+      }).join(' · ') + '개 수업';
+    } else {
+      cnt.textContent = all.filter(function(a){ return passFilter(a.who); }).length + '개 수업';
+    }
+  }
 }
 
 /* ---------- 시간표 ---------- */
@@ -3084,17 +3210,9 @@ function subjClass(s){
   return 'etc';
 }
 
-function renderTimetable(){
-  var table = $('#ttTable');
-  if (!table) return;
-  var mname = UI.ttMember || '김수호';
+function ttBodyHTML(mname){
   var conf = State.tt[mname];
-  var title = $('#ttTitle');
-  if (title) title.textContent = mname + ' ' + (conf ? conf.label : '시간표');
-  if (!conf){
-    table.innerHTML = '<tr><td class="empty">시간표가 없어요</td></tr>';
-    return;
-  }
+  if (!conf) return '<thead><tr><th>교시</th></tr></thead><tbody><tr><td class="empty">시간표가 없어요</td></tr></tbody>';
   var days = ['월','화','수','목','금'];
   var todayDow = DAY_SUN[new Date().getDay()];
   var html = '<thead><tr><th>교시</th>' + days.map(function(d){
@@ -3111,9 +3229,44 @@ function renderTimetable(){
     html += '</tr>';
   });
   html += '</tbody>';
-  table.innerHTML = html;
-  $$('#sub-tt .subnav button').forEach(function(b){
-    b.classList.toggle('active', b.getAttribute('data-ttmember') === mname);
+  return html;
+}
+
+function renderTimetable(){
+  var mode = UI.ttMember || '나란히';
+  var splitOn = mode === '나란히';
+  var soloName = splitOn ? '김수호' : mode;
+
+  var table = $('#ttTable');
+  if (table) table.innerHTML = ttBodyHTML(soloName);
+
+  var title = $('#ttTitle');
+  if (title){
+    var soloConf = State.tt[soloName] || {};
+    title.textContent = splitOn ? '김수호 · 김지호 시간표' : soloName + ' ' + (soloConf.label || '시간표');
+  }
+
+  var single = $('#ttSingle'), split = $('#ttSplit');
+  if (single) single.classList.toggle('hidden', splitOn);
+  if (split){
+    if (!splitOn){
+      split.innerHTML = '';
+    } else {
+      split.className = 'tt-split two';
+      split.innerHTML = KID_NAMES.map(function(m){
+        var conf = State.tt[m] || {};
+        return '<div class="tt-pane" data-pane="' + esc(m) + '">' +
+          '<div class="tt-pane-head"><span class="chip ' + (OWNER_CLASS[m] || 'family') + '">' + esc(m) + '</span>' +
+          '<span class="sub">' + esc(conf.label || '시간표') + '</span></div>' +
+          '<div class="tt-wrap"><table class="tt compact" data-mname="' + esc(m) + '">' + ttBodyHTML(m) + '</table></div>' +
+          '</div>';
+      }).join('');
+    }
+    split.classList.toggle('hidden', !splitOn);
+  }
+
+  $$('#ttMemberNav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-ttmember') === (splitOn ? '나란히' : mode));
   });
 }
 
@@ -3186,7 +3339,7 @@ function fetchNeisTimetable(silent){
       State.tt['김수호'].data[r.day] = r.arr;
     });
     save();
-    if (UI.ttMember === '김수호') renderTimetable();
+    renderTimetable();
     if (!silent) toast('NEIS에서 ' + ok.length + '일 시간표를 불러왔어요', 'ok');
     return ok.length;
   });
@@ -4254,6 +4407,13 @@ function bindEvents(){
 
     var ttBtn = e.target.closest ? e.target.closest('[data-ttmember]') : null;
     if (ttBtn){ UI.ttMember = ttBtn.getAttribute('data-ttmember'); renderTimetable(); return; }
+
+    var avBtn = e.target.closest ? e.target.closest('[data-acadview]') : null;
+    if (avBtn){
+      if (avBtn.disabled) return;
+      acadSetView(avBtn.getAttribute('data-acadview'));
+      return;
+    }
 
     var mw = e.target.closest ? e.target.closest('[data-mealweek]') : null;
     if (mw){ UI.mealWeek = mw.getAttribute('data-mealweek'); renderSchool(); return; }
