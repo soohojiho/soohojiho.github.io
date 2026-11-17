@@ -674,6 +674,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
   .topbar .title{flex:1 1 auto;min-width:0}
   .topbar h1{font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .topbar h1 .badge{display:none}
+  .topbar h1 .badge.kid{display:inline-flex;flex:0 0 auto;font-size:9.5px;padding:2px 6px}
   .topbar .clock-line{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .topbar .top-actions{flex:1 1 100%;justify-content:space-between}
   .filter-wrap span{display:none}
@@ -868,6 +869,99 @@ label.sync-check input{width:auto}
 .call-role{padding:9px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:900;color:#3b4759;text-align:center}
 .call-role.active{background:var(--brand-soft);border-color:#b9ccff;color:var(--brand)}
 .call-role small{display:block;font-size:9.5px;font-weight:800;color:#9aa6b8;margin-top:1px}
+
+/* ---- 수신 대기(백그라운드 리스너) ---- */
+.call-standby{display:flex;align-items:center;gap:14px;margin-top:14px;padding:13px 14px;border-radius:16px;background:linear-gradient(120deg,#f4f8ff,#f2fbf8);border:1px solid #e3edfa;flex-wrap:wrap}
+.call-standby .csb-text{flex:1 1 260px;min-width:0}
+.call-standby .csb-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:#2b3750;flex-wrap:wrap}
+.call-standby .csb-note{font-size:10.8px;font-weight:700;color:#7d8899;line-height:1.55;margin-top:3px}
+.call-standby .csb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.switch{display:inline-flex;align-items:center;gap:8px;padding:5px 11px 5px 6px;border-radius:999px;background:#eef2f9;border:1px solid var(--line);font-size:11.5px;font-weight:900;color:#7d8899;transition:.16s}
+.switch i{width:34px;height:19px;border-radius:999px;background:#c9d4e4;position:relative;display:block;transition:.18s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(20,40,80,.25);transition:.18s}
+.switch[aria-checked="true"]{background:var(--brand-soft);border-color:#b9ccff;color:var(--brand)}
+.switch[aria-checked="true"] i{background:var(--brand)}
+.switch[aria-checked="true"] i::after{transform:translateX(15px)}
+.btn.on{background:var(--mint-soft);border-color:#bfeee2;color:#0f8a72}
+.standby-chip{font-size:10px}
+.standby-chip.sb-listening{background:#e6fbf5;color:#0f8a72}
+.standby-chip.sb-in-call{background:#e6fbf5;color:#0f8a72}
+.standby-chip.sb-ringing{background:#eaf0ff;color:var(--brand)}
+.standby-chip.sb-loading{background:#eaf0ff;color:#4f7cff}
+.standby-chip.sb-busy{background:#fff6e3;color:#b8791a}
+.standby-chip.sb-offline,.standby-chip.sb-error,.standby-chip.sb-off{background:#f4f7fb;color:#8695a8}
+.call-standby-inline{display:inline-block;margin-top:6px;color:#0f8a72;font-weight:900}
+
+/* ---- 이 기기 전용 모드(김수호·김지호) ---- */
+.topbar h1 .badge.kid{background:linear-gradient(135deg,#fff1e8,#ffe3d1);color:#c2560b;box-shadow:inset 0 0 0 1px #ffd9bd}
+.dm-options{display:grid;grid-template-columns:1fr;gap:7px;margin-top:10px}
+.dm-opt{display:flex;flex-direction:column;gap:1px;text-align:left;padding:10px 12px;border-radius:13px;border:1px solid var(--line);background:#fff;transition:.14s}
+.dm-opt b{font-size:12.5px;font-weight:900;color:#3b4759}
+.dm-opt small{font-size:10.5px;font-weight:800;color:#9aa6b8;line-height:1.45}
+.dm-opt:hover{border-color:#c9d8f5;transform:translateY(-1px)}
+.dm-opt.active{background:linear-gradient(120deg,#eef4ff,#f2fbf8);border-color:#b9ccff;box-shadow:0 0 0 3px rgba(79,124,255,.1)}
+.dm-opt.active[data-devicemode="suho"]{background:linear-gradient(120deg,#fff2e6,#ffe9d5);border-color:#ffcf9e;box-shadow:0 0 0 3px rgba(255,168,74,.14)}
+.dm-opt.active[data-devicemode="jiho"]{background:linear-gradient(120deg,#eef7ff,#e7f0ff);border-color:#bcd8ff;box-shadow:0 0 0 3px rgba(79,124,255,.14)}
+.dm-chip.all{background:#f1f5fc;color:#5b6b83}
+.dm-chip.suho{background:#fff1e8;color:#c2560b}
+.dm-chip.jiho{background:#eaf1ff;color:#3b6ae0}
+.filter-wrap.locked{background:#fff8f1;border-color:#ffdfc2}
+.filter-wrap.locked span{color:#c2560b}
+.filter-wrap.locked select{color:#c2560b;font-weight:900}
+@media (max-width:760px){.topbar h1 .badge.kid{font-size:9.5px}}
+
+/* ---- 전용 기기: 할일 체크 잠금 ---- */
+.lock-chip{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:900;color:#b8791a;background:#fff6e3;border:1px solid #ffe6b8;border-radius:999px;padding:3px 8px;white-space:nowrap}
+.q-check.locked{background:#f4f7fb;border-color:#e6ecf5;color:#a9b6c9;cursor:not-allowed}
+.q-item.kidlocked .q-txt{color:#8b96a8}
+.q-item.kidlocked .q-check.locked:hover{background:#f4f7fb}
+.kid-lock-note{display:flex;align-items:center;gap:6px;margin-top:9px;padding:8px 10px;border-radius:11px;background:#fffaf2;border:1px dashed #ffe0b5;font-size:10.5px;font-weight:800;color:#a5761a;line-height:1.5}
+.pc-q{font-size:28px;font-weight:900;text-align:center;letter-spacing:.02em;margin:8px 0 14px;color:#2b3750}
+.pc-note{font-size:11.5px;font-weight:700;color:#7d8899;text-align:center;margin-top:10px}
+
+/* ---- 수신 영상통화 — 어떤 화면(대기화면 포함) 위에서도 보여요 ---- */
+.incoming-call{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(circle at 50% 26%, rgba(38,64,112,.62), rgba(6,12,24,.9) 70%);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);animation:icFade .2s}
+@keyframes icFade{from{opacity:0}to{opacity:1}}
+body.incoming-on{overflow:hidden}
+.ic-card{position:relative;width:100%;max-width:352px;border-radius:28px;padding:24px 22px 20px;text-align:center;color:#fff;
+  background:linear-gradient(165deg,#20304f,#16203a 55%,#0f2a33);
+  border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 80px rgba(4,10,24,.6);
+  animation:icPop .3s cubic-bezier(.2,.9,.3,1.15);overflow:hidden}
+@keyframes icPop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+.ic-ring{position:absolute;left:50%;top:60px;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
+  border:2px solid rgba(120,180,255,.5);animation:icRipple 2s ease-out infinite}
+.ic-ring:nth-child(2){animation-delay:.66s}
+.ic-ring:nth-child(3){animation-delay:1.33s}
+@keyframes icRipple{0%{transform:scale(.55);opacity:.85}100%{transform:scale(1.5);opacity:0}}
+.ic-avatar{position:relative;z-index:1;width:92px;height:92px;margin:2px auto 18px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:44px;line-height:1;background:radial-gradient(circle at 35% 30%,#4f7cff,#2a49a8 70%);
+  box-shadow:0 14px 34px rgba(20,60,140,.5), inset 0 0 0 3px rgba(255,255,255,.18);animation:icBob 1.6s ease-in-out infinite}
+@keyframes icBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ic-kicker{position:relative;z-index:2;font-size:11px;font-weight:900;letter-spacing:.14em;color:#9fc0ff}
+.ic-title{position:relative;z-index:1;font-size:17px;font-weight:900;margin-top:6px;line-height:1.35;letter-spacing:-.02em}
+.ic-title .ic-em{font-size:19px}
+.ic-sub{position:relative;z-index:1;font-size:11.5px;font-weight:700;color:#b7c7e4;margin-top:9px;line-height:1.6}
+.ic-actions{position:relative;z-index:1;display:flex;gap:10px;margin-top:20px}
+.ic-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:14px 12px;border-radius:16px;font-size:14px;font-weight:900;transition:.15s;box-shadow:0 12px 26px rgba(4,10,24,.36)}
+.ic-btn:active{transform:translateY(1px) scale(.99)}
+.ic-btn.accept{background:linear-gradient(135deg,#24d18d,#12a86e);color:#04241a}
+.ic-btn.accept:hover{filter:brightness(1.06)}
+.ic-btn.accept:disabled{opacity:.65;filter:grayscale(.2)}
+.ic-btn.decline{flex:0 0 108px;background:rgba(255,255,255,.1);border:1px solid rgba(255,120,120,.45);color:#ffc9c9}
+.ic-btn.decline:hover{background:rgba(255,90,90,.18)}
+.ic-foot{position:relative;z-index:1;font-size:10px;font-weight:800;color:#8ea4c6;margin-top:12px;line-height:1.5;padding:0 4px}
+@media (max-width:480px){
+  .ic-card{padding:20px 16px 16px;border-radius:24px}
+  .ic-avatar{width:78px;height:78px;font-size:38px}
+  .ic-title{font-size:15.5px}
+  .ic-btn{padding:13px 10px;font-size:13px}
+  .ic-btn.decline{flex:0 0 92px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ic-ring,.ic-avatar{animation:none}
+}
 @media (max-width:1080px){
   .call-layout{grid-template-columns:minmax(0,1fr)}
   .call-chat{min-height:280px}
@@ -923,7 +1017,7 @@ label.sync-check input{width:auto}
         <div class="clock-line" id="clockLine">불러오는 중…</div>
       </div>
       <div class="top-actions">
-        <div class="filter-wrap">
+        <div class="filter-wrap" id="filterWrap">
           <span>보기</span>
           <select id="memberFilter">
             <option value="전체">전체</option>
@@ -1302,6 +1396,8 @@ label.sync-check input{width:auto}
           <button type="button" class="call-role" data-callrole="엄마">👩 엄마</button>
           <button type="button" class="call-role" data-callrole="태블릿">📱 태블릿</button>
           <button type="button" class="call-role" data-callrole="아이들">🧒 아이들</button>
+          <button type="button" class="call-role" data-callrole="김수호">🔥 김수호</button>
+          <button type="button" class="call-role" data-callrole="김지호">⚡ 김지호</button>
           <span class="crb-note">한 번 고르면 이 기기에만 저장돼요</span>
         </div>
         <div class="call-layout">
@@ -1349,6 +1445,8 @@ label.sync-check input{width:auto}
                 <button type="button" class="call-role" data-callrole="엄마">엄마<small>주방·안방</small></button>
                 <button type="button" class="call-role" data-callrole="태블릿">태블릿<small>아이들 방</small></button>
                 <button type="button" class="call-role" data-callrole="아이들">아이들<small>수호·지호와 함께</small></button>
+                <button type="button" class="call-role" data-callrole="김수호">🔥 김수호<small>수호 전용 폰</small></button>
+                <button type="button" class="call-role" data-callrole="김지호">⚡ 김지호<small>지호 전용 폰</small></button>
               </div>
               <p class="g-note">역할은 <b>이 기기에만</b> 저장돼서 폰·태블릿이 서로 역할을 덮어쓰지 않아요.<br>
               같은 역할을 두 기기에서 고르면 연결되지 않아요.</p>
@@ -1358,6 +1456,16 @@ label.sync-check input{width:auto}
               <input type="text" id="callRoom" maxlength="40" placeholder="soohojiho-family" style="margin-top:7px">
               <p class="g-note">방 코드가 같으면 어느 기기든 서로 연결돼요. 다른 사람이 쓰지 않는 나만의 코드로 바꿔도 좋아요.<br>
               영상·채팅은 PeerJS 공개 중계 서버로 기기끼리 직접 연결되며, 별도 서버 설치가 필요 없습니다.</p>
+            </div>
+          </div>
+          <div class="call-standby" id="callStandbyRow">
+            <div class="csb-text">
+              <div class="csb-title">📞 수신 대기 <span class="chip standby-chip sb-off" id="callStandbyChip">꺼짐</span></div>
+              <div class="csb-note" id="callStandbyNote">이 앱이 열려 있으면 카메라·마이크 권한 없이도 가족의 영상통화를 받을 준비를 해 둬요. 걸려 오면 벨소리·진동·알림으로 알려 줘요.</div>
+            </div>
+            <div class="csb-right">
+              <button type="button" class="switch" id="callStandbyToggle" role="switch" aria-checked="true"><i></i><span>켜짐</span></button>
+              <button type="button" class="btn ghost sm" id="callNotifyBtn">🔔 알림 허용</button>
             </div>
           </div>
         </div>
@@ -1371,6 +1479,16 @@ label.sync-check input{width:auto}
             <div class="card-head"><h3><span class="ico">👨‍👩‍👦</span>가족 · 포켓몬 설정</h3></div>
             <div id="memberEdit"></div>
             <p class="muted" style="font-size:11px;margin-top:8px">파트너 포켓몬은 이미 잡은 포켓몬 중에서 고를 수 있어요.</p>
+          </div>
+          <div class="card span-6" id="deviceModeCard">
+            <div class="card-head"><h3><span class="ico">📱</span>이 기기 전용 모드</h3><div class="right"><span class="chip dm-chip all" id="deviceModeChip">👨‍👩‍👦 가족 전체</span></div></div>
+            <div class="dm-options" id="deviceModeOptions">
+              <button type="button" class="dm-opt" data-action="device-mode" data-devicemode="all" aria-pressed="true"><b>👨‍👩‍👦 가족 전체</b><small>모두의 일정·할일을 함께 봐요</small></button>
+              <button type="button" class="dm-opt" data-action="device-mode" data-devicemode="suho" aria-pressed="false"><b>🔥 김수호 전용</b><small>수호 폰·태블릿 · 화면과 통화 역할이 수호로 고정</small></button>
+              <button type="button" class="dm-opt" data-action="device-mode" data-devicemode="jiho" aria-pressed="false"><b>⚡ 김지호 전용</b><small>지호 기기 · 화면과 통화 역할이 지호로 고정</small></button>
+            </div>
+            <p class="g-note" id="deviceModeNote">수호·지호 전용으로 바꾸면 그 아이의 퀘스트·소원·학교 화면만 보이고, 영상통화 역할도 그 이름으로 함께 바뀌어요.</p>
+            <p class="muted" style="font-size:10.5px;margin-top:4px">이 설정은 <b>이 기기에만</b> 저장되고 Family-board로 동기화되지 않아요. 퀘스트·소원·일정 같은 기록은 그대로 함께 저장돼요.</p>
           </div>
           <div class="card span-6">
             <div class="card-head"><h3><span class="ico">🏫</span>보드 · 학교 설정</h3></div>
@@ -1452,6 +1570,22 @@ label.sync-check input{width:auto}
         <div class="amb-wx" id="ambWx"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ================= 수신 영상통화 알림 (모든 화면·대기화면 위) ================= -->
+<div class="incoming-call hidden" id="incomingCall" role="dialog" aria-modal="true" aria-labelledby="incomingTitle">
+  <div class="ic-card">
+    <span class="ic-ring"></span><span class="ic-ring"></span><span class="ic-ring"></span>
+    <div class="ic-avatar" id="incomingEmoji">👨</div>
+    <div class="ic-kicker">📞 영상통화가 와요</div>
+    <div class="ic-title" id="incomingTitle"><span class="ic-em">👨</span> 아빠가 영상통화를 걸었어요</div>
+    <div class="ic-sub" id="incomingHint">받기를 누르면 카메라·마이크를 켜고 연결해요.</div>
+    <div class="ic-actions">
+      <button type="button" class="ic-btn accept" id="incomingAccept">📞 받기</button>
+      <button type="button" class="ic-btn decline" id="incomingDecline">거절</button>
+    </div>
+    <div class="ic-foot" id="incomingFrom">받을 때 이 기기에서 카메라·마이크를 한 번만 허용해 주세요</div>
   </div>
 </div>
 
@@ -3116,7 +3250,12 @@ function memberByName(name){
   }
   return null;
 }
-function currentFilter(){ return State.settings.filter || '전체'; }
+function currentFilter(){
+  var lock = '';
+  try { lock = deviceModeMember(); } catch(e){ lock = ''; }
+  if (lock) return lock;                       // 이 기기 전용 모드면 그 아이로 고정
+  return State.settings.filter || '전체';
+}
 function passFilter(owner){
   var f = currentFilter();
   if (f === '전체') return true;
@@ -3270,6 +3409,11 @@ function renderHero(){
 
 /* ---------- 필터 ---------- */
 function setFilter(v){
+  if (deviceModeMember()){                     // 전용 기기에서는 다른 가족으로 바꿀 수 없어요
+    deviceModeRender();
+    toast('이 기기는 ' + deviceModeMember() + ' 전용이에요', 'warn', 2400);
+    return;
+  }
   State.settings.filter = v;
   save();
   renderAll();
@@ -3442,12 +3586,13 @@ function pokemonCardHTML(m){
   else if (allDone){ eggCls += ' ready'; eggTxt = '🎁 올클리어 알 열기'; }
 
   var quests = m.quests.filter(function(q){ return q.cat === 'quest'; });
+  var kidLock = deviceModeLocked();
   var qHtml = quests.length ? quests.map(function(q){
-    return '<li class="q-item ' + (q.done ? 'done' : '') + '">' +
-      '<button class="q-check" data-action="q-toggle" data-mid="' + m.id + '" data-qid="' + q.id + '">' + (q.done ? '✓' : '') + '</button>' +
+    return '<li class="q-item ' + (q.done ? 'done' : '') + (kidLock ? ' kidlocked' : '') + '">' +
+      '<button class="q-check' + (kidLock ? ' locked' : '') + '" data-action="q-toggle" data-mid="' + m.id + '" data-qid="' + q.id + '"' + (kidLock ? ' aria-disabled="true"' : '') + '>' + (q.done ? '✓' : '') + '</button>' +
       '<span class="q-txt">' + esc(q.text) + '</span>' +
       '<span class="q-pt">+' + Number(q.points) + '</span>' +
-      '<button class="x-btn" data-action="q-del" data-mid="' + m.id + '" data-qid="' + q.id + '">✕</button></li>';
+      (kidLock ? '' : '<button class="x-btn" data-action="q-del" data-mid="' + m.id + '" data-qid="' + q.id + '">✕</button>') + '</li>';
   }).join('') : '<li class="empty" style="padding:10px 0">오늘의 퀘스트를 추가해 보세요</li>';
 
   return '<article class="card pk-card ' + tone + dim + '">' +
@@ -3463,15 +3608,17 @@ function pokemonCardHTML(m){
       '</div>' +
     '</div>' +
     '<div class="today-line"><b>⭐ 오늘의 퀘스트</b><span class="cnt"><i>' + st.todayDone + '</i>/' + st.todayTotal + '</span>' +
+      (kidLock ? kidLockChipHTML() : '') +
       '<button class="' + eggCls + '" data-action="egg" data-mid="' + m.id + '">' + eggTxt + '</button></div>' +
     '<ul class="quests">' + qHtml + '</ul>' +
+    (kidLock ? kidLockNoteHTML() :
     '<form class="q-add" data-form="qadd" data-mid="' + m.id + '">' +
       '<input type="text" name="text" placeholder="퀘스트 추가" maxlength="40" required>' +
       '<select name="points"><option value="10">+10</option><option value="15" selected>+15</option><option value="20">+20</option><option value="30">+30</option></select>' +
       '<button class="plus" type="submit" title="추가">+</button>' +
-    '</form>' +
-    '<div class="pk-foot"><button class="btn sm ghost" data-action="reset-day" data-mid="' + m.id + '">하루 초기화</button>' +
-      '<span class="hint">' + (m.lastReset === todayISO() ? '오늘 시작했어요' : '새 날이에요! 초기화를 눌러요') + '</span></div>' +
+    '</form>') +
+    '<div class="pk-foot">' + (kidLock ? '' : '<button class="btn sm ghost" data-action="reset-day" data-mid="' + m.id + '">하루 초기화</button>') +
+      '<span class="hint">' + (kidLock ? '부모님 기기에서 체크해요' : (m.lastReset === todayISO() ? '오늘 시작했어요' : '새 날이에요! 초기화를 눌러요')) + '</span></div>' +
   '</article>';
 }
 
@@ -3597,6 +3744,7 @@ function openEventModal(dateStr, id){
 
 /* ---------- 퀘스트 조작 ---------- */
 function toggleQuest(mid, qid){
+  if (deviceModeLocked()){ kidLockToast(); return; }
   var m = memberById(mid);
   var q = null;
   m.quests.forEach(function(x){ if (x.id === qid) q = x; });
@@ -3749,6 +3897,7 @@ function confettiBurst(){
 }
 
 function resetDay(mid){
+  if (deviceModeLocked()){ kidLockToast(); return; }
   var m = memberById(mid);
   m.quests.forEach(function(q){ q.done = false; });
   m.hatchedDate = '';
@@ -4065,7 +4214,13 @@ function renderTodoTab(){
       var s = questStats(m);
       done += s.done; total += s.total; xp += s.xpToday;
     });
-    sum.innerHTML = '완료 <b>' + done + '</b>/' + total + ' · 얻은 XP <b>' + xp + '</b>';
+    sum.innerHTML = '완료 <b>' + done + '</b>/' + total + ' · 얻은 XP <b>' + xp + '</b>' +
+      (deviceModeLocked() ? ' ' + kidLockChipHTML() : '');
+  }
+  var ra = $('#todoResetAll');
+  if (ra){
+    ra.disabled = deviceModeLocked();
+    ra.title = deviceModeLocked() ? '부모님 기기에서만 초기화할 수 있어요' : '';
   }
 }
 
@@ -4073,37 +4228,39 @@ function todoCardHTML(m){
   var st = questStats(m);
   var need = xpNeed(m);
   var pct = Math.max(0, Math.min(100, Math.round(Number(m.xp) / need * 100)));
+  var kidLock = deviceModeLocked();
   var groups = ['quest','homework','routine'].map(function(cat){
     var items = m.quests.filter(function(q){ return q.cat === cat; });
     var done = items.filter(function(q){ return q.done; }).length;
     var meta = CAT_META[cat];
     var list = items.length ? items.map(function(q){
-      return '<li class="q-item ' + (q.done ? 'done' : '') + '">' +
-        '<button class="q-check" data-action="q-toggle" data-mid="' + m.id + '" data-qid="' + q.id + '">' + (q.done ? '✓' : '') + '</button>' +
+      return '<li class="q-item ' + (q.done ? 'done' : '') + (kidLock ? ' kidlocked' : '') + '">' +
+        '<button class="q-check' + (kidLock ? ' locked' : '') + '" data-action="q-toggle" data-mid="' + m.id + '" data-qid="' + q.id + '"' + (kidLock ? ' aria-disabled="true"' : '') + '>' + (q.done ? '✓' : '') + '</button>' +
         '<span class="q-txt">' + esc(q.text) + '</span>' +
         '<span class="q-pt">+' + Number(q.points) + '</span>' +
-        '<button class="x-btn" data-action="q-del" data-mid="' + m.id + '" data-qid="' + q.id + '">✕</button></li>';
+        (kidLock ? '' : '<button class="x-btn" data-action="q-del" data-mid="' + m.id + '" data-qid="' + q.id + '">✕</button>') + '</li>';
     }).join('') : '<li class="muted" style="font-size:11.5px;font-weight:700;padding:6px 2px">아직 없어요</li>';
     return '<div class="qgroup"><div class="gh">' + meta.label +
       '<span class="cnt">' + done + '/' + items.length + '</span></div>' +
       '<ul class="todo-list">' + list + '</ul>' +
-      '<form class="q-add" data-form="qadd2" data-mid="' + m.id + '" data-cat="' + cat + '">' +
+      (kidLock ? '' : '<form class="q-add" data-form="qadd2" data-mid="' + m.id + '" data-cat="' + cat + '">' +
         '<input type="text" name="text" placeholder="' + meta.hint + ' 추가" maxlength="40" required>' +
         '<select name="points"><option value="10">+10</option><option value="15" selected>+15</option><option value="20">+20</option><option value="30">+30</option></select>' +
-        '<button class="plus" type="submit">+</button></form></div>';
+        '<button class="plus" type="submit">+</button></form>') + '</div>';
   }).join('');
 
   return '<div class="card pk-card ' + toneFor(m.partner) + '">' +
     '<div class="todo-head">' + artImg(m.partner) +
       '<div><div style="display:flex;align-items:center;gap:6px"><b style="font-size:16px">' + esc(m.name) + '</b>' +
-      '<span class="lvpill">Lv.' + Number(m.level) + '</span></div>' +
+      '<span class="lvpill">Lv.' + Number(m.level) + '</span>' + (kidLock ? kidLockChipHTML() : '') + '</div>' +
       '<div class="muted" style="font-size:11.5px;font-weight:800">' + esc(partnerName(m)) + ' · ' + esc(m.label) + '</div></div>' +
       '<div class="stats">도감 <b>' + m.caught.length + '</b>/151<br>오늘 <b>' + st.todayDone + '/' + st.todayTotal + '</b></div>' +
     '</div>' +
     '<div class="xp" style="margin:0 0 12px"><div class="xp-bar"><i style="width:' + pct + '%"></i></div>' +
       '<div class="xp-meta"><span>XP</span><span>' + Number(m.xp) + ' / ' + need + '</span></div></div>' +
     groups +
-    '<div class="pk-foot"><button class="btn sm ghost" data-action="reset-day" data-mid="' + m.id + '">하루 초기화</button>' +
+    (kidLock ? kidLockNoteHTML() : '') +
+    '<div class="pk-foot">' + (kidLock ? '' : '<button class="btn sm ghost" data-action="reset-day" data-mid="' + m.id + '">하루 초기화</button>') +
       '<button class="btn sm ghost" data-action="dex" data-mid="' + m.id + '">도감 보기</button>' +
       '<button class="btn sm ghost" data-action="egg" data-mid="' + m.id + '">🎁 알</button></div>' +
   '</div>';
@@ -5023,7 +5180,7 @@ function renderSettings(){
   if (sl && document.activeElement !== sl) sl.value = sc.cls || '1';
 
   var h1 = $('.topbar h1');
-  if (h1) h1.innerHTML = esc(State.settings.title || APP_TITLE_DEFAULT) + ' <span class="badge">우리 가족</span>';
+  if (h1) h1.innerHTML = esc(State.settings.title || APP_TITLE_DEFAULT) + ' <span class="badge">우리 가족</span>' + deviceModeBadgeHTML();
   document.title = State.settings.title || APP_TITLE_DEFAULT;
 
   var wrap = $('#memberEdit');
@@ -5052,6 +5209,7 @@ function renderSettings(){
   if (bar) bar.style.width = pct + '%';
   var st = $('#storageText');
   if (st) st.textContent = '(' + (used / 1024).toFixed(1) + 'KB / 약 5MB · ' + pct + '%)';
+  deviceModeRender();
 }
 
 function exportJSON(){
@@ -5157,14 +5315,26 @@ function findById(arr, id){
 
 /* =========================================================
    영상통화 — PeerJS(공개 시그널링) 기반 1:1~다자 연결 + 채팅
+   · 수신 대기(백그라운드 리스너) + 수신 벨소리·진동·전체화면 알림
    ========================================================= */
 var PEERJS_SRC = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
 var CALL_ROLES = [
   { name: '아빠',   code: 'dad',  em: '👨' },
   { name: '엄마',   code: 'mom',  em: '👩' },
   { name: '태블릿', code: 'tab',  em: '📱' },
-  { name: '아이들', code: 'kids', em: '🧒' }
+  { name: '아이들', code: 'kids', em: '🧒' },
+  { name: '김수호', code: 'suho', em: '🔥' },
+  { name: '김지호', code: 'jiho', em: '⚡' }
 ];
+/* 통화를 걸 때 먼저 시도하는 순서(위쪽 역할에만 걸어 중복 연결을 줄입니다) */
+var CALL_DIAL = {
+  '아빠':   ['엄마', '태블릿', '아이들', '김수호', '김지호'],
+  '엄마':   ['태블릿', '아이들', '김수호', '김지호'],
+  '태블릿': ['아이들', '김수호', '김지호'],
+  '아이들': ['김수호', '김지호'],
+  '김수호': ['아빠', '엄마', '태블릿', '아이들', '김지호'],
+  '김지호': ['아빠', '엄마', '태블릿', '아이들', '김수호']
+};
 var Call = {
   peer: null,
   starting: false,
@@ -5178,11 +5348,21 @@ var Call = {
   camOn: true,
   retryTimer: null,
   bound: false,
-  msgs: []
+  msgs: [],
+  pending: null,                                  // 수신을 받을 때 응답할 대상
+  declined: {},                                   // peerId -> 거절 시각(잠시 다시 울리지 않게)
+  standby: { peer: null, state: 'off', timer: null, startTimer: null }
 };
+/* 수신 벨 상태 */
+var Incoming = { active: false, from: '', mc: null, conn: null, since: 0, vibeTimer: null, notif: null };
+/* 벨소리(Web Audio 합성 — 음원 파일 없이) */
+var Ring = { ctx: null, on: false, timer: null, audible: null };
 
 /* 이 기기의 통화 역할 — 기기마다 따로 저장해 폰·태블릿이 서로 덮어쓰지 않습니다 */
 var CALL_ROLE_KEY = 'suho_jiho_call_role_v1';
+var CALL_STANDBY_KEY = 'suho_jiho_call_standby_v1';
+var CALL_NOTIFY_TAG = 'suho-call-incoming';
+
 function callRoleByDevice(){
   var dev = '';
   try { dev = deviceLabel(); } catch(e){ dev = ''; }
@@ -5198,6 +5378,10 @@ function callRoleName(){
 }
 function callSaveRole(name){
   try { window.localStorage.setItem(CALL_ROLE_KEY, String(name)); } catch(e){}
+}
+function callRoleEm(name){
+  for (var i = 0; i < CALL_ROLES.length; i++){ if (CALL_ROLES[i].name === name) return CALL_ROLES[i].em; }
+  return '';
 }
 
 function callCfg(){
@@ -5216,6 +5400,132 @@ function callPeerId(roleName){
   return room + '-' + info.code;
 }
 function callRoomLabel(){ return String(callCfg().room || 'soohojiho-family'); }
+function callInSession(){
+  return !!Call.peer || Call.status === 'live' || Call.status === 'connecting' || Call.starting;
+}
+function callDeclinedRecently(id){
+  if (!id) return false;
+  var t = Call.declined[id];
+  if (!t) return false;
+  if (Date.now() - t > 45000){ delete Call.declined[id]; return false; }
+  return true;
+}
+
+/* ---------- 수신 대기 설정(기기별) ---------- */
+function callStandbyEnabled(){
+  try {
+    var v = window.localStorage.getItem(CALL_STANDBY_KEY);
+    if (v === null || v === '') return true;      // 기본값: 켜짐
+    return v !== '0';
+  } catch(e){ return true; }
+}
+function callStandbySave(on){
+  try { window.localStorage.setItem(CALL_STANDBY_KEY, on ? '1' : '0'); } catch(e){}
+}
+function callStandbyLabel(st){
+  switch (st){
+    case 'loading':      return '연결 중…';
+    case 'listening':    return '켜짐 · 수신 대기 중';
+    case 'ringing':      return '벨이 울리는 중';
+    case 'in-call':      return '통화 중';
+    case 'busy':         return '다른 기기가 같은 역할로 대기 중';
+    case 'offline':      return '인터넷 연결을 기다리는 중';
+    case 'error':        return '연결하지 못했어요 · 다시 시도할게요';
+    default:             return '꺼짐';
+  }
+}
+function callStandbyRender(){
+  var st = callStandbyEnabled() ? (Call.standby.state || 'off') : 'off';
+  var chip = $('#callStandbyChip');
+  if (chip){
+    chip.textContent = callStandbyLabel(st);
+    chip.className = 'chip standby-chip sb-' + st;
+  }
+  var note = $('#callStandbyNote');
+  if (note && !note.getAttribute('data-lock')){
+    if (!callStandbyEnabled()){
+      note.textContent = '수신 대기를 껐어요. 이 기기에서는 가족이 걸어도 벨이 울리지 않아요.';
+    } else if (st === 'busy'){
+      note.textContent = '같은 역할로 대기하는 기기가 이미 있어요. 그 기기에서만 벨이 울려요. 역할을 바꾸면 이 기기에서도 받을 수 있어요.';
+    } else if (st === 'error' || st === 'offline'){
+      note.textContent = '수신 대기를 붙이지 못했어요. 인터넷이 돌아오면 다시 조용히 시도할게요.';
+    } else {
+      note.textContent = '이 앱이 열려 있으면 카메라·마이크 권한 없이도 가족의 영상통화를 받을 준비를 해 둬요. 걸려 오면 벨소리·진동·알림으로 알려 줘요.';
+    }
+  }
+  var tog = $('#callStandbyToggle');
+  if (tog){
+    var on = callStandbyEnabled();
+    tog.setAttribute('aria-checked', on ? 'true' : 'false');
+    var tx = tog.querySelector('span');
+    if (tx) tx.textContent = on ? '켜짐' : '꺼짐';
+  }
+  callNotifyButtonState();
+}
+function callStandbySetState(st){
+  Call.standby.state = st;
+  callStandbyRender();
+}
+
+/* ---------- 수신 대기 리스너(권한 없이 신호만 받는 상태) ---------- */
+function callStandbyClearTimers(){
+  if (Call.standby.timer){ window.clearTimeout(Call.standby.timer); Call.standby.timer = null; }
+  if (Call.standby.startTimer){ window.clearTimeout(Call.standby.startTimer); Call.standby.startTimer = null; }
+}
+function callStandbyStop(){
+  callStandbyClearTimers();
+  var p = Call.standby.peer;
+  Call.standby.peer = null;
+  if (p){ try { p.destroy(); } catch(e){} }
+  callStandbySetState(callStandbyEnabled() ? 'off' : 'off');
+}
+function callStandbyRetry(ms){
+  if (Call.standby.timer) window.clearTimeout(Call.standby.timer);
+  Call.standby.timer = window.setTimeout(function(){
+    Call.standby.timer = null;
+    callStandbyStart(0);
+  }, ms || 45000);
+}
+function callStandbyStart(delay){
+  if (!callStandbyEnabled()){ callStandbySetState('off'); return; }
+  if (Call.peer && !Call.peer.destroyed) return;                       // 이미 통화용 피어가 있어요
+  if (Call.standby.peer && !Call.standby.peer.destroyed) return;       // 이미 대기 중이에요
+  callStandbyClearTimers();
+  if (!Call.standby.state || Call.standby.state === 'off') callStandbySetState('loading');
+  Call.standby.startTimer = window.setTimeout(function(){
+    Call.standby.startTimer = null;
+    callStandbyConnect();
+  }, typeof delay === 'number' ? delay : 0);
+}
+function callStandbyConnect(){
+  if (!callStandbyEnabled()){ callStandbySetState('off'); return; }
+  if (Call.peer && !Call.peer.destroyed) return;
+  if (Call.standby.peer && !Call.standby.peer.destroyed) return;
+  if (navigator.onLine === false){ callStandbySetState('offline'); callStandbyRetry(25000); return; }
+  callStandbySetState('loading');
+  callLoadLib(function(libErr){
+    if (libErr){ callStandbySetState('error'); callStandbyRetry(60000); return; }
+    if (!callStandbyEnabled()){ callStandbySetState('off'); return; }
+    if (Call.peer && !Call.peer.destroyed) return;
+    if (Call.standby.peer && !Call.standby.peer.destroyed) return;
+    var peer;
+    try { peer = new window.Peer(callPeerId(callRoleName()), { debug: 0 }); }
+    catch(e){ callStandbySetState('error'); callStandbyRetry(60000); return; }
+    Call.standby.peer = peer;
+    callWirePeer(peer, 'standby');
+  });
+}
+/* 대기 피어를 그대로 통화용으로 올려 씁니다(같은 ID를 다시 잡지 않아 충돌이 없어요) */
+function callPromoteStandby(){
+  var p = Call.standby.peer;
+  if (!p || p.destroyed) return null;
+  callStandbyClearTimers();
+  Call.standby.peer = null;
+  p.__kind = 'active';
+  Call.peer = p;
+  callStandbySetState('in-call');
+  return p;
+}
 
 function callSetStatus(status, msg){
   Call.status = status;
@@ -5243,9 +5553,10 @@ function callSetStatus(status, msg){
   } else if (status === 'connecting'){
     if (idleTitle) idleTitle.textContent = '상대 기기를 기다리는 중이에요';
     if (idleText) idleText.innerHTML = '이 기기 역할은 <b>' + callRoleInfo().em + ' ' + callRoleInfo().name + '</b>이에요. 가족 기기에서도 <b>통화 시작</b>을 누르면 여기에 상대 화면이 나타나요.';
-  } else {
+  } else if (status === 'idle'){
     if (idleTitle) idleTitle.textContent = '아직 연결된 기기가 없어요';
-    if (idleText) idleText.innerHTML = '이 기기의 역할(아빠·엄마·태블릿·아이들)을 고르고 <b>통화 시작</b>을 누르면, 같은 방 코드를 쓰는 가족 기기와 1번에 연결돼요.';
+    if (idleText) idleText.innerHTML = '이 기기의 역할(아빠·엄마·태블릿·아이들)을 고르고 <b>통화 시작</b>을 누르면, 같은 방 코드를 쓰는 가족 기기와 1번에 연결돼요.' +
+      (callStandbyEnabled() ? '<br><span class="call-standby-inline">📞 수신 대기 중이에요 — 가족이 걸면 이 기기에서 바로 벨이 울려요.</span>' : '');
   }
   var start = $('#callStart'), end = $('#callEnd');
   if (start) start.classList.toggle('hidden', status === 'live' || status === 'connecting');
@@ -5257,6 +5568,7 @@ function callSetStatus(status, msg){
   });
   var roomInput = $('#callRoom');
   if (roomInput && document.activeElement !== roomInput) roomInput.value = callRoomLabel();
+  callStandbyRender();
 }
 
 function callPushMsg(kind, text, who){
@@ -5332,10 +5644,13 @@ function callTeardown(keepLocal){
   if (!keepLocal) callStopLocal();
   callDetachRemote();
   Call.remoteId = '';
+  Call.pending = null;
   if (Call.retryTimer){ window.clearInterval(Call.retryTimer); Call.retryTimer = null; }
+  if (Incoming.active){ callRingStop(); callIncomingReset(); }
   var start = $('#callStart'), end = $('#callEnd');
   if (start) start.classList.remove('hidden');
   if (end) end.classList.add('hidden');
+  callStandbyRender();
 }
 
 function callSend(text){
@@ -5347,40 +5662,73 @@ function callSend(text){
   return any;
 }
 
+/* 매체 연결에 공통 처리(수신 응답·발신 양쪽에서 사용) */
+function callTrackMedia(mc, roleName){
+  if (!mc) return null;
+  var nm = roleName || (mc.metadata && mc.metadata.role) || '가족';
+  if (mc.peer) Call.calls[mc.peer] = mc;
+  mc.on('stream', function(stream){
+    var em = callRoleEm(nm);
+    callAttachRemote(stream, (em ? em + ' ' : '') + nm);
+    callSetStatus('live');
+    callPushMsg('sys', nm + ' 기기와 연결됐어요.');
+  });
+  mc.on('close', function(){
+    if (mc.peer && Call.calls[mc.peer] === mc) delete Call.calls[mc.peer];
+    callCheckIdle();
+  });
+  mc.on('error', function(){ if (mc.peer && Call.calls[mc.peer] === mc) delete Call.calls[mc.peer]; });
+  return mc;
+}
+
+function callDialPeer(id, roleName){
+  if (!Call.peer || Call.peer.destroyed || !id) return;
+  var my = callRoleInfo();
+  if (!Call.localStream) return;
+  try {
+    var mc = Call.peer.call(id, Call.localStream, { metadata: { role: my.name } });
+    if (mc){
+      callTrackMedia(mc, roleName);
+      window.setTimeout(function(){ if (!mc.open && Call.calls[id] === mc){ try { mc.close(); } catch(e){} delete Call.calls[id]; } }, 12000);
+    }
+  } catch(e){}
+}
+function callOpenConn(id, ring){
+  if (!Call.peer || Call.peer.destroyed || !id) return null;
+  if (Call.conns[id]) return Call.conns[id];
+  var my = callRoleInfo();
+  try {
+    var conn = Call.peer.connect(id, { reliable: true, metadata: { role: my.name } });
+    Call.conns[id] = conn;
+    conn.on('open', function(){
+      if (ring){ try { conn.send({ type: 'ring', from: my.name }); } catch(e){} }
+      if (Call.status !== 'live' && !Incoming.active) callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
+    });
+    var killConn = function(){ try { conn.close(); } catch(e){} if (Call.conns[id] === conn) delete Call.conns[id]; };
+    conn.on('error', killConn);
+    conn.on('close', function(){ if (Call.conns[id] === conn) delete Call.conns[id]; });
+    conn.on('data', function(data){ callOnData(data, conn); });
+    window.setTimeout(function(){ if (!conn.open) killConn(); }, 8000);
+    return conn;
+  } catch(e){ return null; }
+}
+
+function callDialTargets(){
+  var my = callRoleName();
+  var list = CALL_DIAL[my];
+  if (list) return list;
+  return CALL_ROLES.filter(function(r){ return r.name !== my; }).map(function(r){ return r.name; });
+}
 function callTryConnect(){
   if (!Call.peer || Call.peer.destroyed) return;
-  var my = callRoleInfo();
-  var myIdx = CALL_ROLES.findIndex(function(r){ return r.name === my.name; });
-  if (!Call.remoteId){
-    CALL_ROLES.forEach(function(r, idx){
-      if (idx <= myIdx) return;                 // 위쪽 역할에만 먼저 걸어요(중복 연결 방지)
-      var id = callPeerId(r.name);
-      if (!id || Call.calls[id] || Call.conns[id]) return;
-      try {
-        var conn = Call.peer.connect(id, { reliable: true, metadata: { role: my.name } });
-        Call.conns[id] = conn;
-        conn.on('open', function(){
-          if (Call.status !== 'live') callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
-        });
-        var killConn = function(){ try { conn.close(); } catch(e){} if (Call.conns[id] === conn) delete Call.conns[id]; };
-        conn.on('error', killConn);
-        conn.on('close', function(){ if (Call.conns[id] === conn) delete Call.conns[id]; });
-        window.setTimeout(function(){ if (!conn.open) killConn(); }, 8000);
-      } catch(e){}
-      if (Call.localStream){
-        try {
-          var mc = Call.peer.call(id, Call.localStream, { metadata: { role: my.name } });
-          if (mc){
-            Call.calls[id] = mc;
-            mc.on('stream', function(stream){ callAttachRemote(stream, r.em + ' ' + r.name); callSetStatus('live'); });
-            mc.on('close', function(){ if (Call.calls[id] === mc) delete Call.calls[id]; callCheckIdle(); });
-            mc.on('error', function(){ if (Call.calls[id] === mc) delete Call.calls[id]; });
-            window.setTimeout(function(){ if (!mc.open && Call.calls[id] === mc){ try { mc.close(); } catch(e){} delete Call.calls[id]; } }, 12000);
-          }
-        } catch(e){}
-      }
-    });
-  }
+  if (Call.remoteId) return;
+  callDialTargets().forEach(function(name){
+    var id = callPeerId(name);
+    if (!id || Call.calls[id] || Call.conns[id]) return;
+    if (callDeclinedRecently(id)) return;       // 방금 거절한 기기는 잠시 건너뛰어요
+    callOpenConn(id, true);                     // 먼저 벨을 울려서 상대 화면이 바로 링
+    if (Call.localStream) callDialPeer(id, name);
+  });
 }
 
 function callCheckIdle(){
@@ -5392,121 +5740,194 @@ function callCheckIdle(){
   }
 }
 
-function callStart(){
-  if (Call.starting) return;
-  callCfg();
-  var role = callRoleInfo();
-  callSetStatus('connecting', '카메라와 마이크를 준비하고 있어요…');
-  callPushMsg('sys', '통화를 시작했어요. 방 코드 ' + callRoomLabel() + ' · ' + role.name);
-  Call.starting = true;
+/* 데이터 채널 공통 처리: 채팅 · 벨 · 거절 */
+function callOnData(data, conn){
+  if (!data || typeof data !== 'object') return;
+  if (data.type === 'chat' && data.text){
+    callPushMsg('them', String(data.text).slice(0, 200), data.who || '가족');
+    return;
+  }
+  if (data.type === 'ring'){
+    callIncomingRing(data.from || '가족', conn);
+    return;
+  }
+  if (data.type === 'reject'){
+    callPeerRejected(data.from || '가족', data.reason || '', conn);
+    return;
+  }
+}
+function callAcceptConn(conn){
+  if (!conn) return;
+  Call.conns[conn.peer] = conn;
+  conn.on('open', function(){
+    if (Incoming.active){ try { conn.send({ type: 'ring-ack', from: callRoleInfo().name }); } catch(e){} return; }
+    if (!Call.peer) return;                      // 수신 대기 중에는 화면 상태를 건드리지 않아요
+    Call.remoteId = conn.peer;
+    if (Call.status !== 'live') callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
+  });
+  conn.on('data', function(data){ callOnData(data, conn); });
+  conn.on('close', function(){ if (Call.conns[conn.peer] === conn) delete Call.conns[conn.peer]; });
+  conn.on('error', function(){ if (Call.conns[conn.peer] === conn) delete Call.conns[conn.peer]; });
+}
 
-  var gotMedia = new Promise(function(resolve){
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ resolve({ err: new Error('nomedia'), stream: null }); return; }
-    navigator.mediaDevices.getUserMedia({ audio: true, video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } })
-      .then(function(stream){ resolve({ err: null, stream: stream }); })
-      .catch(function(err){ resolve({ err: err || new Error('denied'), stream: null }); });
+/* 발신자가 거절을 받았을 때 */
+function callPeerRejected(from, reason, conn){
+  var id = conn && conn.peer ? conn.peer : '';
+  if (id) Call.declined[id] = Date.now();
+  if (reason === 'busy') toast(from + ' 님이 지금 통화 중이에요', 'warn', 3600);
+  else toast('상대방이 통화를 거절했어요', 'warn', 3200);
+  if (!Call.status || Call.status !== 'live'){
+    callSetStatus('connecting', '상대방이 통화를 거절했어요. 다른 가족 기기에서 받을 수 있어요.');
+  }
+}
+
+/* ---------- 피어 이벤트 연결(대기·통화 공용) ---------- */
+function callWirePeer(peer, kind){
+  peer.__kind = kind;
+
+  peer.on('open', function(){
+    if (peer.__kind === 'standby'){
+      if (Call.standby.peer !== peer) return;
+      callStandbySetState(Incoming.active ? 'ringing' : 'listening');
+      return;
+    }
+    if (Call.peer !== peer) return;
+    callActiveOpened();
   });
 
-  gotMedia.then(function(res){
+  peer.on('call', function(mc){
+    if (peer.__kind === 'standby' || !callInSession()){
+      callIncomingCall(mc, peer);
+      return;
+    }
+    /* 이미 통화 중이면 기존처럼 바로 응답(가족 다자 통화) */
+    try { mc.answer(Call.localStream || undefined); } catch(e){}
+    callTrackMedia(mc);
+  });
+
+  peer.on('connection', function(conn){
+    if (Call.peer && Call.peer !== peer) return;   // 지난 피어의 연결은 무시
+    callAcceptConn(conn);
+  });
+
+  peer.on('error', function(err){
+    var type = (err && err.type) || '';
+    if (peer.__kind === 'standby'){
+      /* 백그라운드 대기 중에는 홈 화면에 빨간 오류를 띄우지 않아요 */
+      if (type === 'unavailable-id'){ callStandbySetState('busy'); callStandbyRetry(60000); }
+      else if (type === 'network' || type === 'server-error'){ callStandbySetState('offline'); callStandbyRetry(25000); }
+      else if (type === 'browser-incompatible'){ callStandbySetState('error'); }
+      else if (type === 'peer-unavailable'){ /* 무시 */ }
+      else { callStandbySetState('error'); callStandbyRetry(60000); }
+      return;
+    }
+    Call.starting = false;
+    if (type === 'unavailable-id'){
+      callSetStatus('error', '이미 같은 역할의 기기가 연결돼 있어요. 이 기기의 역할을 다른 것으로 바꾸거나, 먼저 연결된 기기를 종료해 주세요.');
+    } else if (type === 'peer-unavailable'){
+      var missId = String((err && err.message) || '').replace(/^.*?peer\s+/, '').trim();
+      if (missId && Call.conns[missId] && !Call.conns[missId].open) delete Call.conns[missId];
+      if (missId && Call.calls[missId]) { try { Call.calls[missId].close(); } catch(e){} delete Call.calls[missId]; }
+      callSetStatus('connecting', '아직 다른 기기가 접속하지 않았어요. 가족 기기에서도 [통화 시작]을 눌러 주세요.');
+    } else if (type === 'network' || type === 'server-error'){
+      callSetStatus('error', '연결 서버에 닿지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+    } else if (type === 'browser-incompatible'){
+      callSetStatus('error', '이 브라우저에서는 영상통화를 지원하지 않아요. 크롬·사파리 최신 버전을 사용해 주세요.');
+    } else if (type === 'webrtc'){
+      callSetStatus('error', '영상 연결에 실패했어요. 두 기기를 같은 와이파이에 두고 다시 시도해 주세요.');
+    }
+  });
+
+  peer.on('disconnected', function(){
+    if (peer.__kind === 'standby'){ try { peer.reconnect(); } catch(e){} return; }
+    if (Call.status === 'live') callSetStatus('connecting', '연결이 잠시 끊겼어요. 다시 연결하는 중입니다.');
+    try { peer.reconnect(); } catch(e){}
+  });
+}
+
+function callActiveOpened(){
+  Call.starting = false;
+  var pending = Call.pending;
+  Call.pending = null;
+  if (pending){
+    callAnswerOrDial(pending.mc, pending.from);
+  } else {
+    callSetStatus('connecting', '연결을 기다리는 중이에요. 같은 방 코드를 쓰는 가족 기기에서도 통화를 시작해 주세요.');
+  }
+  if (Call.retryTimer) window.clearInterval(Call.retryTimer);
+  Call.retryTimer = window.setInterval(function(){
+    if (!Call.peer || Call.peer.destroyed){ if (Call.retryTimer){ window.clearInterval(Call.retryTimer); Call.retryTimer = null; } return; }
+    var live = Object.keys(Call.calls).length > 0 || Object.keys(Call.conns).some(function(k){ return Call.conns[k] && Call.conns[k].open; });
+    if (!live) callTryConnect();
+  }, 5000);
+}
+
+/* 수신 받기/발신 공통 시작 */
+function callBegin(opts){
+  opts = opts || {};
+  if (Call.starting) return;
+  callCfg();
+  callRingStop();
+  callIncomingReset();
+  var role = callRoleInfo();
+  var fromName = opts.from || '';
+  var mc = opts.mc || null;
+  Call.starting = true;
+  callSetStatus('connecting', '카메라와 마이크를 준비하고 있어요…');
+  if ($('#ambient') && $('#ambient').classList.contains('on')){ try { closeAmbient(); } catch(e){} }
+  showView('call');
+  callPushMsg('sys', fromName
+    ? (fromName + ' 님의 영상통화를 받는 중이에요.')
+    : ('통화를 시작했어요. 방 코드 ' + callRoomLabel() + ' · ' + role.name));
+
+  callGetMedia().then(function(res){
     var err = res && res.err, stream = res && res.stream;
     if (stream){
+      if (Call.localStream && Call.localStream !== stream){ try { Call.localStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){} }
       Call.localStream = stream;
       callAttachLocal(stream);
       stream.getAudioTracks().forEach(function(t){ t.enabled = Call.micOn; });
       stream.getVideoTracks().forEach(function(t){ t.enabled = Call.camOn; });
     } else {
-      var msg = (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError'))
-        ? '카메라·마이크 사용을 허용하지 않아 영상 없이 연결합니다. 브라우저 주소창의 자물쇠 아이콘에서 허용으로 바꿀 수 있어요.'
-        : (err && err.name === 'NotFoundError')
-          ? '이 기기에서 카메라·마이크를 찾지 못했어요. 채팅만으로 연결합니다.'
-          : '영상 장치를 열지 못했어요. 채팅만으로 연결합니다.';
+      var msg = callMediaErrorMsg(err);
       callPushMsg('sys', msg);
       toast(msg, 'warn', 4600);
     }
+
+    var peer = callPromoteStandby();
+    if (peer){
+      Call.pending = { mc: mc, from: fromName };
+      if (peer.open) callActiveOpened();
+      return;
+    }
+    if (Call.peer && !Call.peer.destroyed){
+      Call.pending = { mc: mc, from: fromName };
+      callActiveOpened();
+      return;
+    }
+
+    var id = callPeerId(role.name);
     callLoadLib(function(libErr){
       if (libErr){
-        Call.starting = false;
+        Call.starting = false; Call.pending = null;
         callSetStatus('error', '영상통화 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
         return;
       }
       if (navigator.onLine === false){
-        Call.starting = false;
+        Call.starting = false; Call.pending = null;
         callSetStatus('error', '인터넷에 연결되어 있지 않아요. 연결 후 다시 시도해 주세요.');
         return;
       }
-      var id = callPeerId(role.name);
-      var peer;
-      try {
-        peer = new window.Peer(id, { debug: 0 });
-      } catch(e){
-        Call.starting = false;
+      var peer2;
+      try { peer2 = new window.Peer(id, { debug: 0 }); }
+      catch(e){
+        Call.starting = false; Call.pending = null;
         callSetStatus('error', '영상통화를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
         return;
       }
-      Call.peer = peer;
-
-      peer.on('open', function(){
-        Call.starting = false;
-        callSetStatus('connecting', '연결을 기다리는 중이에요. 같은 방 코드를 쓰는 가족 기기에서도 통화를 시작해 주세요.');
-        callTryConnect();
-        if (Call.retryTimer) window.clearInterval(Call.retryTimer);
-        Call.retryTimer = window.setInterval(function(){
-          if (!Call.peer || Call.peer.destroyed) return;
-          var live = Object.keys(Call.calls).length > 0 || Object.keys(Call.conns).some(function(k){ return Call.conns[k] && Call.conns[k].open; });
-          if (!live) callTryConnect();
-        }, 5000);
-      });
-
-      peer.on('call', function(mc){
-        try { mc.answer(Call.localStream || undefined); } catch(e){}
-        Call.calls[mc.peer] = mc;
-        mc.on('stream', function(stream){
-          var nm = (mc.metadata && mc.metadata.role) ? mc.metadata.role : '가족';
-          callAttachRemote(stream, '👨‍👩‍👦 ' + nm);
-          callSetStatus('live');
-          callPushMsg('sys', nm + ' 기기와 연결됐어요.');
-        });
-        mc.on('close', function(){ delete Call.calls[mc.peer]; });
-      });
-
-      peer.on('connection', function(conn){
-        Call.conns[conn.peer] = conn;
-        conn.on('open', function(){
-          Call.remoteId = conn.peer;
-          if (Call.status !== 'live') callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
-        });
-        conn.on('data', function(data){
-          if (!data || typeof data !== 'object') return;
-          if (data.type === 'chat' && data.text){
-            callPushMsg('them', String(data.text).slice(0, 200), data.who || '가족');
-          }
-        });
-        conn.on('close', function(){ delete Call.conns[conn.peer]; });
-      });
-
-      peer.on('error', function(err){
-        var type = (err && err.type) || '';
-        Call.starting = false;
-        if (type === 'unavailable-id'){
-          callSetStatus('error', '이미 같은 역할의 기기가 연결돼 있어요. 이 기기의 역할을 다른 것으로 바꾸거나, 먼저 연결된 기기를 종료해 주세요.');
-        } else if (type === 'peer-unavailable'){
-          var missId = String((err && err.message) || '').replace(/^.*?peer\s+/, '').trim();
-          if (missId && Call.conns[missId] && !Call.conns[missId].open) delete Call.conns[missId];
-          if (missId && Call.calls[missId]) { try { Call.calls[missId].close(); } catch(e){} delete Call.calls[missId]; }
-          callSetStatus('connecting', '아직 다른 기기가 접속하지 않았어요. 가족 기기에서도 [통화 시작]을 눌러 주세요.');
-        } else if (type === 'network' || type === 'server-error'){
-          callSetStatus('error', '연결 서버에 닿지 못했어요. 잠시 뒤 다시 시도해 주세요.');
-        } else if (type === 'browser-incompatible'){
-          callSetStatus('error', '이 브라우저에서는 영상통화를 지원하지 않아요. 크롬·사파리 최신 버전을 사용해 주세요.');
-        } else if (type === 'webrtc'){
-          callSetStatus('error', '영상 연결에 실패했어요. 두 기기를 같은 와이파이에 두고 다시 시도해 주세요.');
-        }
-      });
-
-      peer.on('disconnected', function(){
-        if (Call.status === 'live') callSetStatus('connecting', '연결이 잠시 끊겼어요. 다시 연결하는 중입니다.');
-        try { peer.reconnect(); } catch(e){}
-      });
+      Call.pending = { mc: mc, from: fromName };
+      Call.peer = peer2;
+      callWirePeer(peer2, 'active');
     });
   }).catch(function(){
     Call.starting = false;
@@ -5514,11 +5935,60 @@ function callStart(){
   });
 }
 
+function callGetMedia(){
+  return new Promise(function(resolve){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ resolve({ err: new Error('nomedia'), stream: null }); return; }
+    try {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } })
+        .then(function(stream){ resolve({ err: null, stream: stream }); })
+        .catch(function(err){ resolve({ err: err || new Error('denied'), stream: null }); });
+    } catch(e){ resolve({ err: e, stream: null }); }
+  });
+}
+function callMediaErrorMsg(err){
+  return (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError'))
+    ? '카메라·마이크 사용을 허용하지 않아 영상 없이 연결합니다. 브라우저 주소창의 자물쇠 아이콘에서 허용으로 바꿀 수 있어요.'
+    : (err && err.name === 'NotFoundError')
+      ? '이 기기에서 카메라·마이크를 찾지 못했어요. 채팅만으로 연결합니다.'
+      : '영상 장치를 열지 못했어요. 채팅만으로 연결합니다.';
+}
+
+function callAnswerOrDial(mc, fromName){
+  if (mc){
+    try { mc.answer(Call.localStream || undefined); } catch(e){}
+    callTrackMedia(mc, fromName);
+    if (Call.status !== 'live') callSetStatus('connecting', (fromName || '가족') + ' 님과 연결하는 중이에요…');
+    return;
+  }
+  if (fromName){
+    var id = callPeerId(fromName);
+    if (id && !callDeclinedRecently(id)){
+      callOpenConn(id, false);
+      callDialPeer(id, fromName);
+    }
+    if (Call.status !== 'live') callSetStatus('connecting', fromName + ' 님에게 다시 거는 중이에요…');
+    return;
+  }
+  callTryConnect();
+}
+
+function callStart(){
+  if (Call.starting) return;
+  if (Call.peer && !Call.peer.destroyed){
+    callSetStatus('connecting', '다시 연결을 시도하고 있어요…');
+    callTryConnect();
+    return;
+  }
+  callBegin({});
+}
+
 function callHangup(){
   callPushMsg('sys', '통화를 종료했어요.');
+  callRingStop();
   callTeardown(false);
   callSetStatus('idle', '');
   toast('통화를 종료했어요');
+  callStandbyStart(1200);          // 끊은 뒤에도 다시 받을 수 있게 대기 재시작
 }
 
 function callToggleMic(){
@@ -5540,6 +6010,248 @@ function callToggleCam(){
   }
 }
 
+/* =========================================================
+   수신 벨 — 벨소리(합성) · 진동 · 전체화면 알림
+   ========================================================= */
+function ringContext(){
+  if (Ring.ctx) return Ring.ctx;
+  var AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  try { Ring.ctx = new AC(); } catch(e){ Ring.ctx = null; }
+  return Ring.ctx;
+}
+function ringUnlock(){
+  var ctx = ringContext();
+  if (!ctx) return;
+  if (ctx.state === 'suspended'){
+    try { var p = ctx.resume(); if (p && p.catch) p.catch(function(){}); } catch(e){}
+  }
+}
+/* 한 번의 "딩-동" — sine 두 음을 부드럽게 */
+function ringPlayBurst(){
+  var ctx = ringContext();
+  if (!ctx) return false;
+  if (ctx.state === 'suspended'){ try { var p = ctx.resume(); if (p && p.catch) p.catch(function(){}); } catch(e){} }
+  if (ctx.state !== 'running') return false;
+  try {
+    var t0 = ctx.currentTime + 0.02;
+    var notes = [{ f: 784.0, t: 0 }, { f: 622.3, t: 0.34 }, { f: 784.0, t: 0.72 }];
+    notes.forEach(function(n){
+      var osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.f, t0 + n.t);
+      g.gain.setValueAtTime(0.0001, t0 + n.t);
+      g.gain.exponentialRampToValueAtTime(0.16, t0 + n.t + 0.045);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.t + 0.34);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t0 + n.t); osc.stop(t0 + n.t + 0.4);
+    });
+    return true;
+  } catch(e){ return false; }
+}
+function callVibratePulse(){
+  if (!navigator.vibrate) return;
+  try { navigator.vibrate([300, 200, 300]); } catch(e){}
+}
+function callVibrateStart(){
+  callVibratePulse();
+  if (Incoming.vibeTimer) window.clearInterval(Incoming.vibeTimer);
+  Incoming.vibeTimer = window.setInterval(function(){
+    if (!Incoming.active) return;
+    callVibratePulse();
+  }, 2200);
+}
+function callVibrateStop(){
+  if (Incoming.vibeTimer){ window.clearInterval(Incoming.vibeTimer); Incoming.vibeTimer = null; }
+  if (navigator.vibrate){ try { navigator.vibrate(0); } catch(e){} }
+}
+function callRingStart(){
+  if (Ring.on) return;
+  Ring.on = true;
+  var first = ringPlayBurst();
+  callVibrateStart();
+  if (Ring.timer) window.clearInterval(Ring.timer);
+  Ring.timer = window.setInterval(function(){
+    if (!Ring.on) return;
+    var ok = ringPlayBurst();
+    callIncomingSoundHint(ok);
+  }, 2000);
+  callIncomingSoundHint(first);
+}
+function callRingStop(){
+  var wasOn = Ring.on;
+  Ring.on = false;
+  if (Ring.timer){ window.clearInterval(Ring.timer); Ring.timer = null; }
+  callVibrateStop();
+  if (wasOn) callIncomingNotifyClose();
+}
+function callIncomingSoundHint(audible){
+  Ring.audible = !!audible;
+  if (!Incoming.active) return;
+  var hint = $('#incomingHint');
+  if (!hint) return;
+  if (audible) hint.textContent = '받기를 누르면 카메라·마이크를 켜고 연결해요.';
+  else hint.textContent = '🔈 브라우저가 소리를 잠시 막고 있어요. 화면을 한 번 누르면 벨소리가 들려요.';
+}
+
+/* ---------- 브라우저 알림 ---------- */
+function callNotifySupported(){ return ('Notification' in window); }
+function callNotifyPermission(){ try { return ('Notification' in window) ? Notification.permission : 'unsupported'; } catch(e){ return 'unsupported'; } }
+function callNotifyButtonState(){
+  var b = $('#callNotifyBtn');
+  if (!b) return;
+  var p = callNotifyPermission();
+  if (p === 'unsupported'){ b.classList.add('hidden'); return; }
+  b.classList.remove('hidden');
+  b.classList.toggle('on', p === 'granted');
+  b.textContent = p === 'granted' ? '🔔 알림 켜짐' : (p === 'denied' ? '🔕 알림 차단됨' : '🔔 알림 허용');
+}
+function callNotifyAsk(){
+  var p = callNotifyPermission();
+  if (p === 'unsupported'){ toast('이 브라우저는 알림을 지원하지 않아요. 벨소리·진동으로 알려 드려요.', 'warn', 3800); return; }
+  if (p === 'granted'){ toast('이미 알림이 켜져 있어요 ✅', 'ok'); return; }
+  if (p === 'denied'){ toast('브라우저 설정에서 이 사이트의 알림을 "허용"으로 바꿔 주세요.', 'warn', 4400); return; }
+  try {
+    var r = Notification.requestPermission(function(res){ callNotifyButtonState(); if (res === 'granted') toast('알림을 켰어요 ✅', 'ok'); });
+    if (r && r.then) r.then(function(res){ callNotifyButtonState(); toast(res === 'granted' ? '알림을 켰어요 ✅' : '알림 없이 벨소리·진동으로 알려 드려요.'); }).catch(function(){});
+  } catch(e){ toast('알림을 켜지 못했어요. 벨소리·진동으로 알려 드려요.', 'warn'); }
+}
+function callIncomingNotify(from){
+  if (callNotifyPermission() !== 'granted') return;
+  var title = '📞 ' + from + '가 영상통화를 걸었어요';
+  var opts = {
+    body: '탭해서 받아 주세요', tag: CALL_NOTIFY_TAG, renotify: true,
+    icon: 'icon-192.png', badge: 'icon-192.png', silent: false, requireInteraction: true
+  };
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if (reg && reg.showNotification){
+          try { reg.showNotification(title, opts).catch(function(){}); return; } catch(e){}
+        }
+        callIncomingNotifyFallback(title, opts);
+      }).catch(function(){ callIncomingNotifyFallback(title, opts); });
+      return;
+    }
+  } catch(e){}
+  callIncomingNotifyFallback(title, opts);
+}
+function callIncomingNotifyFallback(title, opts){
+  try {
+    var n = new Notification(title, opts);
+    n.onclick = function(){ try { window.focus(); } catch(e){} try { n.close(); } catch(e){} try { callIncomingAccept(); } catch(e){} };
+    Incoming.notif = n;
+  } catch(e){}
+}
+function callIncomingNotifyClose(){
+  if (Incoming.notif){ try { Incoming.notif.close(); } catch(e){} Incoming.notif = null; }
+  try {
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if (reg && reg.getNotifications) reg.getNotifications({ tag: CALL_NOTIFY_TAG }).then(function(list){
+          list.forEach(function(n){ try { n.close(); } catch(e){} });
+        }).catch(function(){});
+      }).catch(function(){});
+    }
+  } catch(e){}
+}
+
+/* ---------- 수신 모달 ---------- */
+function callIncomingRender(){
+  var el = $('#incomingCall');
+  if (!el) return;
+  var info = callRoleInfo(Incoming.from);
+  var em = $('#incomingEmoji'), title = $('#incomingTitle'), foot = $('#incomingFrom');
+  if (em) em.textContent = info.em;
+  if (foot) foot.textContent = '📱 받을 때 카메라·마이크를 한 번만 허용해 주세요';
+  if (title) title.innerHTML = '<span class="ic-em">' + info.em + '</span> ' + esc(info.name) + '가 영상통화를 걸었어요';
+  el.classList.remove('hidden');
+  document.body.classList.add('incoming-on');
+  callIncomingSoundHint(Ring.audible);
+  var acc = $('#incomingAccept');
+  if (acc && !Call.starting) acc.disabled = false;
+}
+function callIncomingReset(){
+  Incoming.active = false;
+  Incoming.from = '';
+  Incoming.mc = null;
+  Incoming.conn = null;
+  Incoming.since = 0;
+  var el = $('#incomingCall');
+  if (el) el.classList.add('hidden');
+  document.body.classList.remove('incoming-on');
+  callStandbyRender();
+}
+function callIncomingHide(){
+  var el = $('#incomingCall');
+  if (el) el.classList.add('hidden');
+  document.body.classList.remove('incoming-on');
+}
+
+function callIncomingRing(from, conn){
+  if (!from || from === callRoleInfo().name) return;              // 내가 보낸 벨은 무시
+  if (conn && callDeclinedRecently(conn.peer)) return;            // 방금 거절한 기기
+  if (Incoming.active && Incoming.from === from) return;          // 이미 울리는 중
+  callIncomingOpen({ from: from, mc: null, conn: conn || null });
+}
+function callIncomingCall(mc, peer){
+  var from = (mc && mc.metadata && mc.metadata.role) ? mc.metadata.role : '가족';
+  if (Incoming.active && Incoming.from === from && !Incoming.mc){
+    Incoming.mc = mc;                                             // 벨이 울리는 사이 영상 연결이 도착
+    return;
+  }
+  callIncomingOpen({ from: from, mc: mc || null, conn: null });
+}
+function callIncomingOpen(info){
+  var from = info.from || '가족';
+  if (callInSession()){                                           // 이미 통화 중이면 정중히 거절
+    var conn = info.conn || (info.mc && Call.conns[info.mc.peer]) || null;
+    if (info.mc){ try { info.mc.close(); } catch(e){} }
+    if (conn && conn.open){ try { conn.send({ type: 'reject', from: callRoleInfo().name, reason: 'busy' }); } catch(e){} }
+    if (info.mc && info.mc.peer) Call.declined[info.mc.peer] = Date.now();
+    toast(from + ' 님이 영상통화를 걸었지만 지금 통화 중이에요', 'warn', 3600);
+    return;
+  }
+  if (Incoming.active && Incoming.mc && Incoming.mc !== info.mc){  // 이전 수신은 정리
+    try { Incoming.mc.close(); } catch(e){}
+  }
+  Incoming.active = true;
+  Incoming.from = from;
+  Incoming.mc = info.mc || null;
+  Incoming.conn = info.conn || null;
+  Incoming.since = Date.now();
+  callIncomingRender();
+  callRingStart();
+  callIncomingNotify(from);
+  if ($('#incomingAccept')) $('#incomingAccept').disabled = false;
+  callStandbySetState(Call.standby.peer ? 'ringing' : Call.standby.state);
+}
+
+function callIncomingAccept(){
+  if (!Incoming.active) return;
+  if (Call.starting) return;
+  var from = Incoming.from, mc = Incoming.mc, conn = Incoming.conn;
+  callRingStop();
+  callIncomingHide();
+  Incoming.active = false;
+  Incoming.from = ''; Incoming.mc = null; Incoming.conn = null;
+  if (conn && !Call.conns[conn.peer]) Call.conns[conn.peer] = conn;
+  callBegin({ from: from, mc: mc });
+}
+function callIncomingDecline(){
+  if (!Incoming.active) return;
+  var from = Incoming.from, mc = Incoming.mc, conn = Incoming.conn;
+  callRingStop();
+  callIncomingReset();
+  var peerId = mc && mc.peer ? mc.peer : (conn && conn.peer ? conn.peer : '');
+  if (peerId) Call.declined[peerId] = Date.now();
+  if (conn && conn.open){ try { conn.send({ type: 'reject', from: callRoleInfo().name }); } catch(e){} }
+  if (mc){ try { mc.close(); } catch(e){} }
+  if (conn && !Call.peer){ try { conn.close(); } catch(e){} if (Call.conns[conn.peer] === conn) delete Call.conns[conn.peer]; }
+  callStandbySetState(Call.standby.peer ? 'listening' : Call.standby.state);
+  toast(from + ' 님의 영상통화를 거절했어요', 'warn', 2800);
+}
+
 function callBind(){
   if (Call.bound) return;
   Call.bound = true;
@@ -5548,6 +6260,33 @@ function callBind(){
   if (end) end.addEventListener('click', function(){ callHangup(); });
   if (mic) mic.addEventListener('click', callToggleMic);
   if (cam) cam.addEventListener('click', callToggleCam);
+
+  var acc = $('#incomingAccept'), dec = $('#incomingDecline');
+  if (acc) acc.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); callIncomingAccept(); });
+  if (dec) dec.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); callIncomingDecline(); });
+  var inc = $('#incomingCall');
+  if (inc) inc.addEventListener('click', function(e){
+    if (e.target === inc) { /* 바깥을 눌러도 벨은 계속 울려요(실수로 놓치지 않게) */ }
+    ringUnlock();                    // 탭 한 번으로 소리 잠금을 풀어요
+    if (Incoming.active && !Ring.on) callRingStart();
+  });
+  var sbTog = $('#callStandbyToggle');
+  if (sbTog) sbTog.addEventListener('click', function(){
+    var on = !callStandbyEnabled();
+    callStandbySave(on);
+    if (on){
+      callStandbySetState('loading');
+      callStandbyStart(80);
+      toast('수신 대기를 켰어요. 가족이 걸면 이 기기에서 벨이 울려요 ✅', 'ok', 3200);
+    } else {
+      callStandbyStop();
+      toast('수신 대기를 껐어요. 이 기기에서는 벨이 울리지 않아요.', 'warn', 3000);
+    }
+    callStandbyRender();
+  });
+  var notify = $('#callNotifyBtn');
+  if (notify) notify.addEventListener('click', callNotifyAsk);
+
   var form = $('#callForm');
   if (form) form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -5562,6 +6301,12 @@ function callBind(){
   $$('.call-role').forEach(function(b){
     b.addEventListener('click', function(){
       var role = b.getAttribute('data-callrole');
+      var lock = deviceModeMember();
+      if (lock && role !== lock){
+        toast('이 기기는 ' + lock + ' 전용이에요 · 설정에서 모드를 바꾸면 역할을 고를 수 있어요', 'warn', 3600);
+        callSetStatus(Call.status, '');
+        return;
+      }
       var before = callRoleName();
       callSaveRole(role);
       var wasOn = !!Call.peer || Call.status === 'live' || Call.status === 'connecting';
@@ -5571,11 +6316,20 @@ function callBind(){
       } else {
         callSetStatus(Call.status, '');
       }
-      if (role === before && !wasOn){ toast(role + ' 기기로 설정돼 있어요'); return; }
+      if (role === before && !wasOn){
+        toast(role + ' 기기로 설정돼 있어요');
+        callStandbyStop();
+        callStandbyStart(400);
+        return;
+      }
       toast(role + ' 기기로 바꿨어요' + (wasOn && role !== before ? ' · 새 역할로 다시 연결할게요' : ''));
       if (wasOn && role !== before){
         Call.starting = false;
+        callStandbyStop();          // 이전 역할로 잡고 있던 대기 ID를 놓아 줘요
         window.setTimeout(function(){ callStart(); }, 400);
+      } else {
+        callStandbyStop();
+        callStandbyStart(600);
       }
     });
   });
@@ -5586,9 +6340,145 @@ function callBind(){
     save();
     callSetStatus(Call.status, '');
     toast('방 코드를 "' + callRoomLabel() + '"(으)로 바꿨어요. 가족 기기도 같은 코드로 맞춰 주세요.');
+    if (!Call.peer){ callStandbyStop(); callStandbyStart(600); }
   });
+
+  /* 첫 터치에서 오디오 잠금을 풀어 두면, 벨이 울릴 때 소리가 바로 나요 */
+  var unlock = function(){ ringUnlock(); };
+  ['pointerdown', 'keydown', 'touchstart'].forEach(function(ev){
+    document.addEventListener(ev, unlock, { passive: true });
+  });
+
   callRenderMsgs();
   callSetStatus('idle', '');
+  callStandbyRender();
+}
+
+/* =========================================================
+   이 기기 전용 모드 — 김수호 / 김지호 폰·태블릿용
+   · 이 설정은 이 기기의 localStorage에만 저장하고 동기화하지 않아요.
+   · 기록(퀘스트·소원·일정)은 그대로 Family-board로 함께 씁니다.
+   ========================================================= */
+var DEVICE_MODE_KEY = 'suho_jiho_device_mode_v1';
+var DEVICE_MODES = {
+  all:  { name: '가족 전체',    em: '👨‍👩‍👦', member: '' },
+  suho: { name: '김수호 전용', em: '🔥', member: '김수호' },
+  jiho: { name: '김지호 전용', em: '⚡', member: '김지호' }
+};
+function deviceModeGet(){
+  try {
+    var v = window.localStorage.getItem(DEVICE_MODE_KEY);
+    if (v === 'suho' || v === 'jiho') return v;
+  } catch(e){}
+  return 'all';
+}
+function deviceModeInfo(mode){
+  return DEVICE_MODES[mode] || DEVICE_MODES.all;
+}
+function deviceModeMember(){ return deviceModeInfo(deviceModeGet()).member || ''; }
+function deviceModeLocked(){ return !!deviceModeMember(); }
+/* 전용 기기에서는 할일을 마음대로 체크하지 못하게 해요 */
+function kidLockToast(){
+  toast('🔒 할일 체크는 부모님 기기에서만 할 수 있어요.', 'warn', 3200);
+}
+function kidLockChipHTML(){
+  return '<span class="lock-chip" title="부모님 기기에서만 체크할 수 있어요">🔒 부모님만 체크</span>';
+}
+function kidLockNoteHTML(){
+  return '<div class="kid-lock-note">🔒 퀘스트 체크·추가는 부모님 기기에서만 할 수 있어요. 오늘 한 일은 부모님께 알려 주세요!</div>';
+}
+function deviceModeBadgeHTML(){
+  var mode = deviceModeGet();
+  if (!deviceModeLocked()) return '';
+  var info = deviceModeInfo(mode);
+  return ' <span class="badge kid" id="deviceModeBadge">' + info.em + ' ' + esc(info.name) + '</span>';
+}
+function deviceModeRender(){
+  var mode = deviceModeGet(), member = deviceModeMember(), info = deviceModeInfo(mode);
+  var badge = $('#deviceModeBadge');
+  if (badge){
+    if (member){ badge.textContent = info.em + ' ' + info.name; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  }
+  var sel = $('#memberFilter');
+  if (sel){
+    sel.disabled = !!member;
+    var want = member || (State.settings && State.settings.filter) || '전체';
+    if (sel.value !== want) sel.value = want;
+  }
+  var wrap = $('#filterWrap');
+  if (wrap) wrap.classList.toggle('locked', !!member);
+  $$('.dm-opt').forEach(function(b){
+    var on = b.getAttribute('data-devicemode') === mode;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  var chip = $('#deviceModeChip');
+  if (chip){ chip.textContent = info.em + ' ' + info.name; chip.className = 'chip dm-chip ' + mode; }
+  var note = $('#deviceModeNote');
+  if (note){
+    note.innerHTML = member
+      ? '이 기기는 <b>' + esc(member) + '</b> 화면으로 고정돼 있어요. 퀘스트·소원·일정은 저장되면 다른 가족 기기에도 그대로 보여요. 영상통화 역할도 <b>' + esc(member) + '</b>로 맞춰뒀어요.'
+      : '수호·지호 전용으로 바꾸면 그 아이의 퀘스트·소원·학교 화면만 보이고, 영상통화 역할도 그 이름으로 함께 바뀜니다.';
+  }
+}
+function deviceModeSet(v, silent, skipGuard){
+  var mode = (v === 'suho' || v === 'jiho') ? v : 'all';
+  var before = deviceModeGet();
+  /* 전용 기기에서 나가는 것은 부모님 확인을 거쳐요(아이가 혼자 풀지 못하게) */
+  if (!skipGuard && !silent && mode !== before && deviceModeLocked()){
+    openParentCheck(function(){ deviceModeSet(mode, false, true); });
+    return before;
+  }
+  var info = deviceModeInfo(mode);
+  var member = info.member || '';
+  try { window.localStorage.setItem(DEVICE_MODE_KEY, mode); } catch(e){}
+
+  if (member){
+    /* 이 기기의 통화 역할도 아이 이름으로 맞추고, 수신 대기를 새 ID로 다시 켜요 */
+    callSaveRole(member);
+    if (!Call.peer){
+      callStandbyStop();
+      callStandbyStart(500);
+    }
+    callSetStatus(Call.status, '');
+  } else {
+    /* 전용 모드에서 맞춰둔 역할이면 가족 전체로 돌릴 때 기기 기본 역할로 */
+    var curRole = callRoleName();
+    if (curRole === '김수호' || curRole === '김지호'){
+      callSaveRole(callRoleByDevice());
+      if (!Call.peer){ callStandbyStop(); callStandbyStart(500); }
+      callSetStatus(Call.status, '');
+    }
+  }
+  if (!silent) showView(UI.view || 'home');
+  renderAll();
+  if (!silent && mode !== before){
+    if (member) toast('이 기기를 ' + info.name + ' 모드로 바꿨어요 ✅', 'ok', 3000);
+    else toast('이 기기를 가족 전체 모드로 바꿨어요');
+  }
+  return mode;
+}
+/* 부모님 확인 — 간단한 곱셈으로 어린이가 혼자 풀지 못하게 합니다 */
+function openParentCheck(onOk){
+  var a = 6 + Math.floor(Math.random() * 4);
+  var b = 6 + Math.floor(Math.random() * 4);
+  window.__parentCheckAnswer = a * b;
+  window.__parentOnOk = onOk || null;
+  openModal(
+    modalHead('🔒 부모님 확인', '전용 모드를 끝내려면 계산을 맞춰 주세요') +
+    '<form data-form="parent-check">' +
+      '<div class="modal-body">' +
+        '<div class="pc-q">' + a + ' × ' + b + ' = ?</div>' +
+        '<input type="number" name="answer" inputmode="numeric" placeholder="정답을 넣어 주세요" autocomplete="off" required style="text-align:center;font-size:18px;font-weight:900" maxlength="4">' +
+        '<p class="pc-note">아이 혼자 전용 모드를 풀지 못하도록 하는 간단한 확인이에요.</p>' +
+      '</div>' +
+      '<div class="modal-foot"><span class="muted" style="font-size:11px;font-weight:700">모드를 바꿔도 기록은 그대로예요</span>' +
+        '<div class="right"><button type="button" class="btn ghost" data-action="close-modal">취소</button>' +
+        '<button type="submit" class="btn primary">확인</button></div></div>' +
+    '</form>'
+  );
+  window.setTimeout(function(){ var i = $('#modalRoot input[name="answer"]'); if (i) i.focus(); }, 80);
 }
 
 function bindEvents(){
@@ -5654,6 +6544,7 @@ function bindEvents(){
 
     switch (act){
       case 'close-modal': closeModal(); break;
+      case 'device-mode': deviceModeSet(el.getAttribute('data-devicemode')); break;
       case 'growth-edit': openGrowthModal(el.getAttribute('data-mid')); break;
       case 'growth-add': openGrowthAdd(el.getAttribute('data-mid')); break;
       case 'growth-edit-row': openGrowthAdd(el.getAttribute('data-mid'), el.getAttribute('data-date')); break;
@@ -5708,6 +6599,7 @@ function bindEvents(){
       }
       case 'q-toggle': toggleQuest(el.getAttribute('data-mid'), el.getAttribute('data-qid')); break;
       case 'q-del': {
+        if (deviceModeLocked()){ kidLockToast(); break; }
         var m = memberById(el.getAttribute('data-mid'));
         m.quests = m.quests.filter(function(q){ return q.id !== el.getAttribute('data-qid'); });
         save(); renderAll(); break;
@@ -5791,6 +6683,7 @@ function bindEvents(){
 
     if (df === 'qadd' || df === 'qadd2'){
       e.preventDefault();
+      if (deviceModeLocked()){ kidLockToast(); return; }
       var mid = f.getAttribute('data-mid');
       var m = memberById(mid);
       var txtInput = f.querySelector('input[name="text"]');
@@ -5805,6 +6698,22 @@ function bindEvents(){
       txtInput.value = '';
       save(); renderAll();
       toast('퀘스트를 추가했어요', 'ok');
+      return;
+    }
+
+    if (df === 'parent-check'){
+      e.preventDefault();
+      var pa = f.querySelector('input[name="answer"]');
+      var pv = Number(String((pa && pa.value) || '').replace(/[^0-9]/g, ''));
+      if (pv && pv === Number(window.__parentCheckAnswer)){
+        var pcb = window.__parentOnOk;
+        window.__parentOnOk = null;
+        closeModal();
+        if (pcb) pcb();
+      } else {
+        toast('앗, 계산이 맞지 않아요. 다시 해볼까요?', 'warn', 2600);
+        if (pa){ pa.value = ''; pa.focus(); }
+      }
       return;
     }
 
@@ -6082,6 +6991,7 @@ function bindEvents(){
     toast('처음 상태로 초기화했어요');
   });
   $('#todoResetAll').addEventListener('click', function(){
+    if (deviceModeLocked()){ kidLockToast(); return; }
     if (!window.confirm('두 아이의 오늘 퀘스트를 모두 초기화할까요?')) return;
     State.members.forEach(function(m){
       m.quests.forEach(function(q){ q.done = false; });
@@ -6130,6 +7040,20 @@ function boot(){
   });
 
   callBind();
+  if (deviceModeMember()) callSaveRole(deviceModeMember());   // 전용 기기면 통화 역할도 그 아이로
+  deviceModeRender();
+  callStandbyRender();
+
+  // 수신 대기: 앱을 열면 잠시 뒤 조용히 켜 둡니다(카메라·마이크 권한은 아직 요청하지 않아요)
+  if (callStandbyEnabled()) window.setTimeout(function(){ callStandbyStart(0); }, 1800);
+  window.addEventListener('online', function(){
+    if (callStandbyEnabled() && !Call.peer && (!Call.standby.peer || Call.standby.peer.destroyed)) callStandbyStart(900);
+  });
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) return;
+    if (!callStandbyEnabled() || Call.peer) return;
+    if (!Call.standby.peer || Call.standby.peer.destroyed) callStandbyStart(600);
+  });
 
   // 기기 동기화: 연결돼 있으면 앱을 열 때 최신 기록을 가져옴
   window.addEventListener('online', function(){
