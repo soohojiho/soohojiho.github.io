@@ -1468,6 +1468,23 @@ body.incoming-on{overflow:hidden}
               <button type="button" class="btn ghost sm" id="callNotifyBtn">🔔 알림 허용</button>
             </div>
           </div>
+          <!-- 안드로이드 앱(APK)에서만 보이는 설정 -->
+          <div class="call-standby hidden" id="nativeRingRow">
+            <div class="csb-text">
+              <div class="csb-title">📲 앱 수신 대상 <span class="chip" id="nativeRingChip">전체</span></div>
+              <div class="csb-note" id="nativeRingNote">이 기기(앱)에서 통화를 걸면, 앱이 설치된 가족 기기의 <b>잠금화면이 켜지며 벨이 울립니다</b>. 웹 화면 통화는 지금처럼 모든 기기로 함께 걸려요.</div>
+            </div>
+            <div class="csb-right">
+              <select id="nativeRingTarget" style="border:1px solid #dbe3ef;border-radius:10px;padding:8px 10px;font-weight:800;font-size:12.5px;background:#fff;outline:none">
+                <option value="all">전체</option>
+                <option value="김수호">🔥 김수호</option>
+                <option value="김지호">⚡ 김지호</option>
+                <option value="아빠">아빠</option>
+                <option value="엄마">엄마</option>
+                <option value="태블릿">태블릿</option>
+              </select>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -5461,6 +5478,97 @@ var CALL_ROLE_KEY = 'suho_jiho_call_role_v1';
 var CALL_STANDBY_KEY = 'suho_jiho_call_standby_v1';
 var CALL_NOTIFY_TAG = 'suho-call-incoming';
 
+/* ---------- 안드로이드 앱(APK) 연결 — 브라우저에서는 조용히 꺼져 있어요 ---------- */
+var NATIVE_TARGET_KEY = 'suho_jiho_native_ring_target_v1';
+var NATIVE_DEVICE_KEY = 'suho_jiho_native_device_v1';
+var NATIVE_RING_TARGETS = ['all', '김수호', '김지호', '아빠', '엄마', '태블릿'];
+
+function nativeBridge(){
+  try {
+    var b = window.AndroidBridge;
+    if (b && typeof b.isNativeApp === 'function' && b.isNativeApp()) return b;
+  } catch(e){}
+  return null;
+}
+function nativeIsApp(){ return !!nativeBridge(); }
+function nativeDeviceId(){
+  var b = nativeBridge();
+  try { if (b && b.getDeviceId){ var v = b.getDeviceId(); if (v) return String(v); } } catch(e){}
+  var id = '';
+  try { id = window.localStorage.getItem(NATIVE_DEVICE_KEY) || ''; } catch(e){}
+  if (!id){
+    id = 'web-' + Math.random().toString(36).slice(2, 10);
+    try { window.localStorage.setItem(NATIVE_DEVICE_KEY, id); } catch(e){}
+  }
+  return id;
+}
+function nativeRingTargetGet(){
+  var v = '';
+  try { v = window.localStorage.getItem(NATIVE_TARGET_KEY) || ''; } catch(e){}
+  for (var i = 0; i < NATIVE_RING_TARGETS.length; i++){ if (NATIVE_RING_TARGETS[i] === v) return v; }
+  return 'all';
+}
+function nativeRingTargetLabel(v){ return (!v || v === 'all') ? '전체' : v; }
+function nativeRingTargetSave(v){
+  try { window.localStorage.setItem(NATIVE_TARGET_KEY, String(v || 'all')); } catch(e){}
+  var chip = $('#nativeRingChip');
+  if (chip) chip.textContent = nativeRingTargetLabel(v);
+}
+function nativeRegisterRole(){
+  var b = nativeBridge();
+  if (!b || typeof b.registerRole !== 'function') return;
+  try { b.registerRole(callRoleName(), nativeDeviceId()); } catch(e){}
+}
+function nativePushCall(){
+  var b = nativeBridge();
+  if (!b || typeof b.sendCallPush !== 'function') return;
+  try { b.sendCallPush(nativeRingTargetGet(), callRoleName(), callRoomLabel()); } catch(e){}
+}
+function nativePushCancel(){
+  var b = nativeBridge();
+  if (!b || typeof b.cancelCallPush !== 'function') return;
+  try { b.cancelCallPush('all', callRoleName(), callRoomLabel()); } catch(e){}
+}
+function nativeRender(){
+  var b = nativeBridge();
+  var row = $('#nativeRingRow');
+  if (row) row.classList.toggle('hidden', !b);
+  if (!b) return;
+  var sel = $('#nativeRingTarget');
+  if (sel) sel.value = nativeRingTargetGet();
+  var chip = $('#nativeRingChip');
+  if (chip) chip.textContent = nativeRingTargetLabel(nativeRingTargetGet());
+}
+/* 알림의 [받기]로 열리면 ?autoAnswer=1&callerRole=..&roomCode=.. 로 통화 화면에 바로 들어갑니다 */
+function nativeAutoAnswer(){
+  var q = {};
+  try {
+    (window.location.search || '').replace(/^\?/, '').split('&').forEach(function(part){
+      if (!part) return;
+      var i = part.indexOf('=');
+      var k = i < 0 ? part : part.slice(0, i);
+      var v = i < 0 ? '' : part.slice(i + 1);
+      try { q[decodeURIComponent(k)] = decodeURIComponent(v.replace(/\+/g, ' ')); } catch(e){ q[k] = v; }
+    });
+  } catch(e){}
+  if (String(q.autoAnswer || '') !== '1') return false;
+  var caller = q.callerRole || '';
+  var room = q.roomCode || '';
+  if (room){ try { callCfg().room = room; } catch(e){} }
+  try {
+    if (window.history && history.replaceState) history.replaceState(null, '', window.location.pathname + window.location.hash);
+  } catch(e){}
+  window.setTimeout(function(){
+    try {
+      if (Incoming.active){ callIncomingAccept(); return; }
+      nativePushCancel();                     // 다른 기기의 앱 벨은 여기서 멈춰요
+      if (!Call.peer || Call.peer.destroyed) callBegin({ from: caller || '가족' });
+      else callTryConnect();
+    } catch(e){}
+  }, 800);
+  return true;
+}
+
 function callRoleByDevice(){
   var dev = '';
   try { dev = deviceLabel(); } catch(e){ dev = ''; }
@@ -5476,6 +5584,7 @@ function callRoleName(){
 }
 function callSaveRole(name){
   try { window.localStorage.setItem(CALL_ROLE_KEY, String(name)); } catch(e){}
+  try { nativeRegisterRole(); } catch(e){}   // 앱이면 역할·FCM 토큰을 중계 서버에 다시 알려요
 }
 function callRoleEm(name){
   for (var i = 0; i < CALL_ROLES.length; i++){ if (CALL_ROLES[i].name === name) return CALL_ROLES[i].em; }
@@ -6079,12 +6188,14 @@ function callStart(){
     callTryConnect();
     return;
   }
+  nativePushCall();                       // 앱이면 가족 기기 잠금화면으로 수신 벨을 보내요
   callBegin({});
 }
 
 function callHangup(){
   callPushMsg('sys', '통화를 종료했어요.');
   callRingStop();
+  if (Call.status !== 'live') nativePushCancel();   // 받기 전에 껐으면 앱 벨도 정리
   callTeardown(false);
   callSetStatus('idle', '');
   toast('통화를 종료했어요');
@@ -6332,6 +6443,7 @@ function callIncomingAccept(){
   if (Call.starting) return;
   var from = Incoming.from, mc = Incoming.mc, conn = Incoming.conn;
   callRingStop();
+  nativePushCancel();                    // 다른 기기의 앱 벨소리도 같이 멈춰요
   callIncomingHide();
   Incoming.active = false;
   Incoming.from = ''; Incoming.mc = null; Incoming.conn = null;
@@ -6386,6 +6498,9 @@ function callBind(){
   });
   var notify = $('#callNotifyBtn');
   if (notify) notify.addEventListener('click', callNotifyAsk);
+
+  var ringSel = $('#nativeRingTarget');
+  if (ringSel) ringSel.addEventListener('change', function(){ nativeRingTargetSave(ringSel.value); });
 
   var form = $('#callForm');
   if (form) form.addEventListener('submit', function(e){
@@ -7143,6 +7258,14 @@ function boot(){
   if (deviceModeMember()) callSaveRole(deviceModeMember());   // 전용 기기면 통화 역할도 그 아이로
   deviceModeRender();
   callStandbyRender();
+  window.setTimeout(function(){
+    try {
+      nativeRender();            // 앱(APK)에서만 '앱 수신 대상' 설정이 보여요
+      nativeRegisterRole();      // 역할·FCM 토큰 중계 서버 등록
+      nativeAutoAnswer();        // 알림의 [받기]로 열렸으면 바로 통화 화면으로
+    } catch(e){}
+  }, 300);
+  window.addEventListener('focus', function(){ try { nativeRegisterRole(); } catch(e){} });
 
   // 수신 대기: 앱을 열면 잠시 뒤 조용히 켜 둡니다(카메라·마이크 권한은 아직 요청하지 않아요)
   if (callStandbyEnabled()) window.setTimeout(function(){ callStandbyStart(0); }, 1800);
