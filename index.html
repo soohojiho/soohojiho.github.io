@@ -488,7 +488,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;font-weight:500}
 .meal-day ul li{font-size:11px;font-weight:700;color:var(--ink2);padding:2px 0;line-height:1.45;border-bottom:1px dashed #eef2f8}
 .meal-day ul li:last-child{border-bottom:0}
 .meal-day .alg{font-size:9px;color:#b3bdcc;font-weight:700;margin-left:2px}
-.meal-empty{font-size:11px;color:#b3bdcc;font-weight:700;padding:16px 0;text-align:center}
+.meal-empty{font-size:10.5px;color:#b3bdcc;font-weight:700;padding:14px 4px;text-align:center;line-height:1.6;word-break:keep-all}
 .src{font-size:10px;color:#9aa6b8;font-weight:800;display:inline-flex;align-items:center;gap:4px}
 
 /* ============ Weather ============ */
@@ -860,6 +860,10 @@ label.sync-check input{width:auto}
 .call-form input{flex:1;min-width:0}
 .call-form button{flex:0 0 40px;padding:8px 0;border-radius:12px;background:linear-gradient(135deg,#4f7cff,#3b6fe0);color:#fff;display:flex;align-items:center;justify-content:center}
 .call-setup{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.call-role-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.call-role-bar .crb-label{font-size:10.5px;font-weight:900;color:#8b96a8;margin-right:2px}
+.call-role-bar .call-role{padding:6px 12px;border-radius:999px;font-size:11.5px;box-shadow:var(--shadow-sm)}
+.call-role-bar .crb-note{font-size:10px;font-weight:800;color:#a8b3c4;margin-left:2px}
 .call-roles{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
 .call-role{padding:9px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:900;color:#3b4759;text-align:center}
 .call-role.active{background:var(--brand-soft);border-color:#b9ccff;color:var(--brand)}
@@ -1207,7 +1211,7 @@ label.sync-check input{width:auto}
                   <button data-mealweek="this" class="active">이번 주</button>
                   <button data-mealweek="next">다음 주</button>
                 </div>
-                <button class="btn sm ghost" id="mealRefresh" title="급식 새로고침">↻</button>
+                <button class="btn sm ghost" id="mealRefresh" title="하이클래스 식단 다시 보기">↻</button>
                 <span class="src" id="mealSrc"></span>
               </div>
             </div>
@@ -1293,6 +1297,14 @@ label.sync-check input{width:auto}
           <span class="desc" id="callDesc">같은 방 코드를 쓰는 가족 기기끼리 바로 연결돼요</span>
           <div class="right"><span class="pill" id="callRoomPill">방 코드 · soohojiho-family</span></div>
         </div>
+        <div class="call-role-bar" id="callRoleBar">
+          <span class="crb-label">이 기기 역할</span>
+          <button type="button" class="call-role" data-callrole="아빠">👨 아빠</button>
+          <button type="button" class="call-role" data-callrole="엄마">👩 엄마</button>
+          <button type="button" class="call-role" data-callrole="태블릿">📱 태블릿</button>
+          <button type="button" class="call-role" data-callrole="아이들">🧒 아이들</button>
+          <span class="crb-note">한 번 고르면 이 기기에만 저장돼요</span>
+        </div>
         <div class="call-layout">
           <div>
             <div class="call-stage" id="callStage">
@@ -1339,6 +1351,8 @@ label.sync-check input{width:auto}
                 <button type="button" class="call-role" data-callrole="태블릿">태블릿<small>아이들 방</small></button>
                 <button type="button" class="call-role" data-callrole="아이들">아이들<small>수호·지호와 함께</small></button>
               </div>
+              <p class="g-note">역할은 <b>이 기기에만</b> 저장돼서 폰·태블릿이 서로 역할을 덮어쓰지 않아요.<br>
+              같은 역할을 두 기기에서 고르면 연결되지 않아요.</p>
             </div>
             <div>
               <div style="font-size:11.5px;font-weight:900;color:#5b6b83">가족 방 코드</div>
@@ -1396,7 +1410,7 @@ label.sync-check input{width:auto}
             <div class="card-head"><h3><span class="ico">🔗</span>바로가기 · 안내</h3></div>
             <div class="stack">
               <div class="set-row"><div class="k">네이버 날씨<small>부산 해운대구</small></div><div class="v"><a class="btn sm ghost" target="_blank" rel="noopener" href="https://search.naver.com/search.naver?where=nexearch&query=%EB%B6%80%EC%82%B0%20%ED%95%B4%EC%9A%B4%EB%8C%80%EA%B5%AC%20%EB%82%A0%EC%94%A8">열기 ↗</a></div></div>
-              <div class="set-row"><div class="k">학교 급식<small>하이클래스(학교급식) 우선 · NEIS 대체</small></div><div class="v"><a class="btn sm ghost" href="https://www.hiclass.net/main/home" target="_blank" rel="noopener">하이클래스 ↗</a> <a class="btn sm ghost" href="https://open.neis.go.kr" target="_blank" rel="noopener">나이스 ↗</a></div></div>
+              <div class="set-row"><div class="k">학교 급식<small>하이클래스 1학년 2반 학급 게시판</small></div><div class="v"><a class="btn sm ghost" href="https://www.hiclass.net/main/home" target="_blank" rel="noopener">하이클래스 ↗</a></div></div>
               <div class="set-row"><div class="k">장산초등학교<small>www.jangsan.es.kr</small></div><div class="v"><a class="btn sm ghost" href="http://www.jangsan.es.kr" target="_blank" rel="noopener">열기 ↗</a></div></div>
               <div class="divider"></div>
               <div class="set-row"><div class="k">📱 홈 화면에 추가<small>Chrome 메뉴 → '홈 화면에 추가'</small></div><div class="v"><span class="chip">앱처럼 사용</span></div></div>
@@ -1483,99 +1497,8 @@ var OWNERS = ['김수호','김지호','엄마','아빠','가족 공통'];
 var OWNER_CLASS = {'김수호':'suho','김지호':'jiho','엄마':'mom','아빠':'dad','가족 공통':'family'};
 var DAY_KO = ['월','화','수','목','금','토','일'];
 var DAY_SUN = ['일','월','화','수','목','금','토'];
-var NEIS = { atpt:'C10', code:'7211070', name:'장산초등학교', addr:'부산광역시 해운대구 선수촌로 68', tel:'051-520-1500' };
 var NAVER_WX = 'https://search.naver.com/search.naver?where=nexearch&query=' + encodeURIComponent('부산 해운대구 날씨');
 var NAVER_WX_HOME = 'https://weather.naver.com/';
-
-/* NEIS 급식식단정보(중식) — 2026-11-16 ~ 11-27, 장산초등학교 실제 식단 */
-var MEAL_SEED = {
- "2026-11-16": [
-  "친환경백미밥",
-  "순살누룽지닭곰탕 (5.13.15)",
-  "피시엔칩스/타르타르 (1.2.5.6.9)",
-  "해물부추전 (5.6.9.17)",
-  "숙주나물무침 (5.6.13)",
-  "배추김치 (9.13)",
-  "튼튼요구르트 (2)"
- ],
- "2026-11-17": [
-  "친환경기장밥",
-  "가자미미역국 (5.6)",
-  "숯불간장돈불고기 (5.6.10.12.13)",
-  "스모크햄야채볶음 (2.5.6.10.13.15.16.18)",
-  "양배추쌈/쌈장 (5.6.13)",
-  "깍두기 (9.13)"
- ],
- "2026-11-18": [
-  "친환경백미밥",
-  "장터소고기국 (5.6.16)",
-  "국물떡볶이 (5.6.13)",
-  "순대/쌈장 (2.5.6.10.12.13.16.18)",
-  "배추김치 (9.13)",
-  "고구마맛탕 (13)",
-  "사과주스 (2)"
- ],
- "2026-11-19": [
-  "친환경찰보리밥",
-  "한우배추된장국 (5.6.16)",
-  "비빔나물/약고추장 (5.6.10.13)",
-  "달걀후라이 (1.5.18)",
-  "타코야끼/소스 (1.2.5.6.13)",
-  "배추김치 (9.13)",
-  "찹쌀유과 (5)"
- ],
- "2026-11-20": [
-  "친환경흑미밥",
-  "일식가쓰오장국 (1.2.5.6.7.9.13.18)",
-  "순살춘천닭갈비 (5.6.13.15)",
-  "감자고로케/케찹 (1.5.6.12)",
-  "브로컬리두부무침 (5.6.13)",
-  "배추김치 (9.13)",
-  "골드키위1/2"
- ],
- "2026-11-23": [
-  "친환경기장밥",
-  "들깨감자국 (5.6)",
-  "묵은지제육볶음 (5.6.9.10.13)",
-  "야채계란찜 (1.13)",
-  "파래김자반볶음 (5.6)",
-  "궁채양파장아찌 (5.6.13)"
- ],
- "2026-11-24": [
-  "렌틸콩밥",
-  "호박고추장찌개 (5.6)",
-  "블랙순살등심돈까스/소스 (1.2.5.6.10.12.13.16)",
-  "편육냉채 (1.2.5.6.8.10.13)",
-  "으깬고구마샐러드 (1.5.6)",
-  "배추김치 (9.13)"
- ],
- "2026-11-25": [
-  "친환경찹쌀밥",
-  "옹심이만두국 (2.5.6.10.16.18)",
-  "스팸&달걀구이/줄김 (1.2.5.6.10.15.16.18)",
-  "참치마요 (1.2.5.6.13)",
-  "충무식오징어어묵무침 (5.6.13.17)",
-  "볶음김치 (9.13)",
-  "귤"
- ],
- "2026-11-26": [
-  "친환경찰보리밥",
-  "맑은콩나물국 (5.6)",
-  "닭볶음면 (5.6.13.15)",
-  "아게다시도후&간장소스 (1.5.6.13)",
-  "참나물무침 (5.6.13)",
-  "배추김치 (9.13)"
- ],
- "2026-11-27": [
-  "오색잡곡밥",
-  "돈육김치찌개 (5.6.9.10.13)",
-  "코다리강정/양념치킨소스 (5.6.12.13.16)",
-  "비벼먹는메란장 (1.5.6.13)",
-  "청경채겉절이",
-  "깍두기 (9.13)",
-  "조각멜론"
- ]
-};
 
 /* =========================================================
    하이클래스(HiClass) — 장산초등학교 1학년 2반 (김수호)
@@ -1590,7 +1513,7 @@ var HICLASS = {
   url: 'https://www.hiclass.net/main/home',
   school: '장산초등학교', grade: '1', cls: '2', clsLabel: '1학년 2반', teacher: '박소윤',
   syncedAt: '2026-11-17 19:10',
-  /* 하이클래스에서 직접 확인한 급식 날짜 (이 날짜는 NEIS 자동 수집이 덮어쓰지 않음) */
+  /* 하이클래스 학급 게시판에서 직접 확인한 급식 날짜 */
   mealDays: ['2026-11-16', '2026-11-17', '2026-11-18'],
   /* 요일별 하교 시각 — 하이클래스 중요안내(3/6) */
   leaveTime: { '1':'12:40', '2':'13:40', '3':'12:40', '4':'13:40', '5':'13:40', '6':'', '0':'' },
@@ -1599,10 +1522,25 @@ var HICLASS = {
   dressNote: '월·금은 활동하기 편한 복장'
 };
 
-/* 하이클래스에서 확인한 급식 (11/16~11/18, 내장 NEIS 시드와 일치 확인됨) */
+/* 하이클래스에서 확인한 급식 (11/16~11/18 학급 게시글 + 다음 급식 예고) */
 var HICLASS_MEALS = {
-  '2026-11-16': MEAL_SEED['2026-11-16'],
-  '2026-11-17': MEAL_SEED['2026-11-17'],
+  '2026-11-16': [
+    '친환경백미밥',
+    '순살누룽지닭곰탕 (5.13.15)',
+    '피시엔칩스/타르타르 (1.2.5.6.9)',
+    '해물부추전 (5.6.9.17)',
+    '숙주나물무침 (5.6.13)',
+    '배추김치 (9.13)',
+    '튼튼요구르트 (2)'
+  ],
+  '2026-11-17': [
+    '친환경기장밥',
+    '가자미미역국 (5.6)',
+    '숯불간장돈불고기 (5.6.10.12.13)',
+    '스모크햄야채볶음 (2.5.6.10.13.15.16.18)',
+    '양배추쌈/쌈장 (5.6.13)',
+    '깍두기 (9.13)'
+  ],
   '2026-11-18': [
     '친환경백미밥', '장터소고기국 (5.6.16)', '국물떡볶이 (5.6.13)',
     '순대/쌈장 (2.5.6.10.12.13.16.18)', '배추김치 (9.13)', '고구마맛탕 (13)', '사과주스 (2)'
@@ -1801,10 +1739,11 @@ function defaultState(){
     }),
     meals: Object.assign({}, HICLASS_MEALS),
     mealSource: null,
-    neisSchedule: HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; }),
-    neisUpdated: HICLASS.syncedAt + ' (하이클래스)',
+    schoolSchedule: HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; }),
+    schoolUpdated: HICLASS.syncedAt + ' (하이클래스)',
     health: {},
-    call: { role:'아빠', room:'soohojiho-family' },
+    /* 통화 역할(call.role)은 기기마다 localStorage에만 저장합니다 */
+    call: { room:'soohojiho-family' },
     weather: null
   };
 }
@@ -1958,6 +1897,13 @@ function loadState(){
 /* 저장된 JSON(로컬·동기화)을 현재 앱 구조에 맞춰 정리 */
 function normalizeState(parsed){
   var def = defaultState();
+  /* 예전 버전이 쓰던 학사일정 키 이름을 새 이름으로 옮깁니다 */
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)){
+    if (parsed.neisSchedule && !parsed.schoolSchedule) parsed.schoolSchedule = parsed.neisSchedule;
+    if (parsed.neisUpdated && !parsed.schoolUpdated) parsed.schoolUpdated = parsed.neisUpdated;
+    delete parsed.neisSchedule;
+    delete parsed.neisUpdated;
+  }
   State = deepDefaults(parsed, def);
   // 배열은 사용자 데이터를 그대로 신뢰
   if (!Array.isArray(State.members) || State.members.length < 2) State.members = def.members;
@@ -1976,16 +1922,25 @@ function normalizeState(parsed){
     if (typeof m.birth !== 'string') m.birth = '';
   });
   if (!State.health || typeof State.health !== 'object' || Array.isArray(State.health)) State.health = {};
-  if (!State.call || typeof State.call !== 'object' || Array.isArray(State.call)) State.call = { role:'아빠', room:'soohojiho-family' };
+  if (!State.call || typeof State.call !== 'object' || Array.isArray(State.call)) State.call = { room:'soohojiho-family' };
   if (!State.call.room) State.call.room = 'soohojiho-family';
-  if (!State.call.role) State.call.role = '아빠';
-  /* 학사일정은 하이클래스에서 확인한 것만 남깁니다(나이스에서 자동으로 채운 일정 제거) */
-  if (Array.isArray(State.neisSchedule)){
-    var onlyHiclass = State.neisSchedule.filter(function(x){ return x && x.src === 'hiclass'; });
-    if (onlyHiclass.length !== State.neisSchedule.length) State.neisSchedule = onlyHiclass;
-    if (!State.neisSchedule.length) State.neisSchedule = hiclassScheduleSeed();
+  /* 역할은 기기마다 따로 저장해요. 동기화로 들어온 예전 역할 값은 버립니다. */
+  if (Object.prototype.hasOwnProperty.call(State.call, 'role')) delete State.call.role;
+  /* 급식은 하이클래스 학급 게시판·직접 입력한 식단만 남기고, 예전 자동 수집분은 지웁니다 */
+  if (!State.mealSource || typeof State.mealSource !== 'object' || Array.isArray(State.mealSource)) State.mealSource = {};
+  Object.keys(State.mealSource).forEach(function(d){
+    if (String(State.mealSource[d]).toLowerCase() === 'neis'){
+      delete State.mealSource[d];
+      delete State.meals[d];
+    }
+  });
+  /* 학사일정은 하이클래스에서 확인한 것만 남깁니다 */
+  if (Array.isArray(State.schoolSchedule)){
+    var onlyHiclass = State.schoolSchedule.filter(function(x){ return x && x.src === 'hiclass'; });
+    if (onlyHiclass.length !== State.schoolSchedule.length) State.schoolSchedule = onlyHiclass;
+    if (!State.schoolSchedule.length) State.schoolSchedule = hiclassScheduleSeed();
   }
-  // 하이클래스(1학년 2반) 급식·학사일정·알림장을 NEIS보다 우선
+  // 하이클래스(1학년 2반) 급식·학사일정·알림장을 기준으로 맞춥니다
   try { applyHiclassPriority(); } catch(e){}
   return State;
 }
@@ -2773,6 +2728,18 @@ function syncSetStatus(status, msg){
 }
 
 /* ---- 주고받기 ---- */
+/* 통화 역할은 기기마다 다르므로 올리는 기록에서 뺍니다 */
+function syncDataForUpload(){
+  if (State && State.call && typeof State.call === 'object' && Object.prototype.hasOwnProperty.call(State.call, 'role')){
+    var copy = {}, k, c;
+    for (k in State){ if (Object.prototype.hasOwnProperty.call(State, k)) copy[k] = State[k]; }
+    copy.call = {};
+    for (c in State.call){ if (Object.prototype.hasOwnProperty.call(State.call, c)) copy.call[c] = State.call[c]; }
+    delete copy.call.role;
+    return copy;
+  }
+  return State;
+}
 function syncEnvelope(){
   if (!stateUpdatedAt() && State) State.updatedAt = new Date().toISOString();
   return JSON.stringify({
@@ -2781,7 +2748,7 @@ function syncEnvelope(){
     device: (Sync.cfg && Sync.cfg.deviceId) || '',
     deviceName: (Sync.cfg && Sync.cfg.deviceName) || deviceLabel(),
     savedAt: new Date().toISOString(),
-    data: State
+    data: syncDataForUpload()
   });
 }
 function syncRemoteMeta(){
@@ -4411,7 +4378,6 @@ function allergyPart(name){
 
 function mealsFor(dateStr){
   if (State.meals && State.meals[dateStr] && State.meals[dateStr].length) return State.meals[dateStr];
-  if (MEAL_SEED[dateStr]) return MEAL_SEED[dateStr];
   return [];
 }
 function todayMeal(){ return mealsFor(todayISO()); }
@@ -4423,7 +4389,7 @@ function renderSchool(){
   // 공지
   var wrap = $('#noticeList');
   if (!wrap) return;
-  var sch = (State.neisSchedule && State.neisSchedule.length) ? State.neisSchedule : hiclassScheduleSeed();
+  var sch = (State.schoolSchedule && State.schoolSchedule.length) ? State.schoolSchedule : hiclassScheduleSeed();
   var today = todayISO();
   var items = [];
   sch.forEach(function(s){
@@ -4493,7 +4459,7 @@ function renderSchool(){
   var extra = $('#prepExtra');
   if (extra){
     var wr = weekRange('this');
-    var weekEvents = (State.neisSchedule && State.neisSchedule.length ? State.neisSchedule : hiclassScheduleSeed()).filter(function(x){
+    var weekEvents = (State.schoolSchedule && State.schoolSchedule.length ? State.schoolSchedule : hiclassScheduleSeed()).filter(function(x){
       return x.date >= wr[0] && x.date <= wr[1];
     });
     var h = '<b style="font-size:11.5px;color:#5b6b83">📌 이번 주 학교 일정</b>';
@@ -4533,19 +4499,18 @@ function renderSchool(){
       html += '<div class="meal-day ' + (isToday ? 'today' : '') + '">' +
         '<div class="dh"><b>' + (d.getMonth() + 1) + '/' + d.getDate() + '</b>' +
         '<small>' + DAY_SUN[d.getDay()] + (isToday ? ' · 오늘' : '') + '</small>' +
-        (hi ? '<small style="display:block;color:#0ea5e9;font-weight:800;font-size:9.5px;margin-top:2px">하이클래스</small>'
-            : (list.length ? '<small style="display:block;color:#a8b3c4;font-weight:800;font-size:9.5px;margin-top:2px">NEIS</small>' : '')) + '</div>' +
+        (hi ? '<small style="display:block;color:#0ea5e9;font-weight:800;font-size:9.5px;margin-top:2px">하이클래스</small>' : '') + '</div>' +
         (list.length ? '<ul>' + list.map(function(x){
           var al = allergyPart(x);
           return '<li>' + esc(stripAllergy(x)) + (al ? '<span class="alg"> (' + esc(al) + ')</span>' : '') + '</li>';
-        }).join('') + '</ul>' : '<div class="meal-empty">급식 정보 없음</div>') +
+        }).join('') + '</ul>' : '<div class="meal-empty">아직 하이클래스에 식단이 올라오지 않았어요</div>') +
         '</div>';
     }
     mwrap.innerHTML = html;
     var ms = $('#mealSrc');
     if (ms) ms.textContent = '하이클래스 기준 · ' + HICLASS.syncedAt.slice(5, 16) + ' 확인';
     var mt = $('#mealNote');
-    if (mt) mt.innerHTML = '※ 하이클래스에 오늘 급식과 다음 급식 예고로 올라온 식단이에요. 아직 올라오지 않은 날짜는 NEIS(나이스) 식단으로 보여줍니다.';
+    if (mt) mt.innerHTML = '※ 하이클래스 학급 게시판에 올라온 식단만 보여드려요. 아직 올라오지 않은 날은 비워 둡니다.';
     $$('#mealTabs button').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-mealweek') === UI.mealWeek);
     });
@@ -4553,13 +4518,11 @@ function renderSchool(){
 }
 
 /* ---------- 하이클래스 우선 원칙 ----------
-   하이클래스에서 확인한 급식·학사일정은 NEIS 자동 수집이 덮어쓰지 않는다.
-   NEIS는 하이클래스가 아직 안내하지 않은 날짜의 대체(fallback) 역할만 한다. */
+   급식·학사일정은 하이클래스 학급 게시판에서 확인한 값만 보여줍니다. */
 function mealSource(){ return (State.mealSource && typeof State.mealSource === 'object') ? State.mealSource : (State.mealSource = {}); }
 function isHiclassMeal(iso){
   var m = mealSource();
   if (m[iso] === 'hiclass') return true;
-  if (m[iso] === 'neis') return false;
   return !!HICLASS_MEALS[iso];
 }
 function hiclassMealDays(){
@@ -4581,16 +4544,16 @@ function applyHiclassPriority(){
     if (State.mealSource[d] !== 'hiclass'){ State.mealSource[d] = 'hiclass'; changed = true; }
     HICLASS_MEALS[d] && (State.meals[d] = HICLASS_MEALS[d].slice());
   });
-  if (!State.neisSchedule || !State.neisSchedule.length){
-    State.neisSchedule = hiclassScheduleSeed(); changed = true;
+  if (!State.schoolSchedule || !State.schoolSchedule.length){
+    State.schoolSchedule = hiclassScheduleSeed(); changed = true;
   } else {
     var have = {};
-    State.neisSchedule.forEach(function(s){ have[s.date + '|' + s.name] = 1; });
+    State.schoolSchedule.forEach(function(s){ have[s.date + '|' + s.name] = 1; });
     hiclassScheduleSeed().forEach(function(s){
-      if (!have[s.date + '|' + s.name]){ State.neisSchedule.push(s); have[s.date + '|' + s.name] = 1; changed = true; }
-      else State.neisSchedule.forEach(function(x){ if (x.date === s.date && x.name === s.name && x.src !== 'hiclass'){ x.src = 'hiclass'; changed = true; } });
+      if (!have[s.date + '|' + s.name]){ State.schoolSchedule.push(s); have[s.date + '|' + s.name] = 1; changed = true; }
+      else State.schoolSchedule.forEach(function(x){ if (x.date === s.date && x.name === s.name && x.src !== 'hiclass'){ x.src = 'hiclass'; changed = true; } });
     });
-    State.neisSchedule.sort(function(a, b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
+    State.schoolSchedule.sort(function(a, b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
   }
   /* 예시(sample) 공지·준비물은 하이클래스 알림장 내용으로 교체 */
   if (Array.isArray(State.notices)){
@@ -4614,64 +4577,6 @@ function applyHiclassPriority(){
   }
   if (changed) State.hiclassSeeded = true;
   return changed;
-}
-
-/* ---------- NEIS 실시간 ---------- */
-function neisMealURL(fromYmd, toYmd){
-  var sch = State.settings.school || {};
-  return 'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100' +
-    '&ATPT_OFCDC_SC_CODE=' + encodeURIComponent(sch.atpt || NEIS.atpt) +
-    '&SD_SCHUL_CODE=' + encodeURIComponent(sch.code || NEIS.code) +
-    '&MLSV_FROM_YMD=' + fromYmd + '&MLSV_TO_YMD=' + toYmd;
-}
-
-function fetchNeisMeals(silent){
-  var ranges = [weekRange('this'), weekRange('next')];
-  var urls = ranges.map(function(r){
-    return neisMealURL(r[0].replace(/-/g, ''), r[1].replace(/-/g, ''));
-  });
-  return Promise.all(urls.map(function(u){
-    return fetchWithTimeout(u, 9000).then(function(r){ return r.json(); }).catch(function(){ return {}; });
-  })).then(function(list){
-    var all = [];
-    var added = 0;
-    var skipped = 0;
-    list.forEach(function(j){
-      if (j && j.mealServiceDietInfo && j.mealServiceDietInfo[1] && j.mealServiceDietInfo[1].row){
-        all = all.concat(j.mealServiceDietInfo[1].row);
-      }
-    });
-    if (!all.length) throw new Error('no rows');
-    all.forEach(function(r){
-      var ymd = String(r.MLSV_YMD);
-      var iso = ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
-      var items = String(r.DDISH_NM || '').split(/<br\s*\/?>/i).map(function(s){ return s.trim(); }).filter(Boolean);
-      if (!items.length) return;
-      var m = mealSource();
-      if (isHiclassMeal(iso)){ skipped++; return; }   // 하이클래스 확인분은 그대로 둔다
-      if (!State.meals[iso] || !State.meals[iso].length){ added++; }
-      State.meals[iso] = items;
-      m[iso] = 'neis';
-    });
-    State.mealUpdated = isoDate(new Date()) + ' ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
-    save();
-    renderSchool();
-    renderTodaySummary();
-    renderHero();
-    if (!silent) toast('🍚 NEIS에서 급식 ' + all.length + '끼를 불러왔어요' + (skipped ? ' (하이클래스 ' + skipped + '일 유지)' : ''), 'ok');
-    return all.length;
-  });
-}
-
-function refreshSchoolData(){
-  toast('하이클래스 급식 정보를 확인하는 중…');
-  fetchNeisMeals(true).catch(function(){ return 0; }).then(function(n){
-    if (n) toast('🍚 급식 ' + n + '끼를 새로 확인했어요', 'ok', 3200);
-    else toast('새로 받은 급식 정보가 없어요. 저장된 식단으로 보여드려요.', 'warn', 3600);
-    renderSchool();
-    renderTodaySummary();
-    renderHero();
-  });
 }
 
 /* =========================================================
@@ -5277,14 +5182,33 @@ var Call = {
   msgs: []
 };
 
+/* 이 기기의 통화 역할 — 기기마다 따로 저장해 폰·태블릿이 서로 덮어쓰지 않습니다 */
+var CALL_ROLE_KEY = 'suho_jiho_call_role_v1';
+function callRoleByDevice(){
+  var dev = '';
+  try { dev = deviceLabel(); } catch(e){ dev = ''; }
+  return (dev === '태블릿') ? '태블릿' : '아빠';
+}
+function callRoleName(){
+  var v = '';
+  try { v = window.localStorage.getItem(CALL_ROLE_KEY) || ''; } catch(e){ v = ''; }
+  for (var i = 0; i < CALL_ROLES.length; i++){ if (CALL_ROLES[i].name === v) return v; }
+  v = callRoleByDevice();
+  callSaveRole(v);
+  return v;
+}
+function callSaveRole(name){
+  try { window.localStorage.setItem(CALL_ROLE_KEY, String(name)); } catch(e){}
+}
+
 function callCfg(){
   if (!State.call || typeof State.call !== 'object') State.call = {};
-  if (!State.call.role) State.call.role = '아빠';
   if (!State.call.room) State.call.room = 'soohojiho-family';
   return State.call;
 }
 function callRoleInfo(name){
-  for (var i = 0; i < CALL_ROLES.length; i++) if (CALL_ROLES[i].name === (name || callCfg().role)) return CALL_ROLES[i];
+  var want = name || callRoleName();
+  for (var i = 0; i < CALL_ROLES.length; i++) if (CALL_ROLES[i].name === want) return CALL_ROLES[i];
   return CALL_ROLES[0];
 }
 function callPeerId(roleName){
@@ -5329,7 +5253,7 @@ function callSetStatus(status, msg){
   if (end) end.classList.toggle('hidden', !(status === 'live' || status === 'connecting'));
   var pill = $('#callRoomPill');
   if (pill) pill.textContent = '방 코드 · ' + callRoomLabel() + ' · ' + callRoleInfo().em + ' ' + callRoleInfo().name;
-  $$('#callRoles .call-role').forEach(function(b){
+  $$('.call-role').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-callrole') === callRoleInfo().name);
   });
   var roomInput = $('#callRoom');
@@ -5639,10 +5563,21 @@ function callBind(){
   $$('.call-role').forEach(function(b){
     b.addEventListener('click', function(){
       var role = b.getAttribute('data-callrole');
-      callCfg().role = role;
-      save();
-      callSetStatus(Call.status, '');
-      toast(role + ' 기기로 설정했어요');
+      var before = callRoleName();
+      callSaveRole(role);
+      var wasOn = !!Call.peer || Call.status === 'live' || Call.status === 'connecting';
+      if (wasOn && role !== before){
+        callTeardown(false);
+        callSetStatus('idle', '');
+      } else {
+        callSetStatus(Call.status, '');
+      }
+      if (role === before && !wasOn){ toast(role + ' 기기로 설정돼 있어요'); return; }
+      toast(role + ' 기기로 바꿨어요' + (wasOn && role !== before ? ' · 새 역할로 다시 연결할게요' : ''));
+      if (wasOn && role !== before){
+        Call.starting = false;
+        window.setTimeout(function(){ callStart(); }, 400);
+      }
     });
   });
   var room = $('#callRoom');
@@ -6115,7 +6050,7 @@ function bindEvents(){
   $('#homeWxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
   $('#wxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
   var msr = $('#mealRefresh');
-  if (msr) msr.addEventListener('click', refreshSchoolData);
+  if (msr) msr.addEventListener('click', function(){ renderSchool(); toast('하이클래스에서 확인한 식단을 다시 보여드렸어요'); });
 
   $('#exportBtn').addEventListener('click', exportJSON);
   $('#importBtn').addEventListener('click', function(){ $('#importFile').click(); });
@@ -6197,8 +6132,6 @@ function boot(){
     renderAmbient();
   });
 
-  // 급식은 하이클래스 우선, 확인되지 않은 날만 나이스 식단으로 채웁니다
-  fetchNeisMeals(true).catch(function(){});
   callBind();
 
   // 기기 동기화: 연결돼 있으면 앱을 열 때 최신 기록을 가져옴
