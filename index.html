@@ -1211,7 +1211,6 @@ label.sync-check input{width:auto}
                   <button data-mealweek="this" class="active">이번 주</button>
                   <button data-mealweek="next">다음 주</button>
                 </div>
-                <button class="btn sm ghost" id="mealRefresh" title="하이클래스 식단 다시 보기">↻</button>
                 <span class="src" id="mealSrc"></span>
               </div>
             </div>
@@ -6049,8 +6048,6 @@ function bindEvents(){
 
   $('#homeWxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
   $('#wxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
-  var msr = $('#mealRefresh');
-  if (msr) msr.addEventListener('click', function(){ renderSchool(); toast('하이클래스에서 확인한 식단을 다시 보여드렸어요'); });
 
   $('#exportBtn').addEventListener('click', exportJSON);
   $('#importBtn').addEventListener('click', function(){ $('#importFile').click(); });
