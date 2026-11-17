@@ -5786,6 +5786,7 @@ function callWirePeer(peer, kind){
   peer.__kind = kind;
 
   peer.on('open', function(){
+    peer.__opened = true;
     if (peer.__kind === 'standby'){
       if (Call.standby.peer !== peer) return;
       callStandbySetState(Incoming.active ? 'ringing' : 'listening');
@@ -5897,7 +5898,7 @@ function callBegin(opts){
     var peer = callPromoteStandby();
     if (peer){
       Call.pending = { mc: mc, from: fromName };
-      if (peer.open) callActiveOpened();
+      if (peer.__opened || peer.open) callActiveOpened();
       return;
     }
     if (Call.peer && !Call.peer.destroyed){
@@ -5974,6 +5975,7 @@ function callAnswerOrDial(mc, fromName){
 
 function callStart(){
   if (Call.starting) return;
+  if (Incoming.active){ callIncomingAccept(); return; }   // 벨이 울리는 중이면 그 통화를 받아요
   if (Call.peer && !Call.peer.destroyed){
     callSetStatus('connecting', '다시 연결을 시도하고 있어요…');
     callTryConnect();
