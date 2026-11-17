@@ -2701,7 +2701,8 @@ var Sync = {
   remoteSha: '',      // 마지막으로 주고받은 원격 파일 sha (같으면 내려받지 않아요)
   etag: '',           // 조건부 요청(If-None-Match)용
   pollTimer: null,    // 15초 자동 확인 타이머
-  lastProbeAt: 0
+  lastProbeAt: 0,
+  pauseUntil: 0       // GitHub 요청 한도에 걸리면 잠시 자동 확인을 멈춰요
 };
 
 function deviceLabel(){
@@ -2907,7 +2908,10 @@ function syncProbeMeta(){
     .then(function(res){
       if (res.status === 304) return { notModified: true };
       if (res.status === 404) return null;
-      if (!res.ok) throw new Error(syncErrorText(res.status));
+      if (!res.ok){
+        syncNoteRateLimit(res);
+        throw new Error(syncErrorText(res.status));
+      }
       var tag = res.headers.get('ETag');
       return res.json().then(function(json){
         if (tag) json.__etag = tag;      // 받아들인 뒤에만 기억해요 (건너뛴 차례는 다음에 다시 받기)
@@ -3117,6 +3121,17 @@ function syncAfterChange(){
     syncPush({});
   }, 2500);
 }
+/* GitHub 요청 한도(시간당)에 걸리면 잠시 15초 확인을 멈춰요 — 올리기·가져오기는 그대로 동작해요 */
+function syncNoteRateLimit(res){
+  if (!res) return false;
+  var remaining = res.headers.get('X-RateLimit-Remaining');
+  if (res.status !== 429 && !(res.status === 403 && remaining === '0')) return false;
+  var reset = Number(res.headers.get('X-RateLimit-Reset') || 0) * 1000;
+  var wait = 5 * 60 * 1000;
+  if (reset > Date.now() && reset - Date.now() < 30 * 60 * 1000) wait = (reset - Date.now()) + 2000;
+  Sync.pauseUntil = Date.now() + wait;
+  return true;
+}
 function syncMaybePull(){
   if (!syncConfigured() || !syncOnline()) return;
   if (Sync.cfg.auto === false) return;
@@ -3131,6 +3146,7 @@ function syncPollTick(){
   if (Sync.cfg.auto === false) return;
   if (Sync.busy || Sync.applying) return;
   if (Sync.pushTimer) return;                                    // 올리려고 모아 둔 기록을 덮어쓰지 않기
+  if (Sync.pauseUntil && Date.now() < Sync.pauseUntil) return;    // 요청 한도에 걸렸어요
   if (Date.now() - Sync.lastProbeAt < 12000) return;
   syncPollPull();
 }
