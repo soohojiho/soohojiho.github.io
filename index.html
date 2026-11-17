@@ -60,6 +60,7 @@ a:hover{text-decoration:underline}
   position:sticky;top:0;height:100vh;
   display:flex;flex-direction:column;gap:6px;
   padding:22px 16px 16px;
+  overflow-y:auto;overscroll-behavior:contain;
   background:rgba(255,255,255,.82);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-right:1px solid var(--line);
@@ -736,6 +737,143 @@ label.sync-check input{width:auto}
   .profile-row .pk-art{width:82px;height:82px;flex:0 0 82px}
   .profile-row .pk-art img{width:72px;height:72px}
 }
+/* ============ 성장·건강 ============ */
+.g-kid-nav{display:flex;gap:6px;flex-wrap:wrap}
+.g-sumgrid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.g-stat{border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:linear-gradient(180deg,#ffffff,#f8fbff)}
+.g-stat .k{font-size:11.5px;font-weight:900;color:#7d8899;letter-spacing:-.01em}
+.g-stat .v{font-size:24px;font-weight:900;letter-spacing:-.03em;line-height:1.15;margin-top:2px;color:#1b2434}
+.g-stat .v small{font-size:12px;font-weight:800;color:#8b96a8;margin-left:2px}
+.g-stat .d{font-size:11px;font-weight:800;color:#96a1b2;margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.g-stat .d .dt{color:#8b96a8}
+.g-delta{font-weight:900}
+.g-delta.up{color:#0f9e84}
+.g-delta.down{color:#e0592b}
+.g-delta.flat{color:#8b96a8}
+.g-pct{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:900;border:1px solid transparent}
+.g-pct.p-blue{background:#eef4ff;color:#3b6fe0;border-color:#d9e5ff}
+.g-pct.p-mint{background:#e9fbf5;color:#0f9e84;border-color:#cbf2e6}
+.g-pct.p-amber{background:#fff6e3;color:#b8730b;border-color:#ffe6b8}
+.g-pct.p-red{background:#fff0f0;color:#d94040;border-color:#ffd6d6}
+.g-pct.p-gray{background:#f4f7fb;color:#8b96a8;border-color:#e6ecf5}
+
+.g-chart-tabs{display:flex;gap:4px;background:#f1f5fc;border-radius:12px;padding:3px}
+.g-chart-tabs button{flex:1;padding:6px 4px;border-radius:9px;font-size:12px;font-weight:900;color:#7d8899}
+.g-chart-tabs button.active{background:#fff;color:var(--brand);box-shadow:0 2px 8px rgba(28,52,98,.08)}
+.g-chart-box{position:relative;margin-top:10px}
+.g-chart-box svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.g-chart-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.g-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:10.5px;font-weight:800;color:#66738a}
+.g-legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.g-tip{position:absolute;pointer-events:none;background:#1b2434;color:#fff;font-size:10.5px;font-weight:800;padding:3px 7px;border-radius:8px;transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .12s}
+.g-tip.on{opacity:1}
+.g-note{font-size:10.5px;font-weight:700;color:#9aa6b8;line-height:1.6;margin-top:8px}
+
+.g-table{width:100%;border-collapse:collapse;font-size:12px}
+.g-table th{font-size:10.5px;color:#96a1b2;font-weight:900;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+.g-table td{padding:7px 6px;border-bottom:1px solid var(--line2);font-weight:800;color:#3b4759}
+.g-table tr{transition:background .12s}
+.g-table tbody tr{cursor:pointer}
+.g-table tbody tr:hover{background:#f8fbff}
+.g-table tbody tr.sel{background:#eef4ff;box-shadow:inset 3px 0 0 var(--brand)}
+.g-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.g-table .acts{text-align:right;white-space:nowrap;display:flex;gap:4px;justify-content:flex-end}
+#growthChartCard{align-self:start}
+.g-table .x-btn{background:#fff}
+.g-row-pct{font-size:10px;font-weight:900;color:#8b96a8;margin-left:4px}
+.g-birth{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;font-weight:800;color:#66738a;margin-top:8px}
+.g-birth input{padding:6px 8px;border:1px solid var(--line);border-radius:9px;font-size:12px;font-weight:800;width:auto}
+
+/* 예방접종·검진 */
+.h-group{margin-top:14px}
+.h-group > h4{font-size:12.5px;font-weight:900;color:#3b4759;display:flex;align-items:center;gap:6px}
+.h-row{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid var(--line2);border-radius:12px;background:#fbfdff;margin-top:6px}
+.h-row.done{background:#f2fbf7;border-color:#d5f0e4}
+.h-row .hb{flex:1;min-width:0}
+.h-row .hn{font-size:12px;font-weight:900;color:#28303f}
+.h-row .hd{font-size:10.5px;font-weight:800;color:#8b96a8;margin-top:2px}
+.h-row .hd b{color:#5b6b83}
+.h-row .hstate{font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.h-row .hstate.todo{background:#fff6e3;color:#b8730b}
+.h-row .hstate.done{background:#e9fbf5;color:#0f9e84}
+.h-row .hstate.na{background:#f4f7fb;color:#96a1b2}
+.h-check{flex:0 0 26px;width:26px;height:26px;border-radius:8px;border:2px solid #dbe4f0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.h-row.done .h-check{background:linear-gradient(135deg,#34d399,#10b981);border-color:#10b981}
+.h-date{font-size:10.5px;font-weight:800;color:#5b6b83;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px 5px;width:auto}
+
+/* ============ 날씨 (오늘/내일 + 대기질) ============ */
+.wx-seg{display:flex;gap:3px;background:#eef3fb;border-radius:11px;padding:3px}
+.wx-seg button{padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:900;color:#7d8899}
+.wx-seg button.active{background:#fff;color:var(--brand);box-shadow:0 2px 8px rgba(28,52,98,.08)}
+.wx2-head{display:flex;align-items:center;gap:10px}
+.wx2-head .big{font-size:40px;line-height:1}
+.wx2-temp{font-size:26px;font-weight:900;letter-spacing:-.03em}
+.wx2-temp small{font-size:13px;font-weight:800;color:#8b96a8;margin-left:4px}
+.wx2-cond{font-size:11.5px;font-weight:800;color:#66738a;margin-top:1px}
+.wx2-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}
+.wx2-cell{background:#fbfdff;border:1px solid var(--line2);border-radius:12px;padding:7px 8px;min-width:0}
+.wx2-cell .k{font-size:9.5px;font-weight:900;color:#9aa6b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wx2-cell .v{font-size:13px;font-weight:900;color:#28303f;margin-top:1px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.wx2-cell .v em{font-style:normal;font-size:9.5px;font-weight:900;padding:1px 5px;border-radius:999px}
+.aiq-good{background:#e9fbf5;color:#0f9e84}
+.aiq-normal{background:#eef4ff;color:#3b6fe0}
+.aiq-bad{background:#fff2e6;color:#c8720b}
+.aiq-worst{background:#fff0f0;color:#d94040}
+.aiq-none{background:#f4f7fb;color:#96a1b2}
+.wx2-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;font-size:10px;font-weight:800;color:#9aa6b8}
+
+/* ============ 영상통화 ============ */
+.call-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+.call-layout > *{min-width:0}
+.call-stage{position:relative;width:100%;background:linear-gradient(160deg,#22303f,#141c26);border-radius:20px;overflow:hidden;aspect-ratio:16/9;min-height:220px;box-shadow:var(--shadow)}
+.call-stage video{width:100%;height:100%;object-fit:cover;display:block;background:#141c26}
+.call-idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#c7d3e2;text-align:center;padding:16px}
+.call-idle .em{font-size:40px;opacity:.9}
+.call-idle b{font-size:13px;font-weight:900;color:#e8eef7}
+.call-idle span{font-size:11.5px;font-weight:700;color:#93a3b8;line-height:1.6;max-width:380px}
+.call-pip{position:absolute;right:12px;bottom:12px;width:110px;aspect-ratio:3/4;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.85);background:#0d141b;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.call-pip video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.call-pip .off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;color:#8fa0b5;background:#0d141b}
+.call-badges{position:absolute;left:12px;top:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.call-badge{background:rgba(12,20,28,.72);color:#dbe6f2;font-size:10.5px;font-weight:900;padding:4px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;backdrop-filter:blur(4px)}
+.call-badge .dot{width:6px;height:6px;border-radius:50%;background:#8fa0b5;display:inline-block}
+.call-badge.waiting .dot{background:#ffb547}
+.call-badge.connecting .dot{background:#4f7cff;animation:pulse 1s infinite}
+.call-badge.live .dot{background:#34d399;animation:pulse 1.3s infinite}
+.call-badge.err .dot{background:#ff6b6b}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.call-remote-name{position:absolute;left:12px;bottom:12px;background:rgba(12,20,28,.72);color:#dbe6f2;font-size:10.5px;font-weight:900;padding:3px 9px;border-radius:999px}
+.call-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.call-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:900;color:#3b4759;box-shadow:var(--shadow-sm)}
+.call-btn:hover{border-color:#c9d8f5}
+.call-btn.off{background:#fff0f0;border-color:#ffd6d6;color:#d94040}
+.call-btn.start{background:linear-gradient(135deg,#4f7cff,#3b6fe0);border-color:#3b6fe0;color:#fff}
+.call-btn.end{background:linear-gradient(135deg,#ff7a7a,#ef4444);border-color:#ef4444;color:#fff}
+.call-chat{display:flex;flex-direction:column;height:100%;min-height:360px}
+.call-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 2px;min-height:240px;max-height:420px}
+.call-msg{max-width:86%;padding:7px 10px;border-radius:12px;font-size:12px;font-weight:700;line-height:1.5;word-break:break-word}
+.call-msg.me{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.call-msg.them{align-self:flex-start;background:#f1f5fc;color:#28303f;border-bottom-left-radius:4px}
+.call-msg .who{display:block;font-size:9.5px;font-weight:900;opacity:.75;margin-bottom:2px}
+.call-msg.sys{align-self:center;background:#f8fbff;color:#8b96a8;font-size:10.5px;font-weight:800;text-align:center;border:1px dashed var(--line);max-width:100%}
+.call-form{display:flex;gap:6px;margin-top:8px}
+.call-form input{flex:1;min-width:0}
+.call-form button{flex:0 0 40px;padding:8px 0;border-radius:12px;background:linear-gradient(135deg,#4f7cff,#3b6fe0);color:#fff;display:flex;align-items:center;justify-content:center}
+.call-setup{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.call-roles{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.call-role{padding:9px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:900;color:#3b4759;text-align:center}
+.call-role.active{background:var(--brand-soft);border-color:#b9ccff;color:var(--brand)}
+.call-role small{display:block;font-size:9.5px;font-weight:800;color:#9aa6b8;margin-top:1px}
+@media (max-width:1080px){
+  .call-layout{grid-template-columns:minmax(0,1fr)}
+  .call-chat{min-height:280px}
+  .call-msgs{max-height:260px;min-height:170px}
+}
+@media (max-width:760px){
+  .wx2-grid{grid-template-columns:repeat(3,1fr)}
+  .call-setup{grid-template-columns:1fr}
+  .call-pip{width:88px}
+}
 @media print{.sidebar,.topbar,.btn{display:none}}
 </style>
 </head>
@@ -755,7 +893,9 @@ label.sync-check input{width:auto}
       <button class="nav-item" data-view="todos"><span class="ico">✅</span>할일<span class="nav-badge" id="navBadgeTodo"></span></button>
       <button class="nav-item" data-view="diary"><span class="ico">📖</span>일기</button>
       <button class="nav-item" data-view="school"><span class="ico">🏫</span>학교생활</button>
+      <button class="nav-item" data-view="growth"><span class="ico">💗</span>성장·건강</button>
       <button class="nav-item" data-view="weather"><span class="ico">🌤</span>날씨</button>
+      <button class="nav-item" data-view="call"><span class="ico">📹</span>영상통화</button>
     </nav>
     <div class="nav-label">관리</div>
     <nav class="nav">
@@ -766,7 +906,7 @@ label.sync-check input{width:auto}
         <div class="av" style="background:#fff1e8">🧒</div><div class="av" style="background:#fff8dc">🧒</div><div class="av" style="background:#ffeef4">👩</div><div class="av" style="background:#eaf6ff">👨</div>
         <div class="txt"><b style="color:#3b4759">우리 가족 4명</b><br>함께 만드는 오늘</div>
       </div>
-      <div style="font-size:10px;color:#b3bdcc;text-align:center;font-weight:700">v1.0 · 자동 저장됩니다</div>
+      <div style="font-size:10px;color:#b3bdcc;text-align:center;font-weight:700">v1.3 · 자동 저장됩니다</div>
     </div>
   </aside>
 
@@ -950,12 +1090,11 @@ label.sync-check input{width:auto}
                     <button type="button" data-ttmember="김수호">김수호</button>
                     <button type="button" data-ttmember="김지호">김지호</button>
                   </div>
-                  <button class="btn sm ghost" id="ttRefresh" title="NEIS에서 다시 불러오기">↻ NEIS</button>
                 </div>
               </div>
               <div class="tt-wrap" id="ttSingle"><table class="tt" id="ttTable"></table></div>
               <div class="tt-split two" id="ttSplit"></div>
-              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 바꿀 수 있어요. 김수호 시간표는 NEIS(장산초등학교 1학년 2반)에서, 김지호는 어린이집 하루 흐름으로 저장돼요.</p>
+              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 직접 바꿀 수 있어요. 자동으로 덮어쓰지 않으니 우리 반 실제 시간표대로 고쳐 두세요. 김지호는 어린이집 하루 흐름으로 저장돼요.</p>
             </div>
           </div>
         </div>
@@ -1025,10 +1164,8 @@ label.sync-check input{width:auto}
             <div class="addr" id="hiclassLeave" style="margin-top:4px;color:#0ea5e9;font-weight:800"></div>
           </div>
           <div class="acts">
-            <button class="btn ghost" id="schRefresh">↻ NEIS 새로고침</button>
             <a class="btn ghost" href="https://www.hiclass.net/main/home" target="_blank" rel="noopener">하이클래스 ↗</a>
             <a class="btn ghost" href="http://www.jangsan.es.kr" target="_blank" rel="noopener">학교 홈페이지 ↗</a>
-            <a class="btn ghost" href="https://www.neis.go.kr" target="_blank" rel="noopener">나이스 ↗</a>
           </div>
         </div>
 
@@ -1070,6 +1207,7 @@ label.sync-check input{width:auto}
                   <button data-mealweek="this" class="active">이번 주</button>
                   <button data-mealweek="next">다음 주</button>
                 </div>
+                <button class="btn sm ghost" id="mealRefresh" title="급식 새로고침">↻</button>
                 <span class="src" id="mealSrc"></span>
               </div>
             </div>
@@ -1086,8 +1224,9 @@ label.sync-check input{width:auto}
           <h2>🌤 부산 해운대구 날씨</h2>
           <span class="desc" id="wxUpdated">불러오는 중…</span>
           <div class="right">
+            <div class="wx-seg" id="wxDaySeg"><button type="button" data-wxviewday="0" class="active">오늘</button><button type="button" data-wxviewday="1">내일</button></div>
             <button class="btn ghost" id="wxRefresh">↻ 새로고침</button>
-            <a class="btn primary" id="naverWxTop" target="_blank" rel="noopener" href="https://search.naver.com/search.naver?where=nexearch&query=%EB%B6%80%EC%82%B0%20%ED%95%B4%EC%9A%B4%EB%8C%80%EA%B5%AC%20%EB%82%A0%EC%94%A8">🌐 네이버 날씨 보기</a>
+            <a class="btn primary" id="naverWxTop" target="_blank" rel="noopener" href="https://search.naver.com/search?where=nexearch&query=%EB%B6%80%EC%82%B0%20%ED%95%B4%EC%9A%B4%EB%8C%80%EA%B5%AC%20%EB%82%A0%EC%94%A8">🌐 네이버 날씨 보기</a>
           </div>
         </div>
         <div class="grid g12">
@@ -1108,6 +1247,105 @@ label.sync-check input{width:auto}
             <div class="divider"></div>
             <div style="font-size:11px;color:var(--muted);font-weight:700;line-height:1.7" id="wxSourceNote"></div>
             <a class="btn block ghost" style="margin-top:10px" target="_blank" rel="noopener" href="https://weather.naver.com/">네이버 날씨에서 자세히 보기 ↗</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 성장·건강 ============ -->
+      <section class="view" id="view-growth">
+        <div class="section-head">
+          <h2>💗 성장·건강 기록</h2>
+          <span class="desc">키·몸무게를 기록하면 또래 백분위와 성장 곡선을 보여드려요</span>
+          <div class="right">
+            <div class="subnav g-kid-nav" id="growthKidNav">
+              <button type="button" data-growthkid="suho" class="active">김수호</button>
+              <button type="button" data-growthkid="jiho">김지호</button>
+            </div>
+          </div>
+        </div>
+        <div class="subnav" id="growthTabNav">
+          <button type="button" data-growthtab="record" class="active">성장 기록</button>
+          <button type="button" data-growthtab="health">예방접종·검진</button>
+        </div>
+
+        <div id="growth-record" style="margin-top:14px">
+          <div class="grid g12">
+            <div class="span-4" style="display:flex;flex-direction:column;gap:14px">
+              <div class="card" id="growthSummaryCard"></div>
+              <div class="card" id="growthTableCard"></div>
+            </div>
+            <div class="card span-8" id="growthChartCard"></div>
+          </div>
+        </div>
+
+        <div id="growth-health" class="hidden" style="margin-top:14px">
+          <div class="grid g12">
+            <div class="card span-7" id="healthVaccCard"></div>
+            <div class="card span-5" id="healthCheckCard"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 영상통화 ============ -->
+      <section class="view" id="view-call">
+        <div class="section-head">
+          <h2>📹 영상통화</h2>
+          <span class="desc" id="callDesc">같은 방 코드를 쓰는 가족 기기끼리 바로 연결돼요</span>
+          <div class="right"><span class="pill" id="callRoomPill">방 코드 · soohojiho-family</span></div>
+        </div>
+        <div class="call-layout">
+          <div>
+            <div class="call-stage" id="callStage">
+              <video id="callRemote" autoplay playsinline></video>
+              <div class="call-idle" id="callIdle">
+                <div class="em">📹</div>
+                <b id="callIdleTitle">아직 연결된 기기가 없어요</b>
+                <span id="callIdleText">이 기기의 역할(아빠·엄마·태블릿·아이들)을 고르고 <b>통화 시작</b>을 누르면, 같은 방 코드를 쓰는 가족 기기와 1번에 연결돼요.</span>
+              </div>
+              <div class="call-badges">
+                <span class="call-badge waiting" id="callBadge"><span class="dot"></span>대기 중</span>
+              </div>
+              <div class="call-remote-name" id="callRemoteName">상대 화면</div>
+              <div class="call-pip">
+                <video id="callLocal" autoplay playsinline muted></video>
+                <div class="off" id="callLocalOff">📷</div>
+              </div>
+            </div>
+            <div class="call-bar">
+              <button type="button" class="call-btn" id="callMic">🎤 마이크</button>
+              <button type="button" class="call-btn" id="callCam">📷 카메라</button>
+              <button type="button" class="call-btn start" id="callStart">📞 통화 시작</button>
+              <button type="button" class="call-btn end hidden" id="callEnd">⏹ 통화 종료</button>
+            </div>
+            <p class="g-note" id="callHintLine">※ 화면·소리는 기기 사이에서만 오가고 서버에 저장되지 않아요. 처음 한 번만 카메라·마이크 허용을 눌러 주세요.</p>
+          </div>
+          <div class="card call-chat">
+            <div class="card-head"><h3><span class="ico">💬</span>채팅</h3><div class="right"><span class="sub" id="callChatState">대기 중</span></div></div>
+            <div class="call-msgs" id="callMsgs"></div>
+            <form class="call-form" id="callForm">
+              <input type="text" id="callInput" placeholder="메시지 입력" maxlength="200" autocomplete="off">
+              <button type="submit" title="보내기">➤</button>
+            </form>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="card-head"><h3><span class="ico">⚙️</span>통화 설정</h3><div class="right"><span class="sub">이 기기에서 한 번만 맞춰두면 돼요</span></div></div>
+          <div class="call-setup">
+            <div>
+              <div style="font-size:11.5px;font-weight:900;color:#5b6b83">이 기기는 누구인가요?</div>
+              <div class="call-roles" id="callRoles">
+                <button type="button" class="call-role" data-callrole="아빠">아빠<small>거실 태블릿·폰</small></button>
+                <button type="button" class="call-role" data-callrole="엄마">엄마<small>주방·안방</small></button>
+                <button type="button" class="call-role" data-callrole="태블릿">태블릿<small>아이들 방</small></button>
+                <button type="button" class="call-role" data-callrole="아이들">아이들<small>수호·지호와 함께</small></button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:900;color:#5b6b83">가족 방 코드</div>
+              <input type="text" id="callRoom" maxlength="40" placeholder="soohojiho-family" style="margin-top:7px">
+              <p class="g-note">방 코드가 같으면 어느 기기든 서로 연결돼요. 다른 사람이 쓰지 않는 나만의 코드로 바꿔도 좋아요.<br>
+              영상·채팅은 PeerJS 공개 중계 서버로 기기끼리 직접 연결되며, 별도 서버 설치가 필요 없습니다.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -1545,9 +1783,9 @@ function defaultState(){
     },
     members: [
       { id:'suho', name:'김수호', label:'8세 · 초1', partner:4, caught:[4,16,19,10], level:3, xp:65,
-        hatchedDate:'', lastReset:today, growth:{ height:null, weight:null, date:'', history:[] }, quests: suhoQuests.map(withId) },
+        hatchedDate:'', lastReset:today, birth:'', growth:{ height:null, weight:null, date:'', history:[] }, quests: suhoQuests.map(withId) },
       { id:'jiho', name:'김지호', label:'6세 · 어린이집', partner:25, caught:[25,133,39,52], level:2, xp:40,
-        hatchedDate:'', lastReset:today, growth:{ height:null, weight:null, date:'', history:[] }, quests: jihoQuests.map(withId) }
+        hatchedDate:'', lastReset:today, birth:'', growth:{ height:null, weight:null, date:'', history:[] }, quests: jihoQuests.map(withId) }
     ],
     ddays: [
       { id: uid('dd'), title:'지호 어린이집 발표회', date: shiftDate(14) },
@@ -1620,6 +1858,8 @@ function defaultState(){
     mealSource: null,
     neisSchedule: HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; }),
     neisUpdated: HICLASS.syncedAt + ' (하이클래스)',
+    health: {},
+    call: { role:'아빠', room:'soohojiho-family' },
     weather: null
   };
 }
@@ -1642,7 +1882,13 @@ var UI = {
   diaryDate: '',
   ttMember: '나란히',
   mealWeek: 'this',
-  diaryQuery: ''
+  diaryQuery: '',
+  growthKid: 'suho',
+  growthTab: 'record',
+  growthMeas: 'h',
+  growthSel: '',
+  wxHomeDay: 0,
+  wxViewDay: 0
 };
 
 function $(sel, root){ return (root || document).querySelector(sel); }
@@ -1782,7 +2028,18 @@ function normalizeState(parsed){
   State.members.forEach(function(m){
     if (!m.growth || typeof m.growth !== 'object' || Array.isArray(m.growth)) m.growth = { height:null, weight:null, date:'', history:[] };
     if (!Array.isArray(m.growth.history)) m.growth.history = [];
+    if (typeof m.birth !== 'string') m.birth = '';
   });
+  if (!State.health || typeof State.health !== 'object' || Array.isArray(State.health)) State.health = {};
+  if (!State.call || typeof State.call !== 'object' || Array.isArray(State.call)) State.call = { role:'아빠', room:'soohojiho-family' };
+  if (!State.call.room) State.call.room = 'soohojiho-family';
+  if (!State.call.role) State.call.role = '아빠';
+  /* 학사일정은 하이클래스에서 확인한 것만 남깁니다(나이스에서 자동으로 채운 일정 제거) */
+  if (Array.isArray(State.neisSchedule)){
+    var onlyHiclass = State.neisSchedule.filter(function(x){ return x && x.src === 'hiclass'; });
+    if (onlyHiclass.length !== State.neisSchedule.length) State.neisSchedule = onlyHiclass;
+    if (!State.neisSchedule.length) State.neisSchedule = hiclassScheduleSeed();
+  }
   // 하이클래스(1학년 2반) 급식·학사일정·알림장을 NEIS보다 우선
   try { applyHiclassPriority(); } catch(e){}
   return State;
@@ -1895,6 +2152,498 @@ function openGrowthModal(mid){
       '<div class="divider"></div>' +
       '<div class="between"><b style="font-size:12px">이전 기록</b><span class="sync-line">' + hist.length + '개</span></div>' +
       '<div class="stack">' + histHTML + '</div>' +
+    '</div></div>'
+  );
+}
+
+/* =========================================================
+   성장 기록 — 2017 소아청소년 성장도표(남아) LMS 기준
+   자료: 질병관리청·대한소아청소년과학회 「2017 소아청소년 성장도표」
+   (연령별 신장·체중·체질량지수 LMS 값, 만 0~227개월)
+   ========================================================= */
+var GREF = {"h":{"start":0,"rows":[[1.0,49.8842,0.038],[1.0,54.7244,0.0356],[1.0,58.4249,0.0342],[1.0,61.4292,0.0333],[1.0,63.886,0.0326],[1.0,65.9026,0.032],[1.0,67.6236,0.0317],[1.0,69.1645,0.0314],[1.0,70.5994,0.0312],[1.0,71.9687,0.0312],[1.0,73.2812,0.0312],[1.0,74.5388,0.0313],[1.0,75.7488,0.0314],[1.0,76.9186,0.0315],[1.0,78.0497,0.0317],[1.0,79.1458,0.032],[1.0,80.2113,0.0322],[1.0,81.2487,0.0325],[1.0,82.2587,0.0328],[1.0,83.2418,0.0331],[1.0,84.1996,0.0334],[1.0,85.1348,0.0338],[1.0,86.0477,0.0341],[1.0,86.941,0.0345],[1.0,87.1161,0.0351],[1.0,87.972,0.0354],[1.0,88.8065,0.0358],[1.0,89.6197,0.0361],[1.0,90.412,0.0364],[1.0,91.1828,0.0367],[1.0,91.9327,0.037],[1.0,92.6631,0.0373],[1.0,93.3753,0.0376],[1.0,94.0711,0.0379],[1.0,94.7532,0.0381],[1.0,95.4236,0.0384],[-1.0915,96.4961,0.0403],[-1.0011,97.0464,0.0403],[-0.9126,97.5965,0.0402],[-0.8262,98.1463,0.0402],[-0.7418,98.6959,0.0402],[-0.6592,99.2452,0.0402],[-0.5827,99.793,0.0401],[-0.5077,100.3406,0.0401],[-0.4343,100.8881,0.0401],[-0.3625,101.4353,0.0401],[-0.2921,101.9824,0.0401],[-0.2232,102.5294,0.04],[-0.1597,103.0749,0.04],[-0.0975,103.6204,0.04],[-0.0364,104.1657,0.04],[0.0234,104.7109,0.0399],[0.0822,105.256,0.0399],[0.1398,105.8009,0.0399],[0.1897,106.344,0.0399],[0.2387,106.8869,0.0399],[0.2868,107.4298,0.0398],[0.3341,107.9726,0.0398],[0.3805,108.5153,0.0398],[0.4261,109.0579,0.0398],[0.4242,109.5896,0.0398],[0.4223,110.1212,0.0399],[0.4205,110.6529,0.0399],[0.4187,111.1846,0.0399],[0.4169,111.7162,0.04],[0.4151,112.2479,0.04],[0.3787,112.7735,0.04],[0.3429,113.299,0.0401],[0.3074,113.8245,0.0401],[0.2724,114.3501,0.0402],[0.2378,114.8756,0.0402],[0.2036,115.401,0.0403],[0.1783,115.9183,0.0403],[0.1533,116.4356,0.0404],[0.1287,116.9528,0.0404],[0.1044,117.4701,0.0405],[0.0805,117.9874,0.0405],[0.0569,118.5047,0.0406],[0.0563,119.0136,0.0406],[0.0557,119.5225,0.0406],[0.0552,120.0314,0.0406],[0.0546,120.5404,0.0406],[0.0541,121.0493,0.0406],[0.0536,121.5582,0.0406],[0.0492,122.0537,0.0406],[0.0448,122.5492,0.0406],[0.0405,123.0447,0.0406],[0.0363,123.5402,0.0406],[0.0321,124.0357,0.0406],[0.028,124.5313,0.0406],[0.0397,125.0114,0.0406],[0.0514,125.4914,0.0405],[0.0628,125.9715,0.0405],[0.0741,126.4515,0.0405],[0.0853,126.9316,0.0405],[0.0964,127.4116,0.0405],[0.1205,127.8793,0.0405],[0.1443,128.3469,0.0404],[0.1679,128.8145,0.0404],[0.1912,129.2821,0.0404],[0.2142,129.7497,0.0404],[0.237,130.2172,0.0404],[0.2339,130.6754,0.0404],[0.2308,131.1336,0.0404],[0.2278,131.5919,0.0404],[0.2248,132.0501,0.0404],[0.2218,132.5084,0.0404],[0.2188,132.9666,0.0404],[0.1885,133.4136,0.0405],[0.1585,133.8606,0.0406],[0.1288,134.3076,0.0406],[0.0994,134.7545,0.0407],[0.0704,135.2014,0.0408],[0.0416,135.6482,0.0409],[0.021,136.1026,0.041],[0.0008,136.5569,0.0411],[-0.0191,137.0113,0.0412],[-0.0386,137.4656,0.0414],[-0.0579,137.9199,0.0415],[-0.0768,138.3742,0.0416],[-0.0752,138.8473,0.0417],[-0.0736,139.3205,0.0419],[-0.072,139.7936,0.042],[-0.0705,140.2667,0.0422],[-0.0689,140.7398,0.0423],[-0.0674,141.213,0.0424],[-0.0489,141.7059,0.0426],[-0.0308,142.1987,0.0428],[-0.0131,142.6916,0.043],[0.0041,143.1844,0.0432],[0.0209,143.6773,0.0434],[0.0373,144.1701,0.0436],[0.0886,144.701,0.0438],[0.1383,145.2319,0.0441],[0.1864,145.7627,0.0443],[0.2331,146.2935,0.0445],[0.2784,146.8242,0.0448],[0.3223,147.3549,0.045],[0.4064,147.9321,0.0453],[0.4882,148.5094,0.0455],[0.5676,149.0866,0.0457],[0.6448,149.6638,0.0459],[0.7199,150.2409,0.0462],[0.7929,150.818,0.0464],[0.8928,151.4223,0.0465],[0.991,152.0268,0.0466],[1.0877,152.6312,0.0467],[1.1829,153.2358,0.0468],[1.2764,153.8404,0.0469],[1.3684,154.445,0.047],[1.458,155.0459,0.0469],[1.5475,155.6468,0.0469],[1.637,156.2477,0.0468],[1.7263,156.8487,0.0467],[1.8155,157.4497,0.0466],[1.9045,158.0507,0.0465],[2.0111,158.6245,0.0463],[2.1194,159.1984,0.046],[2.2294,159.7724,0.0457],[2.341,160.3465,0.0454],[2.4544,160.9207,0.0452],[2.5694,161.4949,0.0449],[2.6754,162.0038,0.0445],[2.7844,162.5128,0.044],[2.8966,163.0218,0.0436],[3.0121,163.5308,0.0431],[3.1309,164.0398,0.0427],[3.2531,164.5488,0.0423],[3.3119,164.965,0.0417],[3.3725,165.3813,0.0412],[3.4351,165.7975,0.0407],[3.4998,166.2138,0.0402],[3.5666,166.6301,0.0397],[3.6357,167.0464,0.0392],[3.6315,167.3647,0.0388],[3.6262,167.6831,0.0384],[3.6198,168.0013,0.0379],[3.6121,168.3195,0.0375],[3.6031,168.6377,0.037],[3.5927,168.9558,0.0366],[3.5208,169.1812,0.0363],[3.4457,169.4066,0.036],[3.3672,169.6319,0.0357],[3.2853,169.8571,0.0353],[3.1997,170.0824,0.035],[3.1104,170.3076,0.0347],[2.9809,170.4684,0.0345],[2.8483,170.6294,0.0342],[2.7127,170.7906,0.034],[2.574,170.952,0.0338],[2.4321,171.1137,0.0335],[2.2872,171.2756,0.0333],[2.154,171.3949,0.0332],[2.0196,171.5145,0.033],[1.8841,171.6344,0.0328],[1.7474,171.7546,0.0327],[1.6096,171.8752,0.0325],[1.4707,171.996,0.0324],[1.3966,172.0897,0.0323],[1.3226,172.1836,0.0323],[1.2488,172.2775,0.0322],[1.1751,172.3716,0.0322],[1.1016,172.4658,0.0321],[1.0282,172.56,0.0321],[0.9751,172.6404,0.0321],[0.9218,172.7207,0.0321],[0.8685,172.8009,0.0321],[0.815,172.8812,0.0321],[0.7614,172.9614,0.0321],[0.7077,173.0416,0.0321],[0.6595,173.1222,0.0321],[0.611,173.2027,0.0321],[0.5623,173.2832,0.0321],[0.5134,173.3636,0.032],[0.4642,173.444,0.032],[0.4148,173.5244,0.032],[0.3638,173.6037,0.032],[0.3126,173.683,0.032],[0.2611,173.7622,0.032],[0.2094,173.8413,0.032],[0.1573,173.9204,0.032],[0.105,173.9995,0.032],[0.0449,174.0764,0.032],[-0.0155,174.1532,0.032],[-0.0764,174.23,0.032],[-0.1377,174.3067,0.0319],[-0.1994,174.3833,0.0319],[-0.2615,174.4598,0.0319]]},"w":{"start":0,"rows":[[0.3487,3.3464,0.146],[0.2297,4.4709,0.134],[0.197,5.5675,0.1239],[0.1738,6.3762,0.1173],[0.1553,7.0023,0.1132],[0.1395,7.5105,0.1108],[0.1257,7.934,0.1096],[0.1134,8.297,0.109],[0.1021,8.6151,0.1088],[0.0917,8.9014,0.1088],[0.082,9.1649,0.1089],[0.073,9.4122,0.1091],[0.0644,9.6479,0.1093],[0.0563,9.8749,0.1095],[0.0487,10.0953,0.1098],[0.0413,10.3108,0.1101],[0.0343,10.5228,0.1104],[0.0275,10.7319,0.1108],[0.0211,10.9385,0.1112],[0.0148,11.143,0.1116],[0.0087,11.3462,0.1121],[0.0029,11.5486,0.1126],[-0.0028,11.7504,0.1131],[-0.0083,11.9514,0.1137],[-0.0137,12.1515,0.1143],[-0.0189,12.3502,0.1149],[-0.024,12.5466,0.1154],[-0.0289,12.7401,0.116],[-0.0337,12.9303,0.1166],[-0.0385,13.1169,0.1172],[-0.0431,13.3,0.1178],[-0.0476,13.4798,0.1184],[-0.052,13.6567,0.119],[-0.0564,13.8309,0.1195],[-0.0606,14.0031,0.1201],[-0.0648,14.1736,0.1206],[0.0567,14.7381,0.0969],[-0.0147,14.911,0.0981],[-0.0804,15.0839,0.0993],[-0.1409,15.2569,0.1005],[-0.1966,15.4299,0.1016],[-0.248,15.603,0.1027],[-0.299,15.7775,0.1038],[-0.3461,15.9521,0.1049],[-0.3895,16.1268,0.106],[-0.4297,16.3015,0.107],[-0.4669,16.4763,0.108],[-0.5013,16.6512,0.1089],[-0.5361,16.8276,0.1099],[-0.5684,17.0041,0.1108],[-0.5983,17.1807,0.1118],[-0.6261,17.3573,0.1127],[-0.6518,17.534,0.1136],[-0.6758,17.7108,0.1144],[-0.6998,17.8888,0.1153],[-0.7222,18.067,0.1161],[-0.743,18.2452,0.117],[-0.7623,18.4235,0.1178],[-0.7803,18.6018,0.1186],[-0.7971,18.7802,0.1194],[-0.8162,18.9625,0.1202],[-0.8339,19.1449,0.1211],[-0.8503,19.3274,0.1219],[-0.8655,19.51,0.1227],[-0.8797,19.6926,0.1235],[-0.893,19.8753,0.1242],[-0.9106,20.0814,0.1254],[-0.9264,20.2877,0.1265],[-0.9407,20.4941,0.1275],[-0.9536,20.7007,0.1286],[-0.9653,20.9073,0.1296],[-0.9757,21.1141,0.1306],[-0.9753,21.3417,0.1318],[-0.9743,21.5693,0.133],[-0.973,21.797,0.1342],[-0.9714,22.0247,0.1353],[-0.9694,22.2524,0.1364],[-0.9672,22.4802,0.1375],[-0.9576,22.7267,0.1388],[-0.9481,22.9732,0.14],[-0.9388,23.2196,0.1412],[-0.9298,23.4661,0.1424],[-0.921,23.7126,0.1435],[-0.9124,23.9591,0.1447],[-0.8993,24.2214,0.146],[-0.8867,24.4837,0.1474],[-0.8745,24.7461,0.1486],[-0.8628,25.0084,0.1499],[-0.8514,25.2707,0.1511],[-0.8404,25.5329,0.1524],[-0.8208,25.8155,0.1537],[-0.802,26.0979,0.155],[-0.7841,26.3804,0.1563],[-0.7669,26.6629,0.1576],[-0.7503,26.9453,0.1588],[-0.7344,27.2277,0.16],[-0.7076,27.5321,0.1613],[-0.682,27.8365,0.1625],[-0.6574,28.1409,0.1638],[-0.6339,28.4453,0.165],[-0.6113,28.7497,0.1661],[-0.5896,29.054,0.1673],[-0.5621,29.3761,0.1685],[-0.5357,29.6982,0.1698],[-0.5103,30.0203,0.171],[-0.486,30.3424,0.1721],[-0.4627,30.6645,0.1733],[-0.4402,30.9867,0.1744],[-0.416,31.3251,0.1756],[-0.3928,31.6635,0.1768],[-0.3705,32.0019,0.1779],[-0.3491,32.3404,0.179],[-0.3284,32.6788,0.1801],[-0.3085,33.0173,0.1812],[-0.2869,33.3742,0.1823],[-0.2661,33.7312,0.1833],[-0.2461,34.0882,0.1844],[-0.2267,34.4452,0.1854],[-0.2081,34.8022,0.1864],[-0.1902,35.1592,0.1873],[-0.17,35.5349,0.1882],[-0.1505,35.9105,0.189],[-0.1317,36.2862,0.1899],[-0.1134,36.6619,0.1907],[-0.0958,37.0376,0.1914],[-0.0788,37.4134,0.1922],[-0.0612,37.8103,0.1929],[-0.0441,38.2074,0.1936],[-0.0275,38.6045,0.1942],[-0.0113,39.0017,0.1949],[0.0043,39.3989,0.1955],[0.0195,39.7961,0.1961],[0.0333,40.2146,0.1966],[0.0467,40.6331,0.1971],[0.0599,41.0518,0.1976],[0.0726,41.4706,0.1981],[0.0851,41.8894,0.1986],[0.0973,42.3083,0.1991],[0.1071,42.7515,0.1992],[0.1168,43.1947,0.1994],[0.1263,43.638,0.1996],[0.1356,44.0813,0.1997],[0.1448,44.5248,0.1999],[0.1538,44.9684,0.2],[0.1618,45.4253,0.1998],[0.1698,45.8824,0.1995],[0.1777,46.3396,0.1993],[0.1855,46.7968,0.1991],[0.1932,47.2542,0.1988],[0.2009,47.7116,0.1986],[0.2081,48.1693,0.198],[0.2154,48.6271,0.1974],[0.2226,49.085,0.1969],[0.2299,49.5431,0.1963],[0.2372,50.0012,0.1957],[0.2445,50.4595,0.1952],[0.2503,50.9021,0.1942],[0.2562,51.3448,0.1932],[0.2622,51.7875,0.1923],[0.2683,52.2304,0.1914],[0.2745,52.6733,0.1904],[0.2808,53.1164,0.1895],[0.2841,53.5329,0.1882],[0.2876,53.9495,0.1869],[0.2911,54.366,0.1856],[0.2948,54.7826,0.1843],[0.2986,55.1993,0.183],[0.3026,55.6159,0.1818],[0.3023,55.9927,0.1802],[0.302,56.3694,0.1787],[0.3019,56.7462,0.1772],[0.3019,57.1229,0.1757],[0.3019,57.4995,0.1742],[0.3021,57.8762,0.1727],[0.2993,58.2029,0.1711],[0.2965,58.5296,0.1696],[0.2938,58.8563,0.168],[0.2911,59.1829,0.1665],[0.2885,59.5096,0.165],[0.2859,59.8362,0.1635],[0.2818,60.1106,0.162],[0.2777,60.385,0.1606],[0.2736,60.6594,0.1591],[0.2695,60.9338,0.1577],[0.2654,61.2081,0.1563],[0.2613,61.4825,0.1549],[0.2514,61.7129,0.1537],[0.2412,61.9434,0.1525],[0.231,62.1739,0.1513],[0.2207,62.4045,0.1501],[0.2102,62.6351,0.1489],[0.1996,62.8658,0.1477],[0.1829,63.055,0.1468],[0.166,63.2442,0.1459],[0.1489,63.4335,0.145],[0.1316,63.6229,0.1441],[0.1141,63.8123,0.1432],[0.0964,64.0018,0.1424],[0.0862,64.1526,0.1418],[0.0759,64.3033,0.1413],[0.0655,64.4539,0.1407],[0.055,64.6045,0.1402],[0.0444,64.7551,0.1397],[0.0337,64.9057,0.1391],[0.0282,65.0469,0.1387],[0.0226,65.188,0.1382],[0.0169,65.3291,0.1377],[0.0113,65.4702,0.1373],[0.0055,65.6113,0.1368],[-0.0003,65.7523,0.1364],[-0.0068,65.8907,0.1359],[-0.0134,66.0291,0.1355],[-0.02,66.1674,0.1351],[-0.0267,66.3057,0.1346],[-0.0335,66.4439,0.1342],[-0.0403,66.5821,0.1338],[-0.0469,66.7186,0.1334],[-0.0535,66.8551,0.133],[-0.0602,66.9915,0.1326],[-0.0669,67.1278,0.1322],[-0.0738,67.2641,0.1318],[-0.0807,67.4004,0.1314],[-0.0859,67.5362,0.1311],[-0.0911,67.6719,0.1307],[-0.0965,67.8077,0.1303],[-0.1018,67.9434,0.1299],[-0.1072,68.079,0.1296],[-0.1127,68.2146,0.1292]]},"b":{"start":24,"rows":[[-0.6187,16.0189,0.0779],[-0.584,15.98,0.0779],[-0.5497,15.9414,0.078],[-0.5166,15.9036,0.0781],[-0.485,15.8667,0.0782],[-0.4552,15.8306,0.0783],[-0.4274,15.7953,0.0784],[-0.4016,15.7606,0.0785],[-0.3782,15.7267,0.0787],[-0.3572,15.6934,0.0788],[-0.3388,15.661,0.079],[-0.3231,15.6294,0.0791],[1.8637,15.9455,0.0665],[1.7284,15.9431,0.0672],[1.5969,15.9406,0.0679],[1.4694,15.9381,0.0686],[1.3456,15.9355,0.0692],[1.2257,15.9328,0.0699],[1.1096,15.9302,0.0706],[0.9972,15.9275,0.0712],[0.8886,15.9248,0.0719],[0.7835,15.9222,0.0725],[0.6821,15.9195,0.0731],[0.5841,15.9169,0.0737],[0.4885,15.9165,0.0744],[0.3966,15.9162,0.075],[0.3084,15.916,0.0757],[0.2237,15.9158,0.0763],[0.1425,15.9156,0.0769],[0.0647,15.9156,0.0775],[-0.01,15.9156,0.0781],[-0.0815,15.9156,0.0788],[-0.15,15.9158,0.0793],[-0.2156,15.916,0.0799],[-0.2784,15.9163,0.0805],[-0.3385,15.9167,0.0811],[-0.3931,15.9217,0.0818],[-0.4449,15.9268,0.0824],[-0.4942,15.932,0.0831],[-0.5409,15.9373,0.0838],[-0.5853,15.9426,0.0844],[-0.6274,15.948,0.0851],[-0.6673,15.9535,0.0857],[-0.7053,15.9591,0.0863],[-0.7413,15.9647,0.087],[-0.7754,15.9704,0.0876],[-0.8078,15.9762,0.0883],[-0.8385,15.982,0.0889],[-0.8494,16.01,0.0899],[-0.859,16.038,0.0909],[-0.8675,16.0661,0.0919],[-0.8749,16.0942,0.0929],[-0.8814,16.1223,0.0939],[-0.8869,16.1504,0.0948],[-0.8916,16.1786,0.0958],[-0.8955,16.2068,0.0968],[-0.8987,16.235,0.0978],[-0.9013,16.2633,0.0987],[-0.9032,16.2916,0.0997],[-0.9046,16.3199,0.1007],[-0.8944,16.3645,0.1018],[-0.8842,16.4092,0.1029],[-0.8741,16.4538,0.104],[-0.8639,16.4985,0.1051],[-0.8538,16.5431,0.1062],[-0.8438,16.5878,0.1073],[-0.8339,16.6324,0.1084],[-0.824,16.6771,0.1095],[-0.8142,16.7218,0.1105],[-0.8044,16.7664,0.1116],[-0.7948,16.8111,0.1127],[-0.7852,16.8558,0.1137],[-0.7555,16.9147,0.1148],[-0.7269,16.9736,0.1159],[-0.6992,17.0325,0.117],[-0.6725,17.0914,0.118],[-0.6466,17.1503,0.1191],[-0.6216,17.2092,0.1201],[-0.5974,17.268,0.1212],[-0.574,17.3268,0.1222],[-0.5513,17.3856,0.1232],[-0.5293,17.4444,0.1242],[-0.508,17.5032,0.1252],[-0.4874,17.562,0.1262],[-0.4597,17.6255,0.1271],[-0.4327,17.689,0.128],[-0.4066,17.7524,0.1289],[-0.3812,17.8159,0.1297],[-0.3566,17.8793,0.1306],[-0.3326,17.9428,0.1314],[-0.3093,18.0062,0.1323],[-0.2867,18.0696,0.1331],[-0.2647,18.133,0.1339],[-0.2433,18.1964,0.1348],[-0.2225,18.2598,0.1356],[-0.2022,18.3231,0.1364],[-0.1828,18.3862,0.137],[-0.1638,18.4493,0.1375],[-0.1452,18.5123,0.1381],[-0.127,18.5754,0.1387],[-0.1092,18.6385,0.1392],[-0.0918,18.7015,0.1398],[-0.0747,18.7645,0.1403],[-0.058,18.8276,0.1409],[-0.0416,18.8906,0.1414],[-0.0256,18.9536,0.142],[-0.0099,19.0166,0.1425],[0.0055,19.0796,0.143],[0.014,19.1356,0.1432],[0.0224,19.1917,0.1435],[0.0307,19.2478,0.1437],[0.039,19.3039,0.1439],[0.0471,19.3599,0.1441],[0.0552,19.416,0.1443],[0.0631,19.4721,0.1445],[0.071,19.5282,0.1447],[0.0789,19.5842,0.1449],[0.0866,19.6403,0.1451],[0.0942,19.6964,0.1453],[0.1018,19.7525,0.1455],[0.1009,19.7966,0.1454],[0.1,19.8408,0.1453],[0.0991,19.8849,0.1451],[0.0981,19.9291,0.145],[0.0972,19.9732,0.1449],[0.0963,20.0173,0.1447],[0.0954,20.0615,0.1446],[0.0945,20.1056,0.1445],[0.0936,20.1498,0.1443],[0.0927,20.1939,0.1442],[0.0918,20.2381,0.1441],[0.0909,20.2822,0.1439],[0.0879,20.3193,0.1435],[0.0849,20.3564,0.143],[0.0819,20.3934,0.1426],[0.0789,20.4305,0.1422],[0.0759,20.4676,0.1417],[0.0729,20.5047,0.1413],[0.0698,20.5417,0.1408],[0.0668,20.5788,0.1404],[0.0637,20.6159,0.14],[0.0607,20.6529,0.1395],[0.0576,20.69,0.1391],[0.0545,20.7271,0.1387],[0.0551,20.7616,0.1381],[0.0558,20.7961,0.1375],[0.0564,20.8306,0.1369],[0.0572,20.865,0.1363],[0.0579,20.8995,0.1357],[0.0587,20.934,0.1351],[0.0596,20.9685,0.1345],[0.0605,21.003,0.1339],[0.0614,21.0375,0.1333],[0.0624,21.0719,0.1327],[0.0635,21.1064,0.1321],[0.0645,21.1409,0.1315],[0.0686,21.174,0.131],[0.0728,21.2071,0.1305],[0.077,21.2402,0.1299],[0.0814,21.2733,0.1294],[0.0858,21.3064,0.1289],[0.0904,21.3395,0.1284],[0.095,21.3726,0.1279],[0.0997,21.4057,0.1274],[0.1046,21.4389,0.1269],[0.1095,21.472,0.1263],[0.1146,21.5051,0.1258],[0.1198,21.5383,0.1253],[0.1283,21.5696,0.125],[0.1369,21.6009,0.1246],[0.1457,21.6322,0.1242],[0.1546,21.6636,0.1239],[0.1637,21.6949,0.1235],[0.1729,21.7263,0.1232],[0.1822,21.7577,0.1228],[0.1916,21.7891,0.1225],[0.2013,21.8205,0.1221],[0.211,21.852,0.1217],[0.2209,21.8834,0.1214],[0.2309,21.9149,0.121],[0.2417,21.9445,0.1207],[0.2526,21.9741,0.1204],[0.2637,22.0038,0.1201],[0.2749,22.0334,0.1198],[0.2863,22.0631,0.1195],[0.2978,22.0928,0.1192],[0.3095,22.1225,0.1189],[0.3213,22.1523,0.1186],[0.3334,22.1821,0.1183],[0.3455,22.2119,0.1179],[0.3579,22.2417,0.1176],[0.3704,22.2715,0.1173],[0.3824,22.3005,0.117],[0.3944,22.3295,0.1168],[0.4067,22.3585,0.1165],[0.4191,22.3875,0.1162],[0.4317,22.4166,0.1159],[0.4445,22.4457,0.1156],[0.4574,22.4748,0.1153],[0.4705,22.5039,0.115],[0.4837,22.533,0.1147],[0.4971,22.5622,0.1144],[0.5107,22.5914,0.1142],[0.5245,22.6206,0.1139]]}};
+
+var G_MEAS = {
+  h: { key:'h', label:'키', unit:'cm', short:'키', dp:1 },
+  w: { key:'w', label:'몸무게', unit:'kg', short:'몸무게', dp:1 },
+  b: { key:'b', label:'BMI', unit:'kg/m²', short:'BMI', dp:1 }
+};
+var G_Z3 = -1.8807936081512512, G_Z97 = 1.8807936081512512;
+
+/* 표준정규분포 누적확률(%) */
+function gaussPct(z){
+  var t = 1 / (1 + 0.2316419 * Math.abs(z));
+  var d = 0.3989423 * Math.exp(-z * z / 2);
+  var p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return (z > 0 ? 1 - p : p) * 100;
+}
+function gLMS(meas, months){
+  var t = GREF[meas];
+  if (!t) return null;
+  var i = months - t.start;
+  if (i < 0 || i >= t.rows.length) return null;
+  var r = t.rows[i];
+  return { L: r[0], M: r[1], S: r[2] };
+}
+function gValueAt(meas, months, z){
+  var l = gLMS(meas, months);
+  if (!l) return null;
+  if (Math.abs(l.L) < 1e-9) return l.M * Math.exp(l.S * z);
+  var base = 1 + l.L * l.S * z;
+  if (base <= 0) return null;
+  return l.M * Math.pow(base, 1 / l.L);
+}
+function gZScore(meas, months, x){
+  var l = gLMS(meas, months);
+  if (!l || !x) return null;
+  if (Math.abs(l.L) < 1e-9) return Math.log(x / l.M) / l.S;
+  return (Math.pow(x / l.M, l.L) - 1) / (l.L * l.S);
+}
+function gPercentile(meas, months, x){
+  var z = gZScore(meas, months, x);
+  if (z === null || !isFinite(z)) return null;
+  var p = gaussPct(z);
+  if (!isFinite(p)) return null;
+  return Math.max(0.1, Math.min(99.9, p));
+}
+function gPctBadge(p, opts){
+  if (p === null || p === undefined) return '<span class="g-pct p-gray">기준 없음</span>';
+  var cls = 'p-blue';
+  if (p < 3) cls = 'p-red';
+  else if (p < 25) cls = 'p-amber';
+  else if (p > 97) cls = 'p-red';
+  else if (p > 75) cls = 'p-mint';
+  var r = p < 1 ? p.toFixed(1) : Math.round(p);
+  return '<span class="g-pct ' + cls + '">약 ' + r + '백분위</span>';
+}
+
+/* ---------- 나이 계산 ---------- */
+function gAgeGuessMonths(m){
+  var mt = /(\d+)\s*세/.exec((m && m.label) || '');
+  return mt ? Number(mt[1]) * 12 : 0;
+}
+function gMonthsBetween(aISO, bISO){
+  var a = parseDate(aISO), b = parseDate(bISO);
+  if (!a || !b || isNaN(a) || isNaN(b)) return 0;
+  var months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+  if (b.getDate() < a.getDate()) months -= 1;
+  return months;
+}
+function gAgeMonthsAt(m, dateStr){
+  if (!m) return 0;
+  var d = dateStr || todayISO();
+  if (m.birth) return Math.max(0, gMonthsBetween(m.birth, d));
+  /* 생년월일을 아직 넣지 않았으면 라벨의 만 나이로 추정 */
+  var guess = gAgeGuessMonths(m);
+  var drift = gMonthsBetween(d, todayISO());
+  return Math.max(0, guess - drift);
+}
+function gAgeLabel(months){
+  if (months === null || months === undefined) return '';
+  return '만 ' + Math.floor(months / 12) + '세 ' + (months % 12) + '개월 · 생후 ' + months + '개월';
+}
+function gBirthExact(m){ return !!(m && m.birth); }
+
+/* ---------- 측정 기록 ---------- */
+function growthRows(m){
+  var g = memberGrowth(m);
+  var rows = (g.history || []).map(function(x){
+    return { date: x.date || '', height: (x.height === undefined ? null : x.height), weight: (x.weight === undefined ? null : x.weight) };
+  }).filter(function(x){ return x.date && (x.height != null || x.weight != null); });
+  rows.sort(growthSortDesc);
+  return rows;
+}
+function rowBMI(r){
+  if (r.height == null || r.weight == null || !r.height || !r.weight) return null;
+  var m = r.height / 100;
+  return r.weight / (m * m);
+}
+function gFmt(v, dp){
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return Number(v).toFixed(dp === undefined ? 1 : dp);
+}
+function gDelta(cur, prev){
+  if (cur === null || prev === null || cur === undefined || prev === undefined) return '';
+  var d = cur - prev;
+  var cls = Math.abs(d) < 0.05 ? 'flat' : (d > 0 ? 'up' : 'down');
+  var sign = d > 0 ? '+' : (d < 0 ? '−' : '±');
+  return '<span class="g-delta ' + cls + '">이전 대비 ' + sign + Math.abs(d).toFixed(1) + '</span>';
+}
+
+/* ---------- 요약 카드 ---------- */
+function renderGrowthSummary(m){
+  var box = $('#growthSummaryCard');
+  if (!box) return;
+  var rows = growthRows(m);
+  var latest = rows[0] || null;
+  var prev = rows[1] || null;
+  var ageNow = gAgeMonthsAt(m, latest ? latest.date : todayISO());
+  var bmi = latest ? rowBMI(latest) : null;
+  var pbH = (latest && latest.height != null) ? gPercentile('h', ageNow, latest.height) : null;
+  var pbW = (latest && latest.weight != null) ? gPercentile('w', ageNow, latest.weight) : null;
+  var pbB = bmi ? gPercentile('b', ageNow, bmi) : null;
+  var prevBmi = prev ? rowBMI(prev) : null;
+
+  function stat(k, unit, v, dp, deltaHTML, pb){
+    return '<div class="g-stat"><div class="between"><span class="k">' + k + '</span>' + pb + '</div>' +
+      '<div class="v">' + gFmt(v, dp) + '<small>' + unit + '</small></div>' +
+      '<div class="d"><span class="dt">' + (latest && latest.date ? shortDate(latest.date) + ' 측정' : '기록 없음') + '</span>' + deltaHTML + '</div></div>';
+  }
+
+  box.innerHTML =
+    '<div class="card-head"><h3><span class="ico">📏</span>' + esc(m.name) + ' 성장 기록</h3>' +
+      '<div class="right"><button class="btn sm primary" data-action="growth-add" data-mid="' + m.id + '">+ 키·몸무게 기록</button></div></div>' +
+    (latest ? '' : '<div class="g-note">아직 기록이 없어요. 키와 몸무게를 적으면 또래 백분위와 곡선이 바로 그려져요.</div>') +
+    '<div class="g-birth">생년월일 <input type="date" data-mbirth="' + m.id + '" value="' + esc(m.birth || '') + '" max="' + todayISO() + '">' +
+      (gBirthExact(m) ? '' : '<span style="color:#c8720b">※ 넣으면 백분위가 정확해져요</span>') + '</div>' +
+    '<div class="g-sumgrid">' +
+      stat('키', 'cm', latest ? latest.height : null, 1, gDelta(latest ? latest.height : null, prev ? prev.height : null), gPctBadge(pbH)) +
+      stat('몸무게', 'kg', latest ? latest.weight : null, 1, gDelta(latest ? latest.weight : null, prev ? prev.weight : null), gPctBadge(pbW)) +
+      stat('BMI', 'kg/m²', bmi, 1, gDelta(bmi, prevBmi), gPctBadge(pbB)) +
+    '</div>' +
+    '<div class="g-note">' + (latest ? gEsc(latest.date ? '측정일 기준 ' + gAgeLabel(ageNow) + ' · ' : '') : '') +
+      '또래 백분위는 2017 소아청소년 성장도표(남아) 기준이에요.</div>';
+}
+function gEsc(s){ return esc(s || ''); }
+
+/* ---------- 성장 그래프 (SVG) ---------- */
+function growthChartSVG(m, measKey){
+  var meas = G_MEAS[measKey] || G_MEAS.h;
+  var W = 760, H = 330, padL = 44, padR = 34, padT = 16, padB = 28;
+  var xMax = 228;
+  var xMin = (measKey === 'b') ? 24 : 0;
+  var series = { p3: [], p50: [], p97: [] };
+  var i;
+  for (i = 0; i <= xMax; i++){
+    var v3 = gValueAt(measKey, i, G_Z3), v50 = gValueAt(measKey, i, 0), v97 = gValueAt(measKey, i, G_Z97);
+    series.p3.push(v3); series.p50.push(v50); series.p97.push(v97);
+  }
+  var vals = [];
+  for (i = xMin; i <= xMax; i++){
+    if (series.p3[i] != null) vals.push(series.p3[i]);
+    if (series.p97[i] != null) vals.push(series.p97[i]);
+  }
+  var rows = growthRows(m);
+  var pts = [];
+  rows.forEach(function(r){
+    var v = measKey === 'h' ? r.height : (measKey === 'w' ? r.weight : rowBMI(r));
+    if (v == null) return;
+    var mm = gAgeMonthsAt(m, r.date);
+    if (mm < 0 || mm > xMax) return;
+    pts.push({ months: mm, value: v, date: r.date, pct: gPercentile(measKey, mm, v) });
+    vals.push(v);
+  });
+  if (!vals.length) return '';
+  var vMin = Math.min.apply(null, vals), vMax = Math.max.apply(null, vals);
+  var span = Math.max(1, vMax - vMin);
+  vMin = Math.max(0, vMin - span * 0.08);
+  vMax = vMax + span * 0.08;
+  if (measKey === 'b') vMin = Math.max(8, vMin - 1);
+
+  function X(mo){ return padL + ((Math.max(xMin, Math.min(xMax, mo)) - xMin) / (xMax - xMin)) * (W - padL - padR); }
+  function Y(v){ return padT + (1 - (v - vMin) / (vMax - vMin)) * (H - padT - padB); }
+
+  function line(arr){
+    var d = '', started = false;
+    for (var k = xMin; k <= xMax; k++){
+      var v = arr[k];
+      if (v == null){ continue; }
+      d += (started ? ' L' : 'M') + X(k).toFixed(1) + ' ' + Y(v).toFixed(1);
+      started = true;
+    }
+    return d;
+  }
+  var bandD = '';
+  (function(){
+    var started = false;
+    for (var k = xMin; k <= xMax; k++){
+      var v = series.p97[k];
+      if (v == null) continue;
+      bandD += (started ? ' L' : 'M') + X(k).toFixed(1) + ' ' + Y(v).toFixed(1);
+      started = true;
+    }
+    for (var j = xMax; j >= 0; j--){
+      var v2 = series.p3[j];
+      if (v2 == null) continue;
+      bandD += ' L' + X(j).toFixed(1) + ' ' + Y(v2).toFixed(1);
+    }
+    bandD += ' Z';
+  })();
+
+  var grid = '', ticks = 4;
+  for (var g = 0; g <= ticks; g++){
+    var gv = vMin + (vMax - vMin) * g / ticks;
+    var gy = Y(gv);
+    grid += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + gy.toFixed(1) + '" stroke="#e9eff8" stroke-width="1"/>' +
+      '<text x="' + (padL - 7) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end" font-size="9.5" font-weight="800" fill="#9aa6b8">' + gv.toFixed(measKey === 'b' ? 0 : (measKey === 'h' ? 0 : 0)) + '</text>';
+  }
+  var xlab = '';
+  for (var a = (xMin ? 2 : 0); a <= 18; a += (W > 620 ? 2 : 3)){
+    var xx = X(a * 12);
+    xlab += '<line x1="' + xx.toFixed(1) + '" y1="' + padT + '" x2="' + xx.toFixed(1) + '" y2="' + (H - padB) + '" stroke="#f1f5fb" stroke-width="1"/>' +
+      '<text x="' + xx.toFixed(1) + '" y="' + (H - padB + 14) + '" text-anchor="middle" font-size="9.5" font-weight="800" fill="#9aa6b8">' + a + '세</text>';
+  }
+  /* 오른쪽 3 / 97 라벨 */
+  var lastIdx = xMax;
+  while (lastIdx > 0 && series.p50[lastIdx] == null) lastIdx--;
+  var labRight = '';
+  if (series.p97[lastIdx] != null){
+    labRight += '<text x="' + (W - padR + 5) + '" y="' + (Y(series.p97[lastIdx]) + 3).toFixed(1) + '" font-size="9.5" font-weight="900" fill="#8ba7db">97</text>' +
+      '<text x="' + (W - padR + 5) + '" y="' + (Y(series.p50[lastIdx]) + 3).toFixed(1) + '" font-size="9.5" font-weight="900" fill="#4f7cff">50</text>' +
+      '<text x="' + (W - padR + 5) + '" y="' + (Y(series.p3[lastIdx]) + 3).toFixed(1) + '" font-size="9.5" font-weight="900" fill="#8ba7db">3</text>';
+  }
+
+  var childLine = '', dots = '';
+  if (pts.length){
+    childLine = '<path d="' + pts.map(function(p, k){ return (k === 0 ? 'M' : 'L') + X(p.months).toFixed(1) + ' ' + Y(p.value).toFixed(1); }).join(' ') + '" fill="none" stroke="#ff7a7a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
+  pts.forEach(function(p){
+    var sel = UI.growthSel && UI.growthSel === p.date;
+    dots += '<circle cx="' + X(p.months).toFixed(1) + '" cy="' + Y(p.value).toFixed(1) + '" r="' + (sel ? 6 : 4) + '" fill="#fff" stroke="#ff5c5c" stroke-width="2.4"/>';
+    if (sel){
+      dots += '<line x1="' + X(p.months).toFixed(1) + '" y1="' + padT + '" x2="' + X(p.months).toFixed(1) + '" y2="' + (H - padB) + '" stroke="#ff9d9d" stroke-width="1.2" stroke-dasharray="4 4"/>' +
+        '<text x="' + X(p.months).toFixed(1) + '" y="' + (Y(p.value) - 11).toFixed(1) + '" text-anchor="middle" font-size="10" font-weight="900" fill="#d94040" stroke="#fff" stroke-width="3" paint-order="stroke">' +
+        gFmt(p.value, 1) + meas.unit + '</text>' +
+        '<text x="' + X(p.months).toFixed(1) + '" y="' + (Y(p.value) - 23).toFixed(1) + '" text-anchor="middle" font-size="9" font-weight="800" fill="#d94040">' +
+        shortDate(p.date) + (p.pct != null ? ' · ' + (p.pct < 1 ? p.pct.toFixed(1) : Math.round(p.pct)) + '백분위' : '') + '</text>';
+    }
+  });
+
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(m.name + ' ' + meas.label + ' 성장 곡선') + '">' +
+    '<rect x="' + padL + '" y="' + padT + '" width="' + (W - padL - padR) + '" height="' + (H - padT - padB) + '" fill="#fcfdff" rx="8"/>' +
+    xlab + grid +
+    '<path d="' + bandD + '" fill="rgba(79,124,255,.13)" stroke="none"/>' +
+    '<path d="' + line(series.p3) + '" fill="none" stroke="#a9c1ea" stroke-width="1.3"/>' +
+    '<path d="' + line(series.p97) + '" fill="none" stroke="#a9c1ea" stroke-width="1.3"/>' +
+    '<path d="' + line(series.p50) + '" fill="none" stroke="#4f7cff" stroke-width="1.9"/>' +
+    labRight + childLine + dots +
+    '</svg>';
+}
+
+function renderGrowthChart(m){
+  var box = $('#growthChartCard');
+  if (!box) return;
+  var measKey = UI.growthMeas || 'h';
+  var rows = growthRows(m);
+  var svg = growthChartSVG(m, measKey);
+  var tabs = Object.keys(G_MEAS).map(function(k){
+    return '<button type="button" data-growthmeas="' + k + '" class="' + (k === measKey ? 'active' : '') + '">' + G_MEAS[k].short + '</button>';
+  }).join('');
+  box.innerHTML =
+    '<div class="card-head" style="margin-bottom:6px"><h3><span class="ico">📈</span>성장 그래프</h3>' +
+      '<div class="right"><span class="sub">' + (rows.length ? rows.length + '회 측정 · ' + shortDate(rows[0].date) + ' 기준' : '측정 기록 없음') + '</span></div></div>' +
+    '<div class="g-chart-tabs">' + tabs + '</div>' +
+    '<div class="g-chart-box">' + (svg || '<div class="g-note" style="padding:26px 0;text-align:center">아직 그릴 기록이 없어요. 키·몸무게를 기록해 주세요.</div>') + '</div>' +
+    '<div class="g-legend"><span><i style="background:rgba(79,124,255,.22)"></i>또래 3~97백분위</span><span><i style="background:#4f7cff"></i>또래 50백분위(중앙값)</span><span><i style="background:#ff7a7a"></i>' + esc(m.name) + ' 측정</span></div>' +
+    '<div class="g-note">※ 2017 소아청소년 성장도표(남아)의 만 0~18세 곡선이에요. 측정 내역을 누르면 그래프에서 그 점이 표시됩니다.' + (measKey === 'b' ? ' BMI는 만 2세부터 봐요.' : '') + '</div>';
+}
+
+function renderGrowthTable(m){
+  var box = $('#growthTableCard');
+  if (!box) return;
+  var rows = growthRows(m);
+  var body = rows.length ? rows.map(function(r){
+    var bmi = rowBMI(r);
+    var age = gAgeMonthsAt(m, r.date);
+    var pbH = r.height != null ? gPercentile('h', age, r.height) : null;
+    var sel = UI.growthSel === r.date;
+    return '<tr data-growthrow="' + esc(r.date) + '" class="' + (sel ? 'sel' : '') + '">' +
+      '<td><b>' + (r.date ? shortDate(r.date) : '—') + '</b><div class="g-row-pct">' + gAgeLabel(age).split(' · ')[0] + '</div></td>' +
+      '<td class="num">' + gFmt(r.height, 1) + (pbH != null ? '<div class="g-row-pct">' + (pbH < 1 ? pbH.toFixed(1) : Math.round(pbH)) + '백분위</div>' : '') + '</td>' +
+      '<td class="num">' + gFmt(r.weight, 1) + '</td>' +
+      '<td class="num">' + gFmt(bmi, 1) + '</td>' +
+      '<td class="acts"><button class="x-btn" data-action="growth-edit-row" data-mid="' + m.id + '" data-date="' + esc(r.date) + '" title="수정">✎</button>' +
+        '<button class="x-btn" data-action="growth-del" data-mid="' + m.id + '" data-date="' + esc(r.date) + '" title="삭제">🗑</button></td>' +
+      '</tr>';
+  }).join('') : '<tr><td colspan="5" class="muted" style="text-align:center;padding:16px 0;font-size:12px">아직 기록이 없어요</td></tr>';
+
+  box.innerHTML =
+    '<div class="card-head"><h3><span class="ico">🗂</span>측정 내역</h3><div class="right"><span class="sub">' + rows.length + '건</span></div></div>' +
+    '<table class="g-table"><thead><tr><th>측정일</th><th class="num">키</th><th class="num">몸무게</th><th class="num">BMI</th><th class="acts"></th></tr></thead>' +
+    '<tbody>' + body + '</tbody></table>' +
+    (rows.length ? '<div class="g-note">줄을 누르면 그래프에 표시돼요.</div>' : '');
+}
+
+/* ---------- 예방접종 · 검진 ---------- */
+var NIP_ITEMS = [
+  { id:'bcg',      name:'BCG (결핵)',                 when:0,   note:'출생 직후' },
+  { id:'hep1',     name:'B형간염 1차',                when:0,   note:'출생 직후' },
+  { id:'hep2',     name:'B형간염 2차',                when:1,   note:'생후 1개월' },
+  { id:'dtap1',    name:'DTaP 1차',                   when:2,   note:'생후 2개월' },
+  { id:'ipv1',     name:'IPV(폴리오) 1차',            when:2,   note:'생후 2개월' },
+  { id:'hib1',     name:'Hib 1차',                    when:2,   note:'생후 2개월' },
+  { id:'pcv1',     name:'폐렴구균 1차',               when:2,   note:'생후 2개월' },
+  { id:'rota1',    name:'로타바이러스 1차',           when:2,   note:'생후 2개월' },
+  { id:'dtap2',    name:'DTaP 2차',                   when:4,   note:'생후 4개월' },
+  { id:'ipv2',     name:'IPV 2차',                    when:4,   note:'생후 4개월' },
+  { id:'hib2',     name:'Hib 2차',                    when:4,   note:'생후 4개월' },
+  { id:'pcv2',     name:'폐렴구균 2차',               when:4,   note:'생후 4개월' },
+  { id:'rota2',    name:'로타바이러스 2차',           when:4,   note:'생후 4개월' },
+  { id:'dtap3',    name:'DTaP 3차',                   when:6,   note:'생후 6개월' },
+  { id:'ipv3',     name:'IPV 3차',                    when:6,   note:'생후 6~18개월' },
+  { id:'hib3',     name:'Hib 3차',                    when:6,   note:'생후 6개월' },
+  { id:'pcv3',     name:'폐렴구균 3차',               when:6,   note:'생후 6개월' },
+  { id:'mmr1',     name:'MMR 1차',                    when:12,  note:'생후 12~15개월' },
+  { id:'var1',     name:'수두 1차',                   when:12,  note:'생후 12~15개월' },
+  { id:'je1',      name:'일본뇌염 1차',               when:12,  note:'생후 12~23개월' },
+  { id:'hepA1',    name:'A형간염 1차',                when:12,  note:'생후 12~23개월' },
+  { id:'dtap4',    name:'DTaP 4차',                   when:15,  note:'생후 15~18개월' },
+  { id:'hib4',     name:'Hib 4차',                    when:12,  note:'생후 12~15개월' },
+  { id:'pcv4',     name:'폐렴구균 4차',               when:12,  note:'생후 12~15개월' },
+  { id:'hepA2',    name:'A형간염 2차',                when:18,  note:'1차 6~12개월 후' },
+  { id:'je3',      name:'일본뇌염 3차',               when:24,  note:'2차 후 12개월' },
+  { id:'je4',      name:'일본뇌염 4차',               when:36,  note:'3차 후 12개월' },
+  { id:'mmr2',     name:'MMR 2차',                    when:48,  note:'만 4~6세' },
+  { id:'dtap5',    name:'DTaP 5차',                   when:48,  note:'만 4~6세' },
+  { id:'ipv4',     name:'IPV 4차',                    when:48,  note:'만 4~6세' },
+  { id:'je5',      name:'일본뇌염 5차',               when:72,  note:'만 6세' },
+  { id:'tdap6',    name:'Tdap(또는 Td) 6차',          when:132, note:'만 11~12세' },
+  { id:'je6',      name:'일본뇌염 6차',               when:144, note:'만 12세' },
+  { id:'flu',      name:'인플루엔자 (해마다)',        when:6,   note:'생후 6개월~만 13세 매년 접종 권장' }
+];
+var CHECKUP_ITEMS = [
+  { id:'chk1', name:'영유아 건강검진 1차', when:1,  note:'생후 14~35일' },
+  { id:'chk2', name:'영유아 건강검진 2차', when:4,  note:'생후 4~6개월' },
+  { id:'chk3', name:'영유아 건강검진 3차', when:9,  note:'생후 9~12개월' },
+  { id:'chk4', name:'영유아 건강검진 4차', when:18, note:'생후 18~24개월' },
+  { id:'chk5', name:'영유아 건강검진 5차', when:30, note:'생후 30~36개월' },
+  { id:'chk6', name:'영유아 건강검진 6차', when:42, note:'생후 42~48개월' },
+  { id:'chk7', name:'영유아 건강검진 7차', when:54, note:'생후 54~60개월' },
+  { id:'chk8', name:'영유아 건강검진 8차', when:66, note:'생후 66~72개월' },
+  { id:'schk1', name:'학생 건강검진 (초1)', when:78, note:'초등학교 1학년' },
+  { id:'schk4', name:'학생 건강검진 (초4)', when:114, note:'초등학교 4학년' },
+  { id:'schk7', name:'학생 건강검진 (중1)', when:162, note:'중학교 1학년' }
+];
+function healthState(m){
+  if (!State.health || typeof State.health !== 'object') State.health = {};
+  if (!State.health[m.id] || typeof State.health[m.id] !== 'object') State.health[m.id] = {};
+  return State.health[m.id];
+}
+function healthItemState(m, id){
+  var h = healthState(m);
+  return h[id] || { done: false, date: '' };
+}
+function healthGroupOf(item, ageMonths){
+  if (item.id === 'flu') return 'now';
+  if (item.when < ageMonths - 24) return 'past';
+  if (item.when > ageMonths + 24) return 'future';
+  return 'now';
+}
+function healthRowHTML(m, item, ageMonths){
+  var st = healthItemState(m, item.id);
+  var grp = healthGroupOf(item, ageMonths);
+  var stateHTML;
+  if (st.done) stateHTML = '<span class="hstate done">완료 ' + (st.date ? shortDate(st.date) : '') + '</span>';
+  else if (grp === 'past') stateHTML = '<span class="hstate todo">기록 확인</span>';
+  else if (grp === 'now') stateHTML = '<span class="hstate todo">챙길 때</span>';
+  else stateHTML = '<span class="hstate na">예정</span>';
+  return '<div class="h-row ' + (st.done ? 'done' : '') + '">' +
+    '<button type="button" class="h-check" data-action="health-toggle" data-mid="' + m.id + '" data-hid="' + item.id + '" title="접종·검진 완료 표시">' + (st.done ? '✓' : '') + '</button>' +
+    '<div class="hb"><div class="hn">' + esc(item.name) + '</div>' +
+      '<div class="hd">' + esc(item.note) + (st.done && st.date ? ' · ' + shortDate(st.date) + ' 완료' : '') + '</div></div>' +
+    '<input type="date" class="h-date" data-hdate-mid="' + m.id + '" data-hdate-hid="' + item.id + '" value="' + esc(st.date || '') + '" max="' + todayISO() + '">' +
+    stateHTML + '</div>';
+}
+function renderHealth(m){
+  var vacc = $('#healthVaccCard'), chk = $('#healthCheckCard');
+  if (!vacc) return;
+  var age = gAgeMonthsAt(m, todayISO());
+  function group(list){
+    var now = [], past = [], future = [];
+    list.forEach(function(it){
+      var g = healthGroupOf(it, age);
+      if (it.id === 'flu'){ now.push(it); return; }
+      if (g === 'now') now.push(it);
+      else if (g === 'past') past.push(it);
+      else future.push(it);
+    });
+    return { now: now, past: past, future: future };
+  }
+  function block(title, em, items){
+    if (!items.length) return '';
+    return '<div class="h-group"><h4>' + em + ' ' + title + ' <span class="sub" style="font-weight:800">' + items.length + '</span></h4>' +
+      items.map(function(it){ return healthRowHTML(m, it, age); }).join('') + '</div>';
+  }
+  var v = group(NIP_ITEMS);
+  vacc.innerHTML =
+    '<div class="card-head"><h3><span class="ico">💉</span>' + esc(m.name) + ' 예방접종</h3>' +
+      '<div class="right"><span class="sub">' + gAgeLabel(age) + '</span></div></div>' +
+    block('지금 챙길 접종', '📍', v.now) +
+    block('지난 시기 접종 (기록 확인)', '🕘', v.past) +
+    block('앞으로 받을 접종', '⏭', v.future) +
+    '<div class="g-note">※ 질병관리청 표준예방접종일정(국가예방접종) 기준이에요. 접종 여부는 예방접종도우미(nip.cdc.go.kr)에서 확인하고, 실제 접종은 의료기관 안내를 따라 주세요.</div>';
+
+  var c = group(CHECKUP_ITEMS);
+  var doneCount = CHECKUP_ITEMS.filter(function(it){ return healthItemState(m, it.id).done; }).length;
+  if (chk) chk.innerHTML =
+    '<div class="card-head"><h3><span class="ico">🩺</span>건강검진</h3>' +
+      '<div class="right"><span class="sub">' + doneCount + ' / ' + CHECKUP_ITEMS.length + ' 완료</span></div></div>' +
+    block('지금 챙길 검진', '📍', c.now) +
+    block('지난 검진 (기록 확인)', '🕘', c.past) +
+    block('앞으로 받을 검진', '⏭', c.future) +
+    '<div class="g-note">※ 영유아 건강검진(생후 14일~만 6세)과 학생 건강검진(초1·초4·중1·고1) 기준이에요. 검진표는 학교·보건소 안내를 확인해 주세요.</div>' +
+    '<div class="divider"></div>' +
+    '<div class="between"><b style="font-size:11.5px">이번 달 메모</b><span class="sub">접종·검진 후 적어두세요</span></div>' +
+    '<textarea id="healthMemo" data-hmemo-mid="' + m.id + '" rows="3" placeholder="예: 11/20 일본뇌염 5차 접종 예정 (소아과)" style="margin-top:6px;width:100%;resize:vertical">' + esc(healthState(m).memo || '') + '</textarea>';
+}
+
+/* ---------- 성장·건강 뷰 ---------- */
+function growthKid(){
+  var mid = UI.growthKid || 'suho';
+  return memberById(mid) || State.members[0];
+}
+function renderGrowth(){
+  var m = growthKid();
+  if (!m) return;
+  $$('#growthKidNav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-growthkid') === m.id);
+  });
+  $$('#growthTabNav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-growthtab') === (UI.growthTab || 'record'));
+  });
+  var rec = $('#growth-record'), hlt = $('#growth-health');
+  var tab = UI.growthTab || 'record';
+  if (rec) rec.classList.toggle('hidden', tab !== 'record');
+  if (hlt) hlt.classList.toggle('hidden', tab !== 'health');
+  if (tab === 'record'){
+    renderGrowthSummary(m);
+    renderGrowthChart(m);
+    renderGrowthTable(m);
+  } else {
+    renderHealth(m);
+  }
+}
+
+/* ---------- 키·몸무게 입력 모달 ---------- */
+function openGrowthAdd(mid, presetDate){
+  var m = memberById(mid);
+  if (!m) return;
+  var rows = growthRows(m);
+  var prev = rows[0] || null;
+  var date = presetDate || todayISO();
+  var cur = null;
+  if (presetDate){
+    rows.forEach(function(r){ if (r.date === presetDate) cur = r; });
+  }
+  var hist = rows.slice(0, 6).map(function(r){
+    return '<div class="growth-hist"><span class="g-date">' + shortDate(r.date) + '</span><span>' +
+      (r.height != null ? Number(r.height).toFixed(1) + 'cm' : '') +
+      (r.height != null && r.weight != null ? ' · ' : '') +
+      (r.weight != null ? Number(r.weight).toFixed(1) + 'kg' : '') + '</span>' +
+      '<button class="x-btn" data-action="growth-del" data-mid="' + m.id + '" data-date="' + esc(r.date) + '">✕</button></div>';
+  }).join('');
+  openModal(
+    modalHead('📏 ' + esc(m.name) + ' 키 · 몸무게', presetDate ? '기록을 고칠 수 있어요' : '측정한 날짜와 함께 적으면 곡선에 점으로 쌓여요') +
+    '<div class="modal-body"><div class="stack">' +
+      '<form data-form="growth-save" data-mid="' + m.id + '"><div class="stack">' +
+        '<div class="form-row">' +
+          '<div class="field"><label>잰 날짜</label><input type="date" name="date" value="' + esc(date) + '" max="' + todayISO() + '" required></div>' +
+          '<div class="field"><label>키 (cm)</label><input type="number" name="height" step="0.1" min="0" max="250" inputmode="decimal" placeholder="' + (prev && prev.height != null ? '최근 ' + Number(prev.height).toFixed(1) : '예: 128.0') + '" value="' + (cur && cur.height != null ? Number(cur.height).toFixed(1) : '') + '"></div>' +
+          '<div class="field"><label>몸무게 (kg)</label><input type="number" name="weight" step="0.1" min="0" max="150" inputmode="decimal" placeholder="' + (prev && prev.weight != null ? '최근 ' + Number(prev.weight).toFixed(1) : '예: 26.0') + '" value="' + (cur && cur.weight != null ? Number(cur.weight).toFixed(1) : '') + '"></div>' +
+        '</div>' +
+        '<button class="btn primary" type="submit">저장</button>' +
+      '</div></form>' +
+      (hist ? '<div class="divider"></div><div class="between"><b style="font-size:12px">최근 기록</b><span class="sync-line">' + rows.length + '개</span></div><div class="stack">' + hist + '</div>' : '') +
     '</div></div>'
   );
 }
@@ -2541,10 +3290,12 @@ function renderAll(){
   renderTodoTab();
   renderDiary();
   renderSchool();
+  renderGrowth();
   renderSettings();
   renderBadges();
   renderAmbient();
   renderSyncUI();
+  if ($('#callBadge')) callSetStatus(Call.status || 'idle', '');
 }
 
 /* ---------- 시계 ---------- */
@@ -3378,45 +4129,6 @@ function setTtValue(mname, day, rowIdx, val){
   toast('시간표를 저장했어요', 'ok');
 }
 
-/* ---------- NEIS 시간표 ---------- */
-function neisTimetableURL(ymd, grade, cls){
-  return 'https://open.neis.go.kr/hub/elsTimetable?Type=json&pIndex=1&pSize=100' +
-    '&ATPT_OFCDC_SC_CODE=' + encodeURIComponent(State.settings.school.atpt || NEIS.atpt) +
-    '&SD_SCHUL_CODE=' + encodeURIComponent(State.settings.school.code || NEIS.code) +
-    '&ALL_TI_YMD=' + ymd + '&GRADE=' + encodeURIComponent(grade) + '&CLASS_NM=' + encodeURIComponent(cls);
-}
-
-function fetchNeisTimetable(silent){
-  var sch = State.settings.school || {};
-  var grade = sch.grade || '1';
-  var cls = sch.cls || HICLASS.cls;
-  var days = ['월','화','수','목','금'];
-  var requests = days.map(function(d, idx){
-    var ymd = weekdayOfWeek(idx).replace(/-/g, '');
-    return fetchWithTimeout(neisTimetableURL(ymd, grade, cls), 9000).then(function(r){ return r.json(); }).then(function(j){
-      var rows = [];
-      if (j && j.elsTimetable && j.elsTimetable[1] && j.elsTimetable[1].row) rows = j.elsTimetable[1].row;
-      var arr = ['','','','','',''];
-      rows.forEach(function(r){
-        var p = Number(r.PERIO) - 1;
-        if (p >= 0 && p < 6) arr[p] = r.ITRT_CNTNT || '';
-      });
-      return { day: d, arr: arr };
-    }).catch(function(){ return null; });
-  });
-  return Promise.all(requests).then(function(results){
-    var ok = results.filter(function(r){ return r && r.arr.some(function(x){ return x; }); });
-    if (!ok.length) throw new Error('empty');
-    ok.forEach(function(r){
-      if (!State.tt['김수호'].data[r.day]) State.tt['김수호'].data[r.day] = ['','','','','',''];
-      State.tt['김수호'].data[r.day] = r.arr;
-    });
-    save();
-    renderTimetable();
-    if (!silent) toast('NEIS에서 ' + ok.length + '일 시간표를 불러왔어요', 'ok');
-    return ok.length;
-  });
-}
 /* =========================================================
    수호&지호 가족대시보드 — 할일 탭 · 도감
    ========================================================= */
@@ -3770,7 +4482,8 @@ function renderSchool(){
   sch.forEach(function(s){
     if (dayDiff(today, s.date) < -3) return; // 지난 일정은 3일까지만
     if (s.name === '토요휴업일') return;     // 토요일은 쉬는 날 — 공지 목록에서는 뺌
-    items.push({ date: s.date, title: s.name, memo: s.memo || '', kind: s.src === 'hiclass' ? 'hiclass' : 'neis' });
+    if (s.src && s.src !== 'hiclass') return;   // 하이클래스에서 확인한 일정만 보여요
+    items.push({ date: s.date, title: s.name, memo: s.memo || '', kind: 'hiclass' });
   });
   State.notices.forEach(function(n){
     items.push({ id: n.id, date: n.date, title: n.title, memo: n.memo || '', kind: 'own', sample: n.sample });
@@ -3778,7 +4491,7 @@ function renderSchool(){
   items.sort(function(a, b){
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
     if (a.kind === b.kind) return 0;
-    return a.kind === 'hiclass' ? -1 : (a.kind === 'neis' ? -1 : 1);
+    return a.kind === 'hiclass' ? -1 : 1;
   });
   if (!items.length){
     wrap.innerHTML = '<div class="empty"><b>📢</b>새로운 공지가 없어요</div>';
@@ -3788,7 +4501,7 @@ function renderSchool(){
       return '<div class="notice ' + (isToday ? 'pinned' : '') + '">' +
         '<span class="date">' + shortDate(it.date) + '<br>' + weekdayKo(it.date) + '</span>' +
         '<div class="txt"><b>' + esc(it.title) + '</b>' +
-          '<small>' + (it.kind === 'hiclass' ? '학사일정 · 하이클래스' : (it.kind === 'neis' ? '학사일정 · NEIS' : '우리 공지')) +
+          '<small>' + (it.kind === 'hiclass' ? '학사일정 · 하이클래스' : '우리 공지') +
           (it.sample ? ' · 예시' : '') + (it.memo ? ' · ' + esc(it.memo) : '') +
           (isToday ? ' · <b style="color:#c07a00">오늘</b>' : '') + '</small></div>' +
         (it.kind === 'own' ? '<button class="x-btn" data-action="notice-del" data-id="' + it.id + '">✕</button>' : '') +
@@ -4003,87 +4716,120 @@ function fetchNeisMeals(silent){
   });
 }
 
-function neisScheduleURL(fromYmd, toYmd){
-  var sch = State.settings.school || {};
-  return 'https://open.neis.go.kr/hub/SchoolSchedule?Type=json&pIndex=1&pSize=100' +
-    '&ATPT_OFCDC_SC_CODE=' + encodeURIComponent(sch.atpt || NEIS.atpt) +
-    '&SD_SCHUL_CODE=' + encodeURIComponent(sch.code || NEIS.code) +
-    '&AA_FROM_YMD=' + fromYmd + '&AA_TO_YMD=' + toYmd;
-}
-
-function fetchNeisSchedule(silent){
-  var now = new Date();
-  var urls = [];
-  for (var i = 0; i < 3; i++){
-    var a = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    var b = new Date(now.getFullYear(), now.getMonth() + i + 1, 0);
-    urls.push(neisScheduleURL(isoDate(a).replace(/-/g, ''), isoDate(b).replace(/-/g, '')));
-  }
-  return Promise.all(urls.map(function(u){
-    return fetchWithTimeout(u, 9000).then(function(r){ return r.json(); }).catch(function(){ return {}; });
-  })).then(function(list){
-    var rows = [];
-    list.forEach(function(j){
-      if (j && j.SchoolSchedule && j.SchoolSchedule[1] && j.SchoolSchedule[1].row){
-        rows = rows.concat(j.SchoolSchedule[1].row);
-      }
-    });
-    if (!rows.length) throw new Error('no rows');
-    /* 하이클래스 학사일정을 먼저 놓고, NEIS에만 있는 일정을 뒤에 더한다(하이클래스 우선) */
-    var out = [];
-    var seen = {};
-    (State.neisSchedule || []).forEach(function(s){
-      var key = s.date + '|' + s.name;
-      if (seen[key]) return;
-      seen[key] = 1;
-      out.push({ date: s.date, name: s.name, memo: s.memo || '', src: s.src || 'previous' });
-    });
-    hiclassScheduleSeed().forEach(function(s){
-      var key = s.date + '|' + s.name;
-      if (seen[key]){
-        out.forEach(function(x){ if (x.date === s.date && x.name === s.name) x.src = 'hiclass'; });
-        return;
-      }
-      seen[key] = 1;
-      out.push(s);
-    });
-    rows.forEach(function(r){
-      var ymd = String(r.AA_YMD);
-      var iso = ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
-      var key = iso + '|' + r.EVENT_NM;
-      if (seen[key]) return;
-      seen[key] = 1;
-      out.push({ date: iso, name: r.EVENT_NM, memo: r.EVENT_CNTNT || '', src: 'neis' });
-    });
-    out.sort(function(a, b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
-    State.neisSchedule = out;
-    State.neisUpdated = isoDate(new Date()) + ' ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
-    save();
-    renderSchool();
-    if (!silent) toast('📢 학사일정 ' + rows.length + '건을 불러왔어요', 'ok');
-    return rows.length;
-  });
-}
-
 function refreshSchoolData(){
-  toast('NEIS에서 최신 정보를 불러오는 중…');
-  var p1 = fetchNeisSchedule(true).catch(function(){ return 0; });
-  var p2 = fetchNeisMeals(true).catch(function(){ return 0; });
-  var p3 = fetchNeisTimetable(true).catch(function(){ return 0; });
-  Promise.all([p1, p2, p3]).then(function(res){
-    if (res[0] || res[1] || res[2]){
-      toast('최신 정보로 업데이트했어요 (일정 ' + res[0] + ' · 급식 ' + res[1] + ' · 시간표 ' + res[2] + ')', 'ok', 3200);
-    } else {
-      toast('NEIS에 연결하지 못했어요. 저장된 데이터로 보여드려요.', 'warn', 3600);
-    }
+  toast('하이클래스 급식 정보를 확인하는 중…');
+  fetchNeisMeals(true).catch(function(){ return 0; }).then(function(n){
+    if (n) toast('🍚 급식 ' + n + '끼를 새로 확인했어요', 'ok', 3200);
+    else toast('새로 받은 급식 정보가 없어요. 저장된 식단으로 보여드려요.', 'warn', 3600);
     renderSchool();
+    renderTodaySummary();
+    renderHero();
   });
 }
+
 /* =========================================================
    수호&지호 가족대시보드 — 날씨 · 설정 · 대기화면 · 이벤트
    ========================================================= */
 
 /* ---------- 날씨 ---------- */
+/* ---------- 대기질 (Open-Meteo Air Quality · CAMS) ---------- */
+function normalizeAirQuality(j){
+  var c = (j && j.current) || {};
+  if (c.pm10 === undefined && c.pm2_5 === undefined) return null;
+  var now = new Date();
+  return {
+    pm10: (c.pm10 === null || c.pm10 === undefined) ? null : Math.round(c.pm10 * 10) / 10,
+    pm25: (c.pm2_5 === null || c.pm2_5 === undefined) ? null : Math.round(c.pm2_5 * 10) / 10,
+    at: (c.time ? String(c.time).replace('T', ' ').slice(5, 16) : isoDate(now) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes()))
+  };
+}
+function pmGrade(v, kind){
+  if (v === null || v === undefined || isNaN(v)) return { k: '정보 없음', c: 'aiq-none' };
+  var t = kind === 'pm25' ? [15, 35, 75] : [30, 80, 150];
+  if (v <= t[0]) return { k: '좋음', c: 'aiq-good' };
+  if (v <= t[1]) return { k: '보통', c: 'aiq-normal' };
+  if (v <= t[2]) return { k: '나쁨', c: 'aiq-bad' };
+  return { k: '매우나쁨', c: 'aiq-worst' };
+}
+function uvGrade(v){
+  if (v === null || v === undefined || isNaN(v)) return { k: '정보 없음', c: 'aiq-none' };
+  if (v <= 2) return { k: '낮음', c: 'aiq-good' };
+  if (v <= 5) return { k: '보통', c: 'aiq-normal' };
+  if (v <= 7) return { k: '높음', c: 'aiq-bad' };
+  if (v <= 10) return { k: '매우높음', c: 'aiq-bad' };
+  return { k: '위험', c: 'aiq-worst' };
+}
+function wxDayData(w, idx){
+  var d = w.daily[idx] || w.daily[0] || {};
+  return {
+    idx: idx,
+    min: d.min, max: d.max, pop: d.pop || 0, desc: d.desc || w.desc, icon: d.icon || w.icon,
+    uv: (d.uv === undefined ? null : d.uv),
+    sunrise: d.sunrise || '', sunset: d.sunset || '',
+    date: d.date || ''
+  };
+}
+function wxFactCell(k, vHTML){
+  return '<div class="wx2-cell"><div class="k">' + k + '</div><div class="v">' + vHTML + '</div></div>';
+}
+function wxFactsHTML(w, idx){
+  var d = wxDayData(w, idx);
+  var air = w.air || {};
+  var g10 = pmGrade(air.pm10, 'pm10');
+  var g25 = pmGrade(air.pm25, 'pm25');
+  var guv = uvGrade(d.uv);
+  var cells = [];
+  var airTag = idx === 1 ? ' <em class="aiq-none" style="font-size:8.5px">현재</em>' : '';
+  if (idx === 0){
+    cells.push(wxFactCell('습도', (w.humidity || 0) + '%'));
+    cells.push(wxFactCell('미세먼지', (air.pm10 === undefined || air.pm10 === null ? '—' : air.pm10) + ' <em class="' + g10.c + '">' + g10.k + '</em>'));
+    cells.push(wxFactCell('초미세먼지', (air.pm25 === undefined || air.pm25 === null ? '—' : air.pm25) + ' <em class="' + g25.c + '">' + g25.k + '</em>'));
+    cells.push(wxFactCell('강수확률', (d.pop || 0) + '%'));
+    cells.push(wxFactCell('풍속', Math.round(w.wind || 0) + 'km/h'));
+    cells.push(wxFactCell('자외선', (d.uv === null || d.uv === undefined ? '—' : d.uv) + ' <em class="' + guv.c + '">' + guv.k + '</em>'));
+    cells.push(wxFactCell('일출', d.sunrise || '—'));
+    cells.push(wxFactCell('일몰', d.sunset || '—'));
+  } else {
+    cells.push(wxFactCell('최고 / 최저', d.max + '° <em class="aiq-none" style="font-size:8.5px">' + d.min + '°</em>'));
+    cells.push(wxFactCell('강수확률', (d.pop || 0) + '%'));
+    cells.push(wxFactCell('자외선', (d.uv === null || d.uv === undefined ? '—' : d.uv) + ' <em class="' + guv.c + '">' + guv.k + '</em>'));
+    cells.push(wxFactCell('미세먼지', (air.pm10 === undefined || air.pm10 === null ? '—' : air.pm10) + ' <em class="' + g10.c + '">' + g10.k + '</em>' + airTag));
+    cells.push(wxFactCell('초미세먼지', (air.pm25 === undefined || air.pm25 === null ? '—' : air.pm25) + ' <em class="' + g25.c + '">' + g25.k + '</em>' + airTag));
+    cells.push(wxFactCell('풍속', Math.round(w.wind || 0) + 'km/h'));
+    cells.push(wxFactCell('일출', d.sunrise || '—'));
+    cells.push(wxFactCell('일몰', d.sunset || '—'));
+  }
+  return '<div class="wx2-grid">' + cells.join('') + '</div>';
+}
+function wxHeadHTML(w, idx, big){
+  var d = wxDayData(w, idx);
+  var tempHTML = idx === 0
+    ? '<span class="wx2-temp">' + Math.round(w.temp) + '°<small>' + Math.round(d.min) + '° / ' + Math.round(d.max) + '°</small></span>'
+    : '<span class="wx2-temp">' + Math.round(d.max) + '°<small>최저 ' + Math.round(d.min) + '°</small></span>';
+  var cond = idx === 0
+    ? esc(w.desc) + ' · 체감 ' + Math.round(w.feels) + '°'
+    : esc(d.desc) + ' · ' + shortDate(d.date) + ' ' + weekdayKo(d.date);
+  return '<div class="wx2-head"><div class="big" style="font-size:' + (big ? 52 : 40) + 'px">' + d.icon + '</div>' +
+    '<div><div>' + tempHTML + '</div><div class="wx2-cond">' + cond + '</div>' +
+    '<div class="wx-meta" style="font-size:10px">' + esc(w.at || '') + ' · ' + esc(State.settings.region || '부산 해운대구') + '</div></div></div>';
+}
+function wxSegHTML(active, role){
+  return '<div class="wx-seg">' +
+    '<button type="button" data-' + role + '="0" class="' + (active === 0 ? 'active' : '') + '">오늘</button>' +
+    '<button type="button" data-' + role + '="1" class="' + (active === 1 ? 'active' : '') + '">내일</button>' +
+    '</div>';
+}
+function wxAirAdvice(air){
+  if (!air || air.pm10 === null || air.pm10 === undefined) return '';
+  var g = pmGrade(air.pm10, 'pm10');
+  var g2 = pmGrade(air.pm25, 'pm25');
+  if (g.k === '나쁨' || g.k === '매우나쁨' || g2.k === '나쁨' || g2.k === '매우나쁨'){
+    return '<div class="cloth"><div class="e">😷</div><div><b>대기질 ' + g.k + '</b><p>바깥 놀이는 줄이고, 외출할 때 마스크를 챙겨 주세요.</p></div></div>';
+  }
+  if (g.k === '좋음' && g2.k === '좋음') return '<div class="cloth"><div class="e">🌿</div><div><b>공기가 좋아요</b><p>수호·지호와 바깥에서 놀기 좋은 날이에요.</p></div></div>';
+  return '';
+}
+
 function wxTextInfo(text){
   var t = String(text || '').toLowerCase();
   if (t.indexOf('thunder') >= 0 || t.indexOf('storm') >= 0) return ['⛈','천둥번개'];
@@ -4118,6 +4864,7 @@ function normalizeOpenMeteo(j){
   }
   var daily = [];
   var d = j.daily || {};
+  function hhmm(v){ return v ? String(v).slice(11, 16) : ''; }
   if (d.time){
     for (var k = 0; k < d.time.length; k++){
       var di = wmoInfo(d.weather_code ? d.weather_code[k] : 0);
@@ -4126,10 +4873,14 @@ function normalizeOpenMeteo(j){
         min: Math.round(d.temperature_2m_min[k]),
         max: Math.round(d.temperature_2m_max[k]),
         icon: di[0], desc: di[1],
-        pop: d.precipitation_probability_max ? Math.round(d.precipitation_probability_max[k] || 0) : 0
+        pop: d.precipitation_probability_max ? Math.round(d.precipitation_probability_max[k] || 0) : 0,
+        uv: (d.uv_index_max && d.uv_index_max[k] !== null && d.uv_index_max[k] !== undefined) ? Math.round(d.uv_index_max[k] * 10) / 10 : null,
+        sunrise: hhmm(d.sunrise && d.sunrise[k]),
+        sunset: hhmm(d.sunset && d.sunset[k])
       });
     }
   }
+  var today = daily[0] || {};
   return {
     source: 'open-meteo',
     at: isoDate(now) + ' ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes()),
@@ -4139,6 +4890,9 @@ function normalizeOpenMeteo(j){
     wind: Math.round(cur.wind_speed_10m || 0),
     windDir: degToDir(cur.wind_direction_10m),
     icon: info[0], desc: info[1],
+    uv: (today.uv === undefined ? null : today.uv),
+    sunrise: today.sunrise || '', sunset: today.sunset || '',
+    air: (State.weather && State.weather.air) ? State.weather.air : null,
     hourly: hourly, daily: daily
   };
 }
@@ -4229,26 +4983,34 @@ function loadWeather(force){
   var om = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
     '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m' +
     '&hourly=temperature_2m,weather_code,precipitation_probability' +
-    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset' +
     '&timezone=Asia%2FSeoul&forecast_days=7';
+  var aq = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + lat + '&longitude=' + lon +
+    '&current=pm10,pm2_5&hourly=pm10,pm2_5&timezone=Asia%2FSeoul';
   var wt = 'https://wttr.in/' + encodeURIComponent('Busan Haeundae') + '?format=j1';
 
-  return fetchWithTimeout(om, 7000).then(function(r){
+  var airP = fetchWithTimeout(aq, 7000).then(function(r){
     if (!r.ok) throw new Error('http');
     return r.json();
-  }).then(function(j){
-    State.weather = normalizeOpenMeteo(j);
-    save();
-    return State.weather;
-  }).catch(function(){
+  }).then(normalizeAirQuality).catch(function(){ return null; });
+
+  var mainP = fetchWithTimeout(om, 7000).then(function(r){
+    if (!r.ok) throw new Error('http');
+    return r.json();
+  }).then(function(j){ return normalizeOpenMeteo(j); }).catch(function(){
     return fetchWithTimeout(wt, 7000).then(function(r){
       if (!r.ok) throw new Error('http');
       return r.json();
-    }).then(function(j){
-      State.weather = normalizeWttr(j);
-      save();
-      return State.weather;
-    });
+    }).then(function(j){ return normalizeWttr(j); }).catch(function(){ return null; });
+  });
+
+  return Promise.all([mainP, airP]).then(function(res){
+    var w = res[0] || State.weather || fallbackWeather();
+    if (res[1]) w.air = res[1];
+    else if (State.weather && State.weather.air) w.air = State.weather.air;
+    State.weather = w;
+    save();
+    return State.weather;
   }).catch(function(){
     State.weather = fallbackWeather();
     return State.weather;
@@ -4261,46 +5023,36 @@ function weatherNow(){
 }
 
 function renderWeatherCards(){
-  if (!State.weather){
-    var h0 = $('#homeWx');
-    if (h0) h0.innerHTML = '<div class="empty"><b>🌥</b>부산 해운대구 날씨를 불러오는 중…</div>';
+  var w = State.weather;
+  var home = $('#homeWx');
+  if (!w){
+    if (home) home.innerHTML = '<div class="empty"><b>🌥</b>부산 해운대구 날씨를 불러오는 중…</div>';
     var n0 = $('#wxNowCard');
     if (n0) n0.innerHTML = '<div class="empty"><b>🌥</b>날씨를 불러오는 중…</div>';
     return;
   }
-  var w = weatherNow();
-  var today = w.daily[0] || { min: w.temp - 3, max: w.temp + 3, pop: 0, desc: w.desc };
+  w = weatherNow();
+  var homeIdx = UI.wxHomeDay || 0;
+  var viewIdx = UI.wxViewDay || 0;
 
   // 홈 카드
-  var home = $('#homeWx');
   if (home){
+    var hd = wxDayData(w, homeIdx);
     home.innerHTML =
-      '<div class="wx-now"><div class="wx-ico">' + w.icon + '</div><div>' +
-        '<div class="wx-temp">' + w.temp + '°<small> / ' + today.min + '°~' + today.max + '°</small></div>' +
-        '<div class="wx-cond">' + esc(w.desc) + ' · 체감 ' + w.feels + '°</div>' +
-        '<div class="wx-meta">' + esc(State.settings.region || '부산 해운대구') + ' · ' + esc(w.at) + '</div>' +
-      '</div></div>' +
-      '<div class="wx-facts">' +
-        '<div class="wx-fact"><div class="k">습도</div><div class="v">' + w.humidity + '%</div></div>' +
-        '<div class="wx-fact"><div class="k">바람</div><div class="v">' + w.wind + 'km/h</div></div>' +
-        '<div class="wx-fact"><div class="k">강수</div><div class="v">' + (today.pop || 0) + '%</div></div>' +
+      '<div style="display:flex;justify-content:flex-end;margin:-2px 0 7px">' + wxSegHTML(homeIdx, 'wxhomeday') + '</div>' +
+      wxHeadHTML(w, homeIdx, false) +
+      wxFactsHTML(w, homeIdx) +
+      '<div style="margin-top:9px;padding:8px 10px;border-radius:11px;background:#fbfdff;border:1px solid var(--line2);font-size:11.5px;font-weight:700;color:#66738a;line-height:1.5">' +
+        '🧥 <b style="color:#3b4759">' + esc(wearFor(w.feels)) + '</b>' +
+        ((hd.pop || 0) >= 50 ? '<br>☂️ 우산 챙기세요 (' + hd.pop + '%)' : '') +
+        ((w.air && (pmGrade(w.air.pm10, 'pm10').k === '나쁨' || pmGrade(w.air.pm10, 'pm10').k === '매우나쁨')) ? '<br>😷 미세먼지 ' + pmGrade(w.air.pm10, 'pm10').k + ' · 마스크 챙기기' : '') +
       '</div>' +
-      ((w.hourly && w.hourly.length) ? '<div class="wx-mini-row">' + w.hourly.slice(0, 5).map(function(h){
+      ((w.hourly && w.hourly.length) ? '<div class="wx-mini-row" style="margin-top:8px">' + w.hourly.slice(0, 5).map(function(h){
         return '<div style="flex:1;text-align:center;background:#f8fbff;border:1px solid var(--line2);border-radius:10px;padding:5px 2px">' +
           '<div style="font-size:9.5px;color:#9aa6b8;font-weight:800">' + esc(h.time) + '</div>' +
           '<div style="font-size:14px;line-height:1.3">' + h.icon + '</div>' +
           '<div style="font-size:10.5px;font-weight:900">' + h.temp + '°</div></div>';
       }).join('') + '</div>' : '') +
-      '<div class="wx-mini-row">' + w.daily.slice(1, 4).map(function(d){
-        return '<div style="flex:1;display:flex;align-items:center;gap:5px;background:#fbfdff;border:1px solid var(--line2);border-radius:10px;padding:5px 8px">' +
-          '<span style="font-size:13px">' + d.icon + '</span>' +
-          '<span style="font-size:10.5px;font-weight:800;color:#66738a">' + shortDate(d.date) + '</span>' +
-          '<span style="font-size:10.5px;font-weight:900;margin-left:auto">' + d.min + '°<i style="color:#9aa6b8;font-style:normal">/' + d.max + '°</i></span></div>';
-      }).join('') + '</div>' +
-      '<div style="margin-top:9px;padding:8px 10px;border-radius:11px;background:#fbfdff;border:1px solid var(--line2);font-size:11.5px;font-weight:700;color:#66738a;line-height:1.5">' +
-        '🧥 <b style="color:#3b4759">' + esc(wearFor(w.feels)) + '</b>' +
-        ((today.pop || 0) >= 50 ? '<br>☂️ 우산 챙기세요 (' + today.pop + '%)' : '') +
-      '</div>' +
       '<a class="btn block" style="margin-top:8px;background:#f0fdf6;border-color:#c9f2dc;color:#0f9e84" target="_blank" rel="noopener" href="' + NAVER_WX + '">🌐 네이버 날씨 보기</a>' +
       (w.source === 'fallback' ? '<div class="muted" style="font-size:10.5px;font-weight:700;margin-top:6px">※ 실시간 연결 실패로 저장된 관측값을 보여드려요</div>' : '');
   }
@@ -4308,21 +5060,19 @@ function renderWeatherCards(){
   // 날씨 탭
   var nowCard = $('#wxNowCard');
   if (nowCard){
+    var vd = wxDayData(w, viewIdx);
     nowCard.innerHTML =
-      '<div class="card-head"><h3><span class="ico">📍</span>' + esc(State.settings.region || '부산 해운대구') + '</h3>' +
+      '<div class="card-head"><h3><span class="ico">📍</span>' + esc(State.settings.region || '부산 해운대구') + ' · ' + (viewIdx === 0 ? '오늘' : '내일') + '</h3>' +
         '<div class="right"><span class="chip">' + (w.source === 'open-meteo' ? 'Open-Meteo' : (w.source === 'wttr' ? 'wttr.in' : '저장값')) + '</span></div></div>' +
-      '<div class="wx-now"><div class="wx-ico" style="font-size:64px">' + w.icon + '</div>' +
-        '<div><div class="wx-temp" style="font-size:46px">' + w.temp + '°</div>' +
-        '<div class="wx-cond">' + esc(w.desc) + '</div>' +
-        '<div class="wx-meta">체감 ' + w.feels + '° · 최고 ' + today.max + '° / 최저 ' + today.min + '°</div></div></div>' +
-      '<div class="wx-facts" style="grid-template-columns:repeat(3,1fr)">' +
-        '<div class="wx-fact"><div class="k">습도</div><div class="v">' + w.humidity + '%</div></div>' +
-        '<div class="wx-fact"><div class="k">바람</div><div class="v">' + esc(dirKo(w.windDir)) + ' ' + w.wind + '</div></div>' +
-        '<div class="wx-fact"><div class="k">강수확률</div><div class="v">' + (today.pop || 0) + '%</div></div>' +
-      '</div>' +
+      wxHeadHTML(w, viewIdx, true) +
+      wxFactsHTML(w, viewIdx) +
       '<a class="btn block primary" style="margin-top:12px" target="_blank" rel="noopener" href="' + NAVER_WX + '">🌐 네이버 날씨에서 보기</a>' +
-      '<div class="muted" style="font-size:10.5px;font-weight:700;margin-top:8px">관측 ' + esc(w.at) + ' · 부산 해운대구(35.1631, 129.1635)</div>';
+      '<div class="muted" style="font-size:10.5px;font-weight:700;margin-top:8px">관측 ' + esc(w.at || '') + ' · 부산 해운대구(35.1631, 129.1635)' +
+        (w.air && w.air.at ? '<br>대기질 ' + esc(w.air.at) + ' 기준 (Open-Meteo Air Quality · CAMS)' : '<br>대기질 정보를 받지 못했어요') + '</div>';
   }
+  $$('#wxDaySeg button').forEach(function(b){
+    b.classList.toggle('active', Number(b.getAttribute('data-wxviewday')) === viewIdx);
+  });
 
   var upd = $('#wxUpdated');
   if (upd) upd.textContent = '업데이트 ' + w.at + (w.source === 'fallback' ? ' (저장값)' : '');
@@ -4355,12 +5105,13 @@ function renderWeatherCards(){
     }).join('');
   }
 
-  renderWxAdvice(w, today);
+  renderWxAdvice(w, wxDayData(w, viewIdx));
 
   var note = $('#wxSourceNote');
   if (note){
-    note.innerHTML = '자료: ' + (w.source === 'open-meteo' ? 'Open-Meteo (무료·키 없음)' :
+    note.innerHTML = '자료: ' + (w.source === 'open-meteo' ? 'Open-Meteo 예보 · Air Quality(CAMS) 대기질' :
       (w.source === 'wttr' ? 'wttr.in 대체 데이터' : '저장된 마지막 관측값')) +
+      '<br>미세먼지는 환경부 기준(PM10 30/80/150, PM2.5 15/35/75 ㎍/㎥)으로 좋음·보통·나쁨·매우나쁨을 나눠요.' +
       '<br>네이버 날씨는 보안(CORS) 정책 때문에 이 파일에서 직접 불러올 수 없어, 같은 지역의 실시간 날씨를 Open-Meteo로 받아오고 네이버 날씨로 바로 이동하는 버튼을 넣었어요.' +
       ((w.source !== 'open-meteo') ? '<br>※ 지금은 대체 데이터라 ' + w.daily.length + '일까지만 보여요.' : '');
   }
@@ -4392,6 +5143,11 @@ function renderWxAdvice(w, today){
   if (w.wind >= 25) rows.push({ e:'💨', t:'바람이 강해요', p:'바람막이나 바람을 막는 겉옷이 좋아요.' });
   if (/눈/.test(w.desc)) rows.push({ e:'⛄', t:'눈이 와요', p:'미끄러지지 않는 신발과 장갑을 챙겨 주세요.' });
   if (!rain && f >= 15) rows.push({ e:'🏃', t:'바깥 놀이 좋아요', p:'수호·지호와 산책하기 좋은 날씨예요.' });
+  if (w.air && w.air.pm10 !== null && w.air.pm10 !== undefined){
+    var ag = pmGrade(w.air.pm10, 'pm10');
+    if (ag.k === '나쁨' || ag.k === '매우나쁨') rows.push({ e:'😷', t:'미세먼지 ' + ag.k, p:'PM10 ' + w.air.pm10 + '㎍/㎥ · 바깥 놀이는 줄이고 마스크를 챙겨 주세요.' });
+    else if (ag.k === '좋음') rows.push({ e:'🌿', t:'공기 좋음', p:'PM10 ' + w.air.pm10 + '㎍/㎥ · 바깥 활동하기 좋아요.' });
+  }
 
   var html = rows.map(function(r){
     return '<div class="cloth"><div class="e">' + r.e + '</div><div><b>' + esc(r.t) + '</b><p>' + esc(r.p) + '</p></div></div>';
@@ -4548,6 +5304,406 @@ function findById(arr, id){
   return null;
 }
 
+/* =========================================================
+   영상통화 — PeerJS(공개 시그널링) 기반 1:1~다자 연결 + 채팅
+   ========================================================= */
+var PEERJS_SRC = 'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+var CALL_ROLES = [
+  { name: '아빠',   code: 'dad',  em: '👨' },
+  { name: '엄마',   code: 'mom',  em: '👩' },
+  { name: '태블릿', code: 'tab',  em: '📱' },
+  { name: '아이들', code: 'kids', em: '🧒' }
+];
+var Call = {
+  peer: null,
+  starting: false,
+  localStream: null,
+  calls: {},          // peerId -> MediaConnection
+  conns: {},          // peerId -> DataConnection
+  remoteId: '',
+  status: 'idle',     // idle | connecting | live | error
+  msg: '',
+  micOn: true,
+  camOn: true,
+  retryTimer: null,
+  bound: false,
+  msgs: []
+};
+
+function callCfg(){
+  if (!State.call || typeof State.call !== 'object') State.call = {};
+  if (!State.call.role) State.call.role = '아빠';
+  if (!State.call.room) State.call.room = 'soohojiho-family';
+  return State.call;
+}
+function callRoleInfo(name){
+  for (var i = 0; i < CALL_ROLES.length; i++) if (CALL_ROLES[i].name === (name || callCfg().role)) return CALL_ROLES[i];
+  return CALL_ROLES[0];
+}
+function callPeerId(roleName){
+  var info = callRoleInfo(roleName);
+  var room = String(callCfg().room || 'soohojiho-family').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'soohojiho-family';
+  return room + '-' + info.code;
+}
+function callRoomLabel(){ return String(callCfg().room || 'soohojiho-family'); }
+
+function callSetStatus(status, msg){
+  Call.status = status;
+  Call.msg = msg || '';
+  var badge = $('#callBadge');
+  if (badge){
+    badge.className = 'call-badge ' + status;
+    var label = status === 'live' ? '통화 중' : (status === 'connecting' ? '연결 중' : (status === 'error' ? '연결 실패' : '대기 중'));
+    badge.innerHTML = '<span class="dot"></span>' + label;
+  }
+  var chat = $('#callChatState');
+  if (chat) chat.textContent = (status === 'live' ? '연결됨' : (status === 'connecting' ? '연결 중…' : (status === 'error' ? '연결 실패' : '대기 중')));
+  var hint = $('#callHintLine');
+  if (hint){
+    if (msg) hint.textContent = msg;
+    else if (status === 'live') hint.textContent = '연결됐어요. 화면·소리는 기기 사이에서만 오가고 서버에 저장되지 않아요.';
+    else if (status === 'idle') hint.textContent = '※ 화면·소리는 기기 사이에서만 오가고 서버에 저장되지 않아요. 처음 한 번만 카메라·마이크 허용을 눌러 주세요.';
+  }
+  var idle = $('#callIdle');
+  if (idle) idle.classList.toggle('hidden', status === 'live' || Call.localStream);
+  var idleTitle = $('#callIdleTitle'), idleText = $('#callIdleText');
+  if (status === 'error'){
+    if (idleTitle) idleTitle.textContent = '연결하지 못했어요';
+    if (idleText) idleText.innerHTML = esc(msg || '같은 방 코드를 쓰는 가족 기기가 켜져 있는지 확인해 주세요.');
+  }
+  var start = $('#callStart'), end = $('#callEnd');
+  if (start) start.classList.toggle('hidden', status === 'live' || status === 'connecting');
+  if (end) end.classList.toggle('hidden', !(status === 'live' || status === 'connecting'));
+  var pill = $('#callRoomPill');
+  if (pill) pill.textContent = '방 코드 · ' + callRoomLabel() + ' · ' + callRoleInfo().em + ' ' + callRoleInfo().name;
+  $$('#callRoles .call-role').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-callrole') === callRoleInfo().name);
+  });
+  var roomInput = $('#callRoom');
+  if (roomInput && document.activeElement !== roomInput) roomInput.value = callRoomLabel();
+}
+
+function callPushMsg(kind, text, who){
+  Call.msgs.push({ kind: kind, text: text, who: who || '', at: new Date() });
+  if (Call.msgs.length > 200) Call.msgs = Call.msgs.slice(-200);
+  callRenderMsgs();
+}
+function callRenderMsgs(){
+  var box = $('#callMsgs');
+  if (!box) return;
+  if (!Call.msgs.length){
+    box.innerHTML = '<div class="call-msg sys">아직 메시지가 없어요. 통화가 연결되면 여기로 대화를 나눌 수 있어요.</div>';
+    return;
+  }
+  box.innerHTML = Call.msgs.map(function(m){
+    if (m.kind === 'sys') return '<div class="call-msg sys">' + esc(m.text) + '</div>';
+    var t = pad2(m.at.getHours()) + ':' + pad2(m.at.getMinutes());
+    return '<div class="call-msg ' + (m.kind === 'me' ? 'me' : 'them') + '">' +
+      '<span class="who">' + esc(m.kind === 'me' ? '나' : (m.who || '가족')) + ' · ' + t + '</span>' + esc(m.text) + '</div>';
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function callLoadLib(cb){
+  if (window.Peer) return cb(null);
+  var s = document.createElement('script');
+  s.src = PEERJS_SRC;
+  s.async = true;
+  s.onload = function(){ cb(window.Peer ? null : new Error('lib')); };
+  s.onerror = function(){ cb(new Error('lib')); };
+  document.head.appendChild(s);
+}
+
+function callStopLocal(){
+  if (Call.localStream){
+    Call.localStream.getTracks().forEach(function(t){ try { t.stop(); } catch(e){} });
+  }
+  Call.localStream = null;
+  var lv = $('#callLocal');
+  if (lv) lv.srcObject = null;
+  var off = $('#callLocalOff');
+  if (off) off.classList.remove('hidden');
+}
+function callAttachLocal(stream){
+  var lv = $('#callLocal');
+  if (lv){ lv.srcObject = stream; lv.muted = true; var p = lv.play(); if (p && p.catch) p.catch(function(){}); }
+  var off = $('#callLocalOff');
+  if (off) off.classList.add('hidden');
+}
+function callDetachRemote(){
+  var rv = $('#callRemote');
+  if (rv) rv.srcObject = null;
+  var nm = $('#callRemoteName');
+  if (nm) nm.textContent = '상대 화면';
+}
+function callAttachRemote(stream, label){
+  var rv = $('#callRemote');
+  if (rv){ rv.srcObject = stream; var p = rv.play(); if (p && p.catch) p.catch(function(){}); }
+  var nm = $('#callRemoteName');
+  if (nm) nm.textContent = label || '상대 화면';
+  var idle = $('#callIdle');
+  if (idle) idle.classList.add('hidden');
+}
+
+function callTeardown(keepLocal){
+  Object.keys(Call.calls).forEach(function(k){ try { Call.calls[k].close(); } catch(e){} });
+  Object.keys(Call.conns).forEach(function(k){ try { Call.conns[k].close(); } catch(e){} });
+  Call.calls = {}; Call.conns = {};
+  if (Call.peer){
+    try { Call.peer.destroy(); } catch(e){}
+    Call.peer = null;
+  }
+  if (!keepLocal) callStopLocal();
+  callDetachRemote();
+  Call.remoteId = '';
+  if (Call.retryTimer){ window.clearInterval(Call.retryTimer); Call.retryTimer = null; }
+  var start = $('#callStart'), end = $('#callEnd');
+  if (start) start.classList.remove('hidden');
+  if (end) end.classList.add('hidden');
+}
+
+function callSend(text){
+  var any = false;
+  Object.keys(Call.conns).forEach(function(k){
+    var c = Call.conns[k];
+    if (c && c.open){ try { c.send({ type: 'chat', text: text, who: callRoleInfo().name }); any = true; } catch(e){} }
+  });
+  return any;
+}
+
+function callTryConnect(){
+  if (!Call.peer || Call.peer.destroyed) return;
+  var my = callRoleInfo();
+  var myIdx = CALL_ROLES.findIndex(function(r){ return r.name === my.name; });
+  if (!Call.remoteId){
+    CALL_ROLES.forEach(function(r, idx){
+      if (idx <= myIdx) return;                 // 위쪽 역할에만 먼저 걸어요(중복 연결 방지)
+      var id = callPeerId(r.name);
+      if (!id || Call.calls[id] || Call.conns[id]) return;
+      try {
+        var conn = Call.peer.connect(id, { reliable: true, metadata: { role: my.name } });
+        Call.conns[id] = conn;
+        conn.on('open', function(){
+          if (Call.status !== 'live') callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
+        });
+        var killConn = function(){ try { conn.close(); } catch(e){} if (Call.conns[id] === conn) delete Call.conns[id]; };
+        conn.on('error', killConn);
+        conn.on('close', function(){ if (Call.conns[id] === conn) delete Call.conns[id]; });
+        window.setTimeout(function(){ if (!conn.open) killConn(); }, 8000);
+      } catch(e){}
+      if (Call.localStream){
+        try {
+          var mc = Call.peer.call(id, Call.localStream, { metadata: { role: my.name } });
+          if (mc){
+            Call.calls[id] = mc;
+            mc.on('stream', function(stream){ callAttachRemote(stream, r.em + ' ' + r.name); callSetStatus('live'); });
+            mc.on('close', function(){ if (Call.calls[id] === mc) delete Call.calls[id]; callCheckIdle(); });
+            mc.on('error', function(){ if (Call.calls[id] === mc) delete Call.calls[id]; });
+            window.setTimeout(function(){ if (!mc.open && Call.calls[id] === mc){ try { mc.close(); } catch(e){} delete Call.calls[id]; } }, 12000);
+          }
+        } catch(e){}
+      }
+    });
+  }
+}
+
+function callCheckIdle(){
+  var anyCall = Object.keys(Call.calls).length > 0;
+  var anyConn = Object.keys(Call.conns).some(function(k){ return Call.conns[k] && Call.conns[k].open; });
+  if (!anyCall && !anyConn){
+    callDetachRemote();
+    if (Call.status === 'live') callSetStatus('connecting', '상대 기기와 연결이 끊겼어요. 다시 연결하는 중입니다.');
+  }
+}
+
+function callStart(){
+  if (Call.starting) return;
+  callCfg();
+  var role = callRoleInfo();
+  callSetStatus('connecting', '카메라와 마이크를 준비하고 있어요…');
+  callPushMsg('sys', '통화를 시작했어요. 방 코드 ' + callRoomLabel() + ' · ' + role.name);
+  Call.starting = true;
+
+  var gotMedia = new Promise(function(resolve){
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ resolve({ err: new Error('nomedia'), stream: null }); return; }
+    navigator.mediaDevices.getUserMedia({ audio: true, video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } })
+      .then(function(stream){ resolve({ err: null, stream: stream }); })
+      .catch(function(err){ resolve({ err: err || new Error('denied'), stream: null }); });
+  });
+
+  gotMedia.then(function(res){
+    var err = res && res.err, stream = res && res.stream;
+    if (stream){
+      Call.localStream = stream;
+      callAttachLocal(stream);
+      stream.getAudioTracks().forEach(function(t){ t.enabled = Call.micOn; });
+      stream.getVideoTracks().forEach(function(t){ t.enabled = Call.camOn; });
+    } else {
+      var msg = (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError'))
+        ? '카메라·마이크 사용을 허용하지 않아 영상 없이 연결합니다. 브라우저 주소창의 자물쇠 아이콘에서 허용으로 바꿀 수 있어요.'
+        : (err && err.name === 'NotFoundError')
+          ? '이 기기에서 카메라·마이크를 찾지 못했어요. 채팅만으로 연결합니다.'
+          : '영상 장치를 열지 못했어요. 채팅만으로 연결합니다.';
+      callPushMsg('sys', msg);
+      toast(msg, 'warn', 4600);
+    }
+    callLoadLib(function(libErr){
+      if (libErr){
+        Call.starting = false;
+        callSetStatus('error', '영상통화 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
+        return;
+      }
+      if (navigator.onLine === false){
+        Call.starting = false;
+        callSetStatus('error', '인터넷에 연결되어 있지 않아요. 연결 후 다시 시도해 주세요.');
+        return;
+      }
+      var id = callPeerId(role.name);
+      var peer;
+      try {
+        peer = new window.Peer(id, { debug: 0 });
+      } catch(e){
+        Call.starting = false;
+        callSetStatus('error', '영상통화를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+        return;
+      }
+      Call.peer = peer;
+
+      peer.on('open', function(){
+        Call.starting = false;
+        callSetStatus('connecting', '연결을 기다리는 중이에요. 같은 방 코드를 쓰는 가족 기기에서도 통화를 시작해 주세요.');
+        callTryConnect();
+        if (Call.retryTimer) window.clearInterval(Call.retryTimer);
+        Call.retryTimer = window.setInterval(function(){
+          if (!Call.peer || Call.peer.destroyed) return;
+          var live = Object.keys(Call.calls).length > 0 || Object.keys(Call.conns).some(function(k){ return Call.conns[k] && Call.conns[k].open; });
+          if (!live) callTryConnect();
+        }, 5000);
+      });
+
+      peer.on('call', function(mc){
+        try { mc.answer(Call.localStream || undefined); } catch(e){}
+        Call.calls[mc.peer] = mc;
+        mc.on('stream', function(stream){
+          var nm = (mc.metadata && mc.metadata.role) ? mc.metadata.role : '가족';
+          callAttachRemote(stream, '👨‍👩‍👦 ' + nm);
+          callSetStatus('live');
+          callPushMsg('sys', nm + ' 기기와 연결됐어요.');
+        });
+        mc.on('close', function(){ delete Call.calls[mc.peer]; });
+      });
+
+      peer.on('connection', function(conn){
+        Call.conns[conn.peer] = conn;
+        conn.on('open', function(){
+          Call.remoteId = conn.peer;
+          if (Call.status !== 'live') callSetStatus('connecting', '채팅이 연결됐어요. 상대 기기에서도 통화를 시작하면 영상이 보여요.');
+        });
+        conn.on('data', function(data){
+          if (!data || typeof data !== 'object') return;
+          if (data.type === 'chat' && data.text){
+            callPushMsg('them', String(data.text).slice(0, 200), data.who || '가족');
+          }
+        });
+        conn.on('close', function(){ delete Call.conns[conn.peer]; });
+      });
+
+      peer.on('error', function(err){
+        var type = (err && err.type) || '';
+        Call.starting = false;
+        if (type === 'unavailable-id'){
+          callSetStatus('error', '이미 같은 역할의 기기가 연결돼 있어요. 이 기기의 역할을 다른 것으로 바꾸거나, 먼저 연결된 기기를 종료해 주세요.');
+        } else if (type === 'peer-unavailable'){
+          var missId = String((err && err.message) || '').replace(/^.*?peer\s+/, '').trim();
+          if (missId && Call.conns[missId] && !Call.conns[missId].open) delete Call.conns[missId];
+          if (missId && Call.calls[missId]) { try { Call.calls[missId].close(); } catch(e){} delete Call.calls[missId]; }
+          callSetStatus('connecting', '아직 다른 기기가 접속하지 않았어요. 가족 기기에서도 [통화 시작]을 눌러 주세요.');
+        } else if (type === 'network' || type === 'server-error'){
+          callSetStatus('error', '연결 서버에 닿지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+        } else if (type === 'browser-incompatible'){
+          callSetStatus('error', '이 브라우저에서는 영상통화를 지원하지 않아요. 크롬·사파리 최신 버전을 사용해 주세요.');
+        } else if (type === 'webrtc'){
+          callSetStatus('error', '영상 연결에 실패했어요. 두 기기를 같은 와이파이에 두고 다시 시도해 주세요.');
+        }
+      });
+
+      peer.on('disconnected', function(){
+        if (Call.status === 'live') callSetStatus('connecting', '연결이 잠시 끊겼어요. 다시 연결하는 중입니다.');
+        try { peer.reconnect(); } catch(e){}
+      });
+    });
+  }).catch(function(){
+    Call.starting = false;
+    callSetStatus('error', '통화를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+  });
+}
+
+function callHangup(){
+  callPushMsg('sys', '통화를 종료했어요.');
+  callTeardown(false);
+  callSetStatus('idle', '');
+  toast('통화를 종료했어요');
+}
+
+function callToggleMic(){
+  Call.micOn = !Call.micOn;
+  if (Call.localStream) Call.localStream.getAudioTracks().forEach(function(t){ t.enabled = Call.micOn; });
+  var b = $('#callMic');
+  if (b){
+    b.classList.toggle('off', !Call.micOn);
+    b.innerHTML = (Call.micOn ? '🎤 마이크' : '🔇 마이크 꺼짐');
+  }
+}
+function callToggleCam(){
+  Call.camOn = !Call.camOn;
+  if (Call.localStream) Call.localStream.getVideoTracks().forEach(function(t){ t.enabled = Call.camOn; });
+  var b = $('#callCam');
+  if (b){
+    b.classList.toggle('off', !Call.camOn);
+    b.innerHTML = (Call.camOn ? '📷 카메라' : '🚫 카메라 꺼짐');
+  }
+}
+
+function callBind(){
+  if (Call.bound) return;
+  Call.bound = true;
+  var start = $('#callStart'), end = $('#callEnd'), mic = $('#callMic'), cam = $('#callCam');
+  if (start) start.addEventListener('click', function(){ callStart(); });
+  if (end) end.addEventListener('click', function(){ callHangup(); });
+  if (mic) mic.addEventListener('click', callToggleMic);
+  if (cam) cam.addEventListener('click', callToggleCam);
+  var form = $('#callForm');
+  if (form) form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var input = $('#callInput');
+    var text = input ? input.value.trim() : '';
+    if (!text) return;
+    var sent = callSend(text);
+    callPushMsg('me', text);
+    if (input) input.value = '';
+    if (!sent) callPushMsg('sys', '아직 연결된 기기가 없어 이 기기에만 남겨 두었어요.');
+  });
+  $$('.call-role').forEach(function(b){
+    b.addEventListener('click', function(){
+      var role = b.getAttribute('data-callrole');
+      callCfg().role = role;
+      save();
+      callSetStatus(Call.status, '');
+      toast(role + ' 기기로 설정했어요');
+    });
+  });
+  var room = $('#callRoom');
+  if (room) room.addEventListener('change', function(){
+    var v = String(room.value || '').trim();
+    callCfg().room = v || 'soohojiho-family';
+    save();
+    callSetStatus(Call.status, '');
+    toast('방 코드를 "' + callRoomLabel() + '"(으)로 바꿨어요. 가족 기기도 같은 코드로 맞춰 주세요.');
+  });
+  callRenderMsgs();
+  callSetStatus('idle', '');
+}
+
 function bindEvents(){
   // 사이드바
   document.addEventListener('click', function(e){
@@ -4582,6 +5738,29 @@ function bindEvents(){
     var mw = e.target.closest ? e.target.closest('[data-mealweek]') : null;
     if (mw){ UI.mealWeek = mw.getAttribute('data-mealweek'); renderSchool(); return; }
 
+    var gk = e.target.closest ? e.target.closest('[data-growthkid]') : null;
+    if (gk){ UI.growthKid = gk.getAttribute('data-growthkid'); UI.growthSel = ''; renderGrowth(); return; }
+
+    var gt = e.target.closest ? e.target.closest('[data-growthtab]') : null;
+    if (gt){ UI.growthTab = gt.getAttribute('data-growthtab'); renderGrowth(); return; }
+
+    var gm = e.target.closest ? e.target.closest('[data-growthmeas]') : null;
+    if (gm){ UI.growthMeas = gm.getAttribute('data-growthmeas'); renderGrowth(); return; }
+
+    var grow = (e.target.closest && !e.target.closest('button')) ? e.target.closest('[data-growthrow]') : null;
+    if (grow){
+      var rd = grow.getAttribute('data-growthrow');
+      UI.growthSel = (UI.growthSel === rd) ? '' : rd;
+      renderGrowth();
+      return;
+    }
+
+    var wd = e.target.closest ? e.target.closest('[data-wxviewday]') : null;
+    if (wd){ UI.wxViewDay = Number(wd.getAttribute('data-wxviewday')); renderWeatherCards(); return; }
+
+    var wh = e.target.closest ? e.target.closest('[data-wxhomeday]') : null;
+    if (wh){ UI.wxHomeDay = Number(wh.getAttribute('data-wxhomeday')); renderWeatherCards(); return; }
+
     var el = e.target.closest ? e.target.closest('[data-action]') : null;
     if (!el) return;
     var act = el.getAttribute('data-action');
@@ -4589,6 +5768,22 @@ function bindEvents(){
     switch (act){
       case 'close-modal': closeModal(); break;
       case 'growth-edit': openGrowthModal(el.getAttribute('data-mid')); break;
+      case 'growth-add': openGrowthAdd(el.getAttribute('data-mid')); break;
+      case 'growth-edit-row': openGrowthAdd(el.getAttribute('data-mid'), el.getAttribute('data-date')); break;
+      case 'health-toggle': {
+        var hm = memberById(el.getAttribute('data-mid'));
+        var hid = el.getAttribute('data-hid');
+        if (!hm || !hid) break;
+        var hs = healthState(hm);
+        var cur = hs[hid] || { done:false, date:'' };
+        cur.done = !cur.done;
+        if (cur.done && !cur.date) cur.date = todayISO();
+        if (!cur.done) cur.date = '';
+        hs[hid] = cur;
+        save(); renderGrowth();
+        toast(cur.done ? '완료로 표시했어요 ✅' : '완료 표시를 해제했어요');
+        break;
+      }
       case 'growth-del': deleteGrowth(memberById(el.getAttribute('data-mid')), el.getAttribute('data-date')); break;
       case 'sync-open': syncOpenModal(); break;
       case 'sync-pull': syncPull({ manual: true }); break;
@@ -4879,6 +6074,22 @@ function bindEvents(){
     }
     if (t.id === 'setTitle'){ State.settings.title = t.value.trim() || APP_TITLE_DEFAULT; saveNow(); renderSettings(); return; }
     if (t.id === 'setRegion'){ State.settings.region = t.value.trim(); save(); renderWeatherCards(); return; }
+    var mb = t.getAttribute('data-mbirth');
+    if (mb){
+      var mmb = memberById(mb);
+      if (mmb){ mmb.birth = t.value || ''; save(); renderGrowth(); toast(mmb.birth ? '생년월일을 저장했어요. 백분위가 정확해져요 📏' : '생년월일을 비웠어요'); }
+      return;
+    }
+    var hd = t.getAttribute('data-hdate-hid');
+    if (hd){
+      var hdm = memberById(t.getAttribute('data-hdate-mid'));
+      if (hdm){
+        var hst = healthState(hdm);
+        hst[hd] = { done: true, date: t.value || todayISO() };
+        save(); renderGrowth();
+      }
+      return;
+    }
     if (t.id === 'setSchool' || t.id === 'setGrade' || t.id === 'setClass'){
       State.settings.school = State.settings.school || {};
       if (t.id === 'setSchool') State.settings.school.name = t.value.trim();
@@ -4902,6 +6113,12 @@ function bindEvents(){
     var t = e.target;
     if (!t) return;
     if (t.id === 'diarySearch'){ UI.diaryQuery = t.value; renderDiary(); return; }
+    var hmem = t.getAttribute ? t.getAttribute('data-hmemo-mid') : null;
+    if (hmem){
+      var hmm = memberById(hmem);
+      if (hmm){ var st2 = healthState(hmm); st2.memo = t.value; save(); }
+      return;
+    }
     if (t.getAttribute && t.getAttribute('data-role') === 'diary-image') return;
   });
 
@@ -4944,10 +6161,8 @@ function bindEvents(){
 
   $('#homeWxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
   $('#wxRefresh').addEventListener('click', function(){ toast('날씨를 새로 불러오는 중…'); loadWeather(true).then(renderWeatherCards); });
-  $('#schRefresh').addEventListener('click', refreshSchoolData);
-  $('#ttRefresh').addEventListener('click', function(){
-    fetchNeisTimetable(false).catch(function(){ toast('NEIS 시간표를 불러오지 못했어요. 저장된 시간표를 보여드려요.', 'warn', 3200); });
-  });
+  var msr = $('#mealRefresh');
+  if (msr) msr.addEventListener('click', refreshSchoolData);
 
   $('#exportBtn').addEventListener('click', exportJSON);
   $('#importBtn').addEventListener('click', function(){ $('#importFile').click(); });
@@ -5029,10 +6244,9 @@ function boot(){
     renderAmbient();
   });
 
-  // NEIS 실시간 정보 (실패해도 내장 데이터로 동작)
+  // 급식은 하이클래스 우선, 확인되지 않은 날만 나이스 식단으로 채웁니다
   fetchNeisMeals(true).catch(function(){});
-  fetchNeisSchedule(true).catch(function(){});
-  fetchNeisTimetable(true).catch(function(){});
+  callBind();
 
   // 기기 동기화: 연결돼 있으면 앱을 열 때 최신 기록을 가져옴
   window.addEventListener('online', function(){
