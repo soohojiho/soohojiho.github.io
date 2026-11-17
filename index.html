@@ -799,7 +799,7 @@ label.sync-check input{width:auto}
 .h-row .hstate.na{background:#f4f7fb;color:#96a1b2}
 .h-check{flex:0 0 26px;width:26px;height:26px;border-radius:8px;border:2px solid #dbe4f0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
 .h-row.done .h-check{background:linear-gradient(135deg,#34d399,#10b981);border-color:#10b981}
-.h-date{font-size:10.5px;font-weight:800;color:#5b6b83;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px 5px;width:auto}
+.h-date{font-size:10.5px;font-weight:800;color:#5b6b83;background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 5px;width:124px;min-width:0;flex:0 0 124px}
 
 /* ============ 날씨 (오늘/내일 + 대기질) ============ */
 .wx-seg{display:flex;gap:3px;background:#eef3fb;border-radius:11px;padding:3px}
@@ -2559,17 +2559,19 @@ function renderHealth(m){
     });
     return { now: now, past: past, future: future };
   }
-  function block(title, em, items){
+  function block(title, em, items, collapsible){
     if (!items.length) return '';
-    return '<div class="h-group"><h4>' + em + ' ' + title + ' <span class="sub" style="font-weight:800">' + items.length + '</span></h4>' +
-      items.map(function(it){ return healthRowHTML(m, it, age); }).join('') + '</div>';
+    var head = em + ' ' + title + ' <span class="sub" style="font-weight:800">' + items.length + '</span>';
+    var body = items.map(function(it){ return healthRowHTML(m, it, age); }).join('');
+    if (collapsible) return '<details class="h-group"><summary style="cursor:pointer;list-style:none"><h4 style="display:inline-flex">' + head + ' <span class="sub" style="font-weight:800;margin-left:4px">펼치기</span></h4></summary>' + body + '</details>';
+    return '<div class="h-group"><h4>' + head + '</h4>' + body + '</div>';
   }
   var v = group(NIP_ITEMS);
   vacc.innerHTML =
     '<div class="card-head"><h3><span class="ico">💉</span>' + esc(m.name) + ' 예방접종</h3>' +
       '<div class="right"><span class="sub">' + gAgeLabel(age) + '</span></div></div>' +
     block('지금 챙길 접종', '📍', v.now) +
-    block('지난 시기 접종 (기록 확인)', '🕘', v.past) +
+    block('지난 시기 접종 (기록 확인)', '🕘', v.past, true) +
     block('앞으로 받을 접종', '⏭', v.future) +
     '<div class="g-note">※ 질병관리청 표준예방접종일정(국가예방접종) 기준이에요. 접종 여부는 예방접종도우미(nip.cdc.go.kr)에서 확인하고, 실제 접종은 의료기관 안내를 따라 주세요.</div>';
 
@@ -2579,7 +2581,7 @@ function renderHealth(m){
     '<div class="card-head"><h3><span class="ico">🩺</span>건강검진</h3>' +
       '<div class="right"><span class="sub">' + doneCount + ' / ' + CHECKUP_ITEMS.length + ' 완료</span></div></div>' +
     block('지금 챙길 검진', '📍', c.now) +
-    block('지난 검진 (기록 확인)', '🕘', c.past) +
+    block('지난 검진 (기록 확인)', '🕘', c.past, true) +
     block('앞으로 받을 검진', '⏭', c.future) +
     '<div class="g-note">※ 영유아 건강검진(생후 14일~만 6세)과 학생 건강검진(초1·초4·중1·고1) 기준이에요. 검진표는 학교·보건소 안내를 확인해 주세요.</div>' +
     '<div class="divider"></div>' +
