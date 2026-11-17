@@ -5365,11 +5365,17 @@ function callSetStatus(status, msg){
     else if (status === 'idle') hint.textContent = '※ 화면·소리는 기기 사이에서만 오가고 서버에 저장되지 않아요. 처음 한 번만 카메라·마이크 허용을 눌러 주세요.';
   }
   var idle = $('#callIdle');
-  if (idle) idle.classList.toggle('hidden', status === 'live' || Call.localStream);
+  if (idle) idle.classList.toggle('hidden', status === 'live');
   var idleTitle = $('#callIdleTitle'), idleText = $('#callIdleText');
   if (status === 'error'){
     if (idleTitle) idleTitle.textContent = '연결하지 못했어요';
     if (idleText) idleText.innerHTML = esc(msg || '같은 방 코드를 쓰는 가족 기기가 켜져 있는지 확인해 주세요.');
+  } else if (status === 'connecting'){
+    if (idleTitle) idleTitle.textContent = '상대 기기를 기다리는 중이에요';
+    if (idleText) idleText.innerHTML = '이 기기 역할은 <b>' + callRoleInfo().em + ' ' + callRoleInfo().name + '</b>이에요. 가족 기기에서도 <b>통화 시작</b>을 누르면 여기에 상대 화면이 나타나요.';
+  } else {
+    if (idleTitle) idleTitle.textContent = '아직 연결된 기기가 없어요';
+    if (idleText) idleText.innerHTML = '이 기기의 역할(아빠·엄마·태블릿·아이들)을 고르고 <b>통화 시작</b>을 누르면, 같은 방 코드를 쓰는 가족 기기와 1번에 연결돼요.';
   }
   var start = $('#callStart'), end = $('#callEnd');
   if (start) start.classList.toggle('hidden', status === 'live' || status === 'connecting');
