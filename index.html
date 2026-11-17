@@ -2697,7 +2697,11 @@ var Sync = {
   busy: false,
   pushTimer: null,
   lastPullTry: 0,
-  queue: false
+  queue: false,
+  remoteSha: '',      // 마지막으로 주고받은 원격 파일 sha (같으면 내려받지 않아요)
+  etag: '',           // 조건부 요청(If-None-Match)용
+  pollTimer: null,    // 15초 자동 확인 타이머
+  lastProbeAt: 0
 };
 
 function deviceLabel(){
@@ -2831,7 +2835,7 @@ function syncCardHTML(info){
         '<button class="btn ghost" data-action="sync-pull">⬇ 지금 가져오기</button>' : '') +
     '</div>' +
     syncMetaHTML() +
-    '<p class="muted" style="font-size:11px;line-height:1.6">태블릿 · 엄마 폰 · 아빠 폰에서 같은 토큰을 한 번씩 넣으면 기록이 자동으로 맞춰져요. 토큰은 그 기기 브라우저에만 저장되고 사이트 파일에는 남지 않아요.</p>' +
+    '<p class="muted" style="font-size:11px;line-height:1.6">태블릿 · 엄마 폰 · 아빠 폰에서 같은 토큰을 한 번씩 넣으면 기록이 자동으로 맞춰져요. 화면을 보고 있는 동안에는 <b>15초마다</b> 다른 기기 기록을 조용히 확인해요. 토큰은 그 기기 브라우저에만 저장되고 사이트 파일에는 남지 않아요.</p>' +
   '</div>';
 }
 function renderSyncUI(){
@@ -2887,10 +2891,38 @@ function syncEnvelope(){
 function syncRemoteMeta(){
   return syncFetch(syncFileUrl() + '?ref=' + encodeURIComponent(Sync.cfg.branch || 'main'))
     .then(function(res){
+      var tag = res.headers.get('ETag');
+      if (tag) Sync.etag = tag;
       if (res.status === 404) return null;
       if (!res.ok) throw new Error(syncErrorText(res.status));
       return res.json();
     });
+}
+/* 원격 파일이 그대로면 본문 없이 304로 끝나는 가벼운 확인 (15초 자동 확인용) */
+function syncProbeMeta(){
+  var url = syncFileUrl() + '?ref=' + encodeURIComponent(Sync.cfg.branch || 'main');
+  var headers = syncHeaders();
+  if (Sync.etag) headers['If-None-Match'] = Sync.etag;
+  return syncFetch(url, { headers: headers })
+    .then(function(res){
+      if (res.status === 304) return { notModified: true };
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(syncErrorText(res.status));
+      var tag = res.headers.get('ETag');
+      return res.json().then(function(json){
+        if (tag) json.__etag = tag;      // 받아들인 뒤에만 기억해요 (건너뛴 차례는 다음에 다시 받기)
+        return json;
+      });
+    });
+}
+/* 입력 중이거나 모달을 보고 있으면 화면을 다시 그리지 않아요 (쓰던 글이 사라지지 않게) */
+function syncTypingBusy(){
+  if (modalOpen()) return true;
+  var el = document.activeElement;
+  if (!el) return false;
+  var tag = (el.tagName || '').toUpperCase();
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+  return !!el.isContentEditable;
 }
 function syncDecodeMeta(meta){
   var readText = (meta && meta.content)
@@ -2974,6 +3006,12 @@ function syncPush(opts){
         ePut.status = res.status;
         throw ePut;
       }
+      return res.json().then(function(j){ return j; }, function(){ return null; });
+    })
+    .then(function(j){
+      // 방금 올린 파일은 확인할 필요 없어요 (15초 자동 확인이 되돌려 받지 않도록)
+      if (j && j.content && j.content.sha) Sync.remoteSha = j.content.sha;
+      Sync.etag = '';
       Sync.busy = false;
       Sync.lastSync = new Date().toISOString();
       Sync.cfg.lastSync = Sync.lastSync;
@@ -3012,8 +3050,9 @@ function syncPull(opts){
   if (Sync.busy){ Sync.queue = true; return Promise.resolve(false); }
   Sync.busy = true;
   Sync.lastPullTry = Date.now();
+  Sync.lastProbeAt = Sync.lastPullTry;
   syncSetStatus('busy', '다른 기기 기록을 확인하는 중…');
-  return syncRemoteMeta()
+  return (opts.meta ? Promise.resolve(opts.meta) : syncRemoteMeta())   // 자동 확인이 이미 받아 온 정보는 다시 받지 않아요
     .then(function(meta){
       if (!meta){
         Sync.busy = false;
@@ -3021,12 +3060,15 @@ function syncPull(opts){
         if (opts.manual) toast('아직 GitHub에 올린 기록이 없어요. “지금 올리기”를 눌러 주세요.', 'warn', 4600);
         return false;
       }
+      if (meta.sha) Sync.remoteSha = meta.sha;          // 이 파일은 확인했어요
+      var probeTag = meta.__etag || '';
       return syncDecodeMeta(meta).then(function(env){
         var remoteAt = env.updatedAt || '';
         var localAt = stateUpdatedAt();
         var remoteNewer = !localAt || (!!remoteAt && new Date(remoteAt).getTime() > new Date(localAt).getTime());
         if (!remoteNewer && !opts.force){
           Sync.busy = false;
+          if (probeTag) Sync.etag = probeTag;
           syncSetStatus('ok', '이 기기 기록이 이미 최신이에요.');
           if (opts.manual) toast('이미 최신 상태예요 👍', 'ok');
           return false;
@@ -3045,6 +3087,7 @@ function syncPull(opts){
         var ok = syncApplyEnvelope(env);
         Sync.busy = false;
         if (ok){
+          if (probeTag) Sync.etag = probeTag;
           Sync.lastSync = new Date().toISOString();
           Sync.cfg.lastSync = Sync.lastSync;
           syncSaveCfg();
@@ -3056,6 +3099,8 @@ function syncPull(opts){
     })
     .catch(function(err){
       Sync.busy = false;
+      Sync.remoteSha = '';                              // 다음 차례에 다시 확인
+      Sync.etag = '';
       var msg = (err && err.message) ? err.message : syncNetworkText();
       if (!/[\u3131-\ud7a3]/.test(msg)) msg = syncNetworkText();
       syncSetStatus('err', msg);
@@ -3065,16 +3110,51 @@ function syncPull(opts){
 }
 function syncAfterChange(){
   if (!syncConfigured() || Sync.applying) return;
-  if (!Sync.cfg.auto) return;
+  if (Sync.cfg.auto === false) return;
   if (Sync.pushTimer) window.clearTimeout(Sync.pushTimer);
-  Sync.pushTimer = window.setTimeout(function(){ syncPush({}); }, 2500);
+  Sync.pushTimer = window.setTimeout(function(){
+    Sync.pushTimer = null;          // 올리기 시작 — 15초 자동 확인이 다시 돌 수 있게
+    syncPush({});
+  }, 2500);
 }
 function syncMaybePull(){
   if (!syncConfigured() || !syncOnline()) return;
-  if (!Sync.cfg.auto) return;
+  if (Sync.cfg.auto === false) return;
   if (Sync.busy) return;
-  if (Date.now() - Sync.lastPullTry < 30000) return;
+  if (Date.now() - Sync.lastPullTry < 10000) return;   // 앱으로 돌아오면 10초 안이라도 바로 맞추기
   syncPull({});
+}
+/* ---- 15초마다 조용히 다른 기기 기록 확인 ---- */
+function syncPollTick(){
+  if (document.hidden) return;                                   // 화면에 보일 때만
+  if (!syncConfigured() || !syncOnline()) return;
+  if (Sync.cfg.auto === false) return;
+  if (Sync.busy || Sync.applying) return;
+  if (Sync.pushTimer) return;                                    // 올리려고 모아 둔 기록을 덮어쓰지 않기
+  if (Date.now() - Sync.lastProbeAt < 12000) return;
+  syncPollPull();
+}
+function syncPollPull(){
+  if (!syncConfigured() || !syncOnline()) return Promise.resolve(false);
+  if (Sync.busy || Sync.applying || Sync.pushTimer) return Promise.resolve(false);
+  Sync.lastProbeAt = Date.now();
+  Sync.lastPullTry = Sync.lastProbeAt;
+  return syncProbeMeta()
+    .then(function(meta){
+      if (!meta || meta.notModified) return false;      // 바뀐 게 없어요
+      var sha = (meta && meta.sha) || '';
+      if (sha && sha === Sync.remoteSha){               // 같은 파일이에요
+        if (meta.__etag) Sync.etag = meta.__etag;
+        return false;
+      }
+      if (syncTypingBusy()) return false;               // 입력 중이면 다음 차례에 (이번 응답은 기억하지 않아요)
+      return syncPull({ meta: meta, notify: false });
+    })
+    .catch(function(){ return false; });                // 잠깐 실패해도 조용히 넘어가요
+}
+function syncStartPoll(){
+  if (Sync.pollTimer) return;
+  Sync.pollTimer = window.setInterval(syncPollTick, 15000);
 }
 function syncConnect(){
   var localAt = stateUpdatedAt();
@@ -3118,6 +3198,8 @@ function syncUnlink(){
   Sync.cfg.token = '';
   Sync.cfg.lastSync = '';
   Sync.lastSync = '';
+  Sync.remoteSha = '';
+  Sync.etag = '';
   syncSaveCfg();
   syncSetStatus('local', '이 기기 동기화를 껐어요. 토큰을 지웠어요.');
   renderSyncUI();
@@ -3147,7 +3229,7 @@ function syncFormHTML(){
         esc((c.owner || SYNC_DEFAULT_REPO.owner) + '/' + (c.repo || SYNC_DEFAULT_REPO.repo)) + '"></div>' +
       '<div class="field"><label>브랜치</label><input type="text" name="branch" spellcheck="false" value="' + esc(c.branch || 'main') + '"></div>' +
     '</div>' +
-    '<label class="sync-check"><input type="checkbox" name="auto"' + (c.auto !== false ? ' checked' : '') + '> 바뀌면 자동으로 올리고, 앱을 열 때 최신 기록 가져오기</label>' +
+    '<label class="sync-check"><input type="checkbox" name="auto"' + (c.auto !== false ? ' checked' : '') + '> 바뀌면 자동으로 올리고, 화면을 보는 동안 15초마다 다른 기기 기록 가져오기</label>' +
     '<div class="row" style="gap:8px;flex-wrap:wrap">' +
       '<button class="btn primary" type="submit">토큰 저장하고 연결</button>' +
       (hasToken ? '<span class="chip family">토큰 저장됨</span>' : '') +
@@ -3174,7 +3256,7 @@ function syncOpenModal(){
       '</div>' +
       '<div class="divider"></div>' +
       '<div id="syncMetaLine">' + syncMetaHTML() + '</div>' +
-      '<div class="sync-note">가족 기록은 <b>' + esc((Sync.cfg.owner || SYNC_DEFAULT_REPO.owner) + '/' + (Sync.cfg.repo || SYNC_DEFAULT_REPO.repo)) + '</b> 비공개 저장소에만 보관돼요. 두 기기에서 동시에 고치면 마지막에 저장한 기록이 남아요.</div>' +
+      '<div class="sync-note">가족 기록은 <b>' + esc((Sync.cfg.owner || SYNC_DEFAULT_REPO.owner) + '/' + (Sync.cfg.repo || SYNC_DEFAULT_REPO.repo)) + '</b> 비공개 저장소에만 보관돼요. 다른 기기 기록이 바뀌면 화면을 보는 동안 15초 안에 저절로 반영되고(입력 중이면 잠시 미뤄요), 두 기기에서 동시에 고치면 마지막에 저장한 기록이 남아요.</div>' +
     '</div></div>'
   );
 }
@@ -7066,6 +7148,7 @@ function boot(){
   });
   window.addEventListener('focus', syncMaybePull);
   document.addEventListener('visibilitychange', function(){ if (!document.hidden) syncMaybePull(); });
+  syncStartPoll();                       // 화면을 보고 있는 동안 15초마다 다른 기기 기록을 조용히 확인
   if (syncConfigured()){
     window.setTimeout(function(){
       if (syncOnline()) syncPull({ notify: false });
