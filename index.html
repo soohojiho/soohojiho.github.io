@@ -955,7 +955,7 @@ label.sync-check input{width:auto}
               </div>
               <div class="tt-wrap" id="ttSingle"><table class="tt" id="ttTable"></table></div>
               <div class="tt-split two" id="ttSplit"></div>
-              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 바꿀 수 있어요. 김수호 시간표는 NEIS(장산초등학교 1학년)에서, 김지호는 어린이집 하루 흐름으로 저장돼요.</p>
+              <p class="muted" style="font-size:11px;margin-top:8px">※ 칸을 누르면 과목을 바꿀 수 있어요. 김수호 시간표는 NEIS(장산초등학교 1학년 2반)에서, 김지호는 어린이집 하루 흐름으로 저장돼요.</p>
             </div>
           </div>
         </div>
@@ -1020,11 +1020,13 @@ label.sync-check input{width:auto}
         <div class="school-hero">
           <div class="em">🏫</div>
           <div>
-            <h2>장산초등학교</h2>
-            <div class="addr">부산광역시 해운대구 선수촌로 68 · 051-520-1500 · 공립</div>
+            <h2>장산초등학교 <span class="chip" style="vertical-align:middle">1학년 2반 · 하이클래스</span></h2>
+            <div class="addr">부산광역시 해운대구 선수촌로 68 · 051-520-1500 · 공립 · 담임 박소윤</div>
+            <div class="addr" id="hiclassLeave" style="margin-top:4px;color:#0ea5e9;font-weight:800"></div>
           </div>
           <div class="acts">
             <button class="btn ghost" id="schRefresh">↻ NEIS 새로고침</button>
+            <a class="btn ghost" href="https://www.hiclass.net/main/home" target="_blank" rel="noopener">하이클래스 ↗</a>
             <a class="btn ghost" href="http://www.jangsan.es.kr" target="_blank" rel="noopener">학교 홈페이지 ↗</a>
             <a class="btn ghost" href="https://www.neis.go.kr" target="_blank" rel="noopener">나이스 ↗</a>
           </div>
@@ -1072,7 +1074,8 @@ label.sync-check input{width:auto}
               </div>
             </div>
             <div class="meal" id="mealWeek"></div>
-            <p class="muted" style="font-size:10.5px;margin-top:8px">※ 괄호 안 숫자는 알레르기 유발 식재료 번호예요. (예: 1=난류, 2=우유, 5=대두, 6=밀, 9=새우)</p>
+            <p class="muted" id="mealNote" style="font-size:10.5px;margin-top:8px"></p>
+            <p class="muted" style="font-size:10.5px;margin-top:2px">※ 괄호 안 숫자는 알레르기 유발 식재료 번호예요. (예: 1=난류, 2=우유, 5=대두, 6=밀, 9=새우)</p>
           </div>
         </div>
       </section>
@@ -1155,7 +1158,7 @@ label.sync-check input{width:auto}
             <div class="card-head"><h3><span class="ico">🔗</span>바로가기 · 안내</h3></div>
             <div class="stack">
               <div class="set-row"><div class="k">네이버 날씨<small>부산 해운대구</small></div><div class="v"><a class="btn sm ghost" target="_blank" rel="noopener" href="https://search.naver.com/search.naver?where=nexearch&query=%EB%B6%80%EC%82%B0%20%ED%95%B4%EC%9A%B4%EB%8C%80%EA%B5%AC%20%EB%82%A0%EC%94%A8">열기 ↗</a></div></div>
-              <div class="set-row"><div class="k">학교 급식<small>NEIS 급식식단정보</small></div><div class="v"><a class="btn sm ghost" href="https://open.neis.go.kr" target="_blank" rel="noopener">열기 ↗</a></div></div>
+              <div class="set-row"><div class="k">학교 급식<small>하이클래스(학교급식) 우선 · NEIS 대체</small></div><div class="v"><a class="btn sm ghost" href="https://www.hiclass.net/main/home" target="_blank" rel="noopener">하이클래스 ↗</a> <a class="btn sm ghost" href="https://open.neis.go.kr" target="_blank" rel="noopener">나이스 ↗</a></div></div>
               <div class="set-row"><div class="k">장산초등학교<small>www.jangsan.es.kr</small></div><div class="v"><a class="btn sm ghost" href="http://www.jangsan.es.kr" target="_blank" rel="noopener">열기 ↗</a></div></div>
               <div class="divider"></div>
               <div class="set-row"><div class="k">📱 홈 화면에 추가<small>Chrome 메뉴 → '홈 화면에 추가'</small></div><div class="v"><span class="chip">앱처럼 사용</span></div></div>
@@ -1336,6 +1339,72 @@ var MEAL_SEED = {
  ]
 };
 
+/* =========================================================
+   하이클래스(HiClass) — 장산초등학교 1학년 2반 (김수호)
+   2026-11-17 19:10 하이클래스 앱에서 직접 확인한 값
+   · 급식: 11/9~11/18 게시글 + '다음 급식 예고'(11/18)
+   · 학사일정: 하이클래스 달력(11월·12월)
+   · 알림장: 11/17(화)·11/16(월)·11/13(금) 등
+   · 중요안내: 요일별 하교시각·매일 준비물
+   ========================================================= */
+var HICLASS = {
+  label: '하이클래스',
+  url: 'https://www.hiclass.net/main/home',
+  school: '장산초등학교', grade: '1', cls: '2', clsLabel: '1학년 2반', teacher: '박소윤',
+  syncedAt: '2026-11-17 19:10',
+  /* 하이클래스에서 직접 확인한 급식 날짜 (이 날짜는 NEIS 자동 수집이 덮어쓰지 않음) */
+  mealDays: ['2026-11-16', '2026-11-17', '2026-11-18'],
+  /* 요일별 하교 시각 — 하이클래스 중요안내(3/6) */
+  leaveTime: { '1':'12:40', '2':'13:40', '3':'12:40', '4':'13:40', '5':'13:40', '6':'', '0':'' },
+  leaveNote: '월·수 12:40(급식 후) · 화·목·금 13:40',
+  dailyItems: '통통통 — 물통·우체통·필통 (+독서할 책·수저통 선택)',
+  dressNote: '월·금은 활동하기 편한 복장'
+};
+
+/* 하이클래스에서 확인한 급식 (11/16~11/18, 내장 NEIS 시드와 일치 확인됨) */
+var HICLASS_MEALS = {
+  '2026-11-16': MEAL_SEED['2026-11-16'],
+  '2026-11-17': MEAL_SEED['2026-11-17'],
+  '2026-11-18': [
+    '친환경백미밥', '장터소고기국 (5.6.16)', '국물떡볶이 (5.6.13)',
+    '순대/쌈장 (2.5.6.10.12.13.16.18)', '배추김치 (9.13)', '고구마맛탕 (13)', '사과주스 (2)'
+  ]
+};
+
+/* 하이클래스 학사일정 — 11월~12월 (달력에서 날짜별로 확인) */
+var HICLASS_SCHEDULE = [
+  { date:'2026-11-07', name:'토요휴업일', memo:'' },
+  { date:'2026-11-14', name:'토요휴업일', memo:'' },
+  { date:'2026-11-16', name:'book적 book적 한마당', memo:'' },
+  { date:'2026-11-17', name:'book적 book적 한마당', memo:'' },
+  { date:'2026-11-18', name:'book적 book적 한마당', memo:'' },
+  { date:'2026-11-19', name:'대입수능일', memo:'등교 9:20~9:40' },
+  { date:'2026-11-19', name:'book적 book적 한마당', memo:'' },
+  { date:'2026-11-20', name:'book적 book적 한마당', memo:'' },
+  { date:'2026-11-21', name:'토요휴업일', memo:'' },
+  { date:'2026-11-28', name:'토요휴업일', memo:'' },
+  { date:'2026-12-05', name:'토요휴업일', memo:'' },
+  { date:'2026-12-12', name:'토요휴업일', memo:'' },
+  { date:'2026-12-18', name:'전교임원선거', memo:'' },
+  { date:'2026-12-19', name:'토요휴업일', memo:'' },
+  { date:'2026-12-25', name:'성탄절', memo:'' },
+  { date:'2026-12-26', name:'토요휴업일', memo:'' },
+  { date:'2026-12-30', name:'겨울방학식', memo:'' },
+  { date:'2026-12-31', name:'겨울방학', memo:'' }
+];
+
+/* 하이클래스 알림장(11/17 화)에서 가져온 공지·준비물 기본값 */
+var HICLASS_NOTICES = [
+  { date:'2026-11-17', title:'우체통 · 일기장 (월요일에 제출)', memo:'1편만 쓰면 돼요' },
+  { date:'2026-11-18', title:'기본준비물 다시 챙기기', memo:'연필·지우개·색연필·싸인펜·가위·풀' },
+  { date:'2026-11-19', title:'수능일 등교 9:20~9:40', memo:'9시 이전 등교 금지' },
+  { date:'2026-11-19', title:'겨울방학 돌봄교실 수요조사 제출', memo:'희망하는 경우만' }
+];
+var HICLASS_PREPS = [
+  { title:'매일 챙기기 (통통통)', due:'', items:['물통','우체통','필통','수저통(선택)','독서할 책(선택)'] },
+  { title:'기본준비물 점검', due:'2026-11-18', items:['연필','지우개','색연필','싸인펜','가위','풀'] }
+];
+
 /* NEIS 학사일정 — 2026-11-16 ~ 12-30, 장산초등학교 실제 일정 */
 var NEIS_SCHEDULE = [
  {
@@ -1469,7 +1538,7 @@ function defaultState(){
       title: APP_TITLE_DEFAULT,
       region: '부산 해운대구',
       lat: 35.1631, lon: 129.1635,
-      school: { name:'장산초등학교', atpt:'C10', code:'7211070', grade:'1', cls:'1' },
+      school: { name:'장산초등학교', atpt:'C10', code:'7211070', grade:'1', cls:'2' },
       filter: '전체',
       acadView: 'split',
       firstRun: today
@@ -1540,17 +1609,17 @@ function defaultState(){
       { id: uid('d'), date: shiftDate(-4), owner:'가족 공통', mood:'🥰', title:'해운대 바닷가 산책',
         text:'주말에 다 같이 해운대 해수욕장을 걸었다. 지호가 모래성을 크게 만들고, 수호는 파도랑 달리기 경주를 했다.', image:'' }
     ],
-    notices: [
-      { id: uid('n'), date: shiftDate(3), title:'11월 학부모 상담 주간 신청서 제출', memo:'가정통신문 확인 후 신청서 제출', sample:true },
-      { id: uid('n'), date: shiftDate(7), title:'겨울철 안전 교육 안내', memo:'', sample:true }
-    ],
-    preps: [
-      { id: uid('p'), title:'수호 체육복·실내화', due: shiftDate(2), items:[{t:'체육복',done:false},{t:'실내화',done:false},{t:'물통',done:false}], sample:true },
-      { id: uid('p'), title:'지호 여분 옷 가방', due: shiftDate(1), items:[{t:'여분 옷',done:false},{t:'속옷',done:false},{t:'물티슈',done:false}], sample:true },
-      { id: uid('p'), title:'가정통신문 제출', due: shiftDate(3), items:[{t:'현장학습 동의서',done:false},{t:'개인정보 동의서',done:false}], sample:true }
-    ],
-    meals: {},
-    mealSource: '',
+    notices: HICLASS_NOTICES.map(function(n){
+      return { id: uid('n'), date: n.date, title: n.title, memo: n.memo || '', sample: false, src: 'hiclass' };
+    }),
+    preps: HICLASS_PREPS.map(function(p){
+      return { id: uid('p'), title: p.title, due: p.due || '',
+        items: p.items.map(function(t){ return { t: t, done: false }; }), sample: false, src: 'hiclass' };
+    }),
+    meals: Object.assign({}, HICLASS_MEALS),
+    mealSource: null,
+    neisSchedule: HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; }),
+    neisUpdated: HICLASS.syncedAt + ' (하이클래스)',
     weather: null
   };
 }
@@ -1684,12 +1753,14 @@ function loadState(){
   try { raw = window.localStorage.getItem(STORAGE_KEY); } catch(e){ raw = null; }
   if (!raw){
     State = defaultState();
+    try { applyHiclassPriority(); } catch(e){}
     return;
   }
   try {
     normalizeState(JSON.parse(raw));
   } catch(e){
     State = defaultState();
+    try { applyHiclassPriority(); } catch(e2){}
   }
 }
 
@@ -1712,6 +1783,8 @@ function normalizeState(parsed){
     if (!m.growth || typeof m.growth !== 'object' || Array.isArray(m.growth)) m.growth = { height:null, weight:null, date:'', history:[] };
     if (!Array.isArray(m.growth.history)) m.growth.history = [];
   });
+  // 하이클래스(1학년 2반) 급식·학사일정·알림장을 NEIS보다 우선
+  try { applyHiclassPriority(); } catch(e){}
   return State;
 }
 
@@ -3316,7 +3389,7 @@ function neisTimetableURL(ymd, grade, cls){
 function fetchNeisTimetable(silent){
   var sch = State.settings.school || {};
   var grade = sch.grade || '1';
-  var cls = sch.cls || '1';
+  var cls = sch.cls || HICLASS.cls;
   var days = ['월','화','수','목','금'];
   var requests = days.map(function(d, idx){
     var ymd = weekdayOfWeek(idx).replace(/-/g, '');
@@ -3685,22 +3758,27 @@ function mealsFor(dateStr){
 function todayMeal(){ return mealsFor(todayISO()); }
 
 function renderSchool(){
+  // 하이클래스 하교 시각 배지
+  var hl = $('#hiclassLeave');
+  if (hl) hl.textContent = '🏫 하교 ' + HICLASS.leaveNote + ' · ' + HICLASS.dailyItems;
   // 공지
   var wrap = $('#noticeList');
   if (!wrap) return;
-  var sch = (State.neisSchedule && State.neisSchedule.length) ? State.neisSchedule : NEIS_SCHEDULE;
+  var sch = (State.neisSchedule && State.neisSchedule.length) ? State.neisSchedule : hiclassScheduleSeed();
   var today = todayISO();
   var items = [];
   sch.forEach(function(s){
     if (dayDiff(today, s.date) < -3) return; // 지난 일정은 3일까지만
-    items.push({ date: s.date, title: s.name, memo: s.memo || '', kind: 'neis' });
+    if (s.name === '토요휴업일') return;     // 토요일은 쉬는 날 — 공지 목록에서는 뺌
+    items.push({ date: s.date, title: s.name, memo: s.memo || '', kind: s.src === 'hiclass' ? 'hiclass' : 'neis' });
   });
   State.notices.forEach(function(n){
     items.push({ id: n.id, date: n.date, title: n.title, memo: n.memo || '', kind: 'own', sample: n.sample });
   });
   items.sort(function(a, b){
     if (a.date !== b.date) return a.date < b.date ? -1 : 1;
-    return a.kind === 'neis' ? -1 : 1;
+    if (a.kind === b.kind) return 0;
+    return a.kind === 'hiclass' ? -1 : (a.kind === 'neis' ? -1 : 1);
   });
   if (!items.length){
     wrap.innerHTML = '<div class="empty"><b>📢</b>새로운 공지가 없어요</div>';
@@ -3710,7 +3788,7 @@ function renderSchool(){
       return '<div class="notice ' + (isToday ? 'pinned' : '') + '">' +
         '<span class="date">' + shortDate(it.date) + '<br>' + weekdayKo(it.date) + '</span>' +
         '<div class="txt"><b>' + esc(it.title) + '</b>' +
-          '<small>' + (it.kind === 'neis' ? '학사일정 · NEIS' : '우리 공지') +
+          '<small>' + (it.kind === 'hiclass' ? '학사일정 · 하이클래스' : (it.kind === 'neis' ? '학사일정 · NEIS' : '우리 공지')) +
           (it.sample ? ' · 예시' : '') + (it.memo ? ' · ' + esc(it.memo) : '') +
           (isToday ? ' · <b style="color:#c07a00">오늘</b>' : '') + '</small></div>' +
         (it.kind === 'own' ? '<button class="x-btn" data-action="notice-del" data-id="' + it.id + '">✕</button>' : '') +
@@ -3718,7 +3796,7 @@ function renderSchool(){
     }).join('');
   }
   var src = $('#noticeSrc');
-  if (src) src.textContent = (State.neisUpdated ? 'NEIS · ' + State.neisUpdated : 'NEIS 학사일정 (내장)');
+  if (src) src.textContent = '하이클래스 기준 · ' + HICLASS.clsLabel;
 
   // 준비물
   var pwrap = $('#prepList');
@@ -3755,7 +3833,7 @@ function renderSchool(){
   var extra = $('#prepExtra');
   if (extra){
     var wr = weekRange('this');
-    var weekEvents = (State.neisSchedule && State.neisSchedule.length ? State.neisSchedule : NEIS_SCHEDULE).filter(function(x){
+    var weekEvents = (State.neisSchedule && State.neisSchedule.length ? State.neisSchedule : hiclassScheduleSeed()).filter(function(x){
       return x.date >= wr[0] && x.date <= wr[1];
     });
     var h = '<b style="font-size:11.5px;color:#5b6b83">📌 이번 주 학교 일정</b>';
@@ -3769,7 +3847,11 @@ function renderSchool(){
       }).join('');
     }
     var lunch2 = todayMeal();
-    h += '<div class="divider" style="margin:9px 0"></div><b style="font-size:11.5px;color:#5b6b83">🍚 오늘 급식</b>' +
+    h += '<div class="divider" style="margin:9px 0"></div>' +
+      '<div class="row" style="font-size:11.5px;font-weight:700;padding:3px 0"><span class="chip">🏫 하교</span><span style="flex:1;min-width:0;color:#5b6b83">' + esc(HICLASS.leaveNote) + '</span></div>' +
+      '<div class="row" style="font-size:11.5px;font-weight:700;padding:3px 0"><span class="chip">🎒 매일</span><span style="flex:1;min-width:0;color:#5b6b83">' + esc(HICLASS.dailyItems) + '</span></div>' +
+      '<div class="muted" style="font-size:10.5px;font-weight:700;padding:2px 0">' + esc(HICLASS.dressNote) + ' · 하이클래스 중요안내</div>' +
+      '<div class="divider" style="margin:9px 0"></div><b style="font-size:11.5px;color:#5b6b83">🍚 오늘 급식</b>' +
       (lunch2.length ? '<div style="font-size:11px;font-weight:700;color:#66738a;line-height:1.6;margin-top:3px">' +
         lunch2.map(function(x){ return esc(stripAllergy(x)); }).join(' · ') + '</div>'
         : '<div class="muted" style="font-size:11.5px;font-weight:700">오늘은 급식이 없어요</div>');
@@ -3787,9 +3869,12 @@ function renderSchool(){
       var iso = isoDate(d);
       var list = mealsFor(iso);
       var isToday = iso === todayISO();
+      var hi = !!hiclassMealDays()[iso];
       html += '<div class="meal-day ' + (isToday ? 'today' : '') + '">' +
         '<div class="dh"><b>' + (d.getMonth() + 1) + '/' + d.getDate() + '</b>' +
-        '<small>' + DAY_SUN[d.getDay()] + (isToday ? ' · 오늘' : '') + '</small></div>' +
+        '<small>' + DAY_SUN[d.getDay()] + (isToday ? ' · 오늘' : '') + '</small>' +
+        (hi ? '<small style="display:block;color:#0ea5e9;font-weight:800;font-size:9.5px;margin-top:2px">하이클래스</small>'
+            : (list.length ? '<small style="display:block;color:#a8b3c4;font-weight:800;font-size:9.5px;margin-top:2px">NEIS</small>' : '')) + '</div>' +
         (list.length ? '<ul>' + list.map(function(x){
           var al = allergyPart(x);
           return '<li>' + esc(stripAllergy(x)) + (al ? '<span class="alg"> (' + esc(al) + ')</span>' : '') + '</li>';
@@ -3798,11 +3883,78 @@ function renderSchool(){
     }
     mwrap.innerHTML = html;
     var ms = $('#mealSrc');
-    if (ms) ms.textContent = State.mealUpdated ? 'NEIS · ' + State.mealUpdated : 'NEIS 내장 데이터';
+    if (ms) ms.textContent = '하이클래스 기준 · ' + HICLASS.syncedAt.slice(5, 16) + ' 확인';
+    var mt = $('#mealNote');
+    if (mt) mt.innerHTML = '※ 하이클래스에 오늘 급식과 다음 급식 예고로 올라온 식단이에요. 아직 올라오지 않은 날짜는 NEIS(나이스) 식단으로 보여줍니다.';
     $$('#mealTabs button').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-mealweek') === UI.mealWeek);
     });
   }
+}
+
+/* ---------- 하이클래스 우선 원칙 ----------
+   하이클래스에서 확인한 급식·학사일정은 NEIS 자동 수집이 덮어쓰지 않는다.
+   NEIS는 하이클래스가 아직 안내하지 않은 날짜의 대체(fallback) 역할만 한다. */
+function mealSource(){ return (State.mealSource && typeof State.mealSource === 'object') ? State.mealSource : (State.mealSource = {}); }
+function isHiclassMeal(iso){
+  var m = mealSource();
+  if (m[iso] === 'hiclass') return true;
+  if (m[iso] === 'neis') return false;
+  return !!HICLASS_MEALS[iso];
+}
+function hiclassMealDays(){
+  var m = mealSource(), out = {};
+  Object.keys(m).forEach(function(d){ if (m[d] === 'hiclass') out[d] = 1; });
+  if (!Object.keys(out).length) HICLASS.mealDays.forEach(function(d){ out[d] = 1; });
+  return out;
+}
+function scheduleSource(){ return State.scheduleSrc || 'hiclass'; }
+function hiclassScheduleSeed(){
+  return HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; });
+}
+
+/* 기존 기록(예전 버전·다른 기기)을 하이클래스 기준으로 맞춘다 */
+function applyHiclassPriority(){
+  if (!State) return false;
+  var changed = false;
+  if (!State.mealSource || typeof State.mealSource !== 'object'){ State.mealSource = {}; changed = true; }
+  HICLASS.mealDays.forEach(function(d){
+    if (State.mealSource[d] !== 'hiclass'){ State.mealSource[d] = 'hiclass'; changed = true; }
+    HICLASS_MEALS[d] && (State.meals[d] = HICLASS_MEALS[d].slice());
+  });
+  if (!State.neisSchedule || !State.neisSchedule.length){
+    State.neisSchedule = hiclassScheduleSeed(); changed = true;
+  } else {
+    var have = {};
+    State.neisSchedule.forEach(function(s){ have[s.date + '|' + s.name] = 1; });
+    hiclassScheduleSeed().forEach(function(s){
+      if (!have[s.date + '|' + s.name]){ State.neisSchedule.push(s); have[s.date + '|' + s.name] = 1; changed = true; }
+      else State.neisSchedule.forEach(function(x){ if (x.date === s.date && x.name === s.name && x.src !== 'hiclass'){ x.src = 'hiclass'; changed = true; } });
+    });
+    State.neisSchedule.sort(function(a, b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
+  }
+  /* 예시(sample) 공지·준비물은 하이클래스 알림장 내용으로 교체 */
+  if (Array.isArray(State.notices)){
+    var sampleOnly = State.notices.length && State.notices.every(function(n){ return n.sample; });
+    if (sampleOnly){
+      State.notices = HICLASS_NOTICES.map(function(n){
+        return { id: uid('n'), date: n.date, title: n.title, memo: n.memo || '', sample: false, src: 'hiclass' };
+      });
+      changed = true;
+    }
+  }
+  if (Array.isArray(State.preps)){
+    var pSampleOnly = State.preps.length && State.preps.every(function(p){ return p.sample; });
+    if (pSampleOnly || (!State.preps.length && !State.hiclassSeeded)){
+      State.preps = HICLASS_PREPS.map(function(p){
+        return { id: uid('p'), title: p.title, due: p.due || '',
+          items: p.items.map(function(t){ return { t: t, done: false }; }), sample: false, src: 'hiclass' };
+      });
+      changed = true;
+    }
+  }
+  if (changed) State.hiclassSeeded = true;
+  return changed;
 }
 
 /* ---------- NEIS 실시간 ---------- */
@@ -3824,6 +3976,7 @@ function fetchNeisMeals(silent){
   })).then(function(list){
     var all = [];
     var added = 0;
+    var skipped = 0;
     list.forEach(function(j){
       if (j && j.mealServiceDietInfo && j.mealServiceDietInfo[1] && j.mealServiceDietInfo[1].row){
         all = all.concat(j.mealServiceDietInfo[1].row);
@@ -3835,15 +3988,18 @@ function fetchNeisMeals(silent){
       var iso = ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
       var items = String(r.DDISH_NM || '').split(/<br\s*\/?>/i).map(function(s){ return s.trim(); }).filter(Boolean);
       if (!items.length) return;
+      var m = mealSource();
+      if (isHiclassMeal(iso)){ skipped++; return; }   // 하이클래스 확인분은 그대로 둔다
       if (!State.meals[iso] || !State.meals[iso].length){ added++; }
       State.meals[iso] = items;
+      m[iso] = 'neis';
     });
     State.mealUpdated = isoDate(new Date()) + ' ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
     save();
     renderSchool();
     renderTodaySummary();
     renderHero();
-    if (!silent) toast('🍚 NEIS에서 급식 ' + all.length + '끼를 불러왔어요', 'ok');
+    if (!silent) toast('🍚 NEIS에서 급식 ' + all.length + '끼를 불러왔어요' + (skipped ? ' (하이클래스 ' + skipped + '일 유지)' : ''), 'ok');
     return all.length;
   });
 }
@@ -3874,24 +4030,33 @@ function fetchNeisSchedule(silent){
       }
     });
     if (!rows.length) throw new Error('no rows');
+    /* 하이클래스 학사일정을 먼저 놓고, NEIS에만 있는 일정을 뒤에 더한다(하이클래스 우선) */
     var out = [];
     var seen = {};
+    (State.neisSchedule || []).forEach(function(s){
+      var key = s.date + '|' + s.name;
+      if (seen[key]) return;
+      seen[key] = 1;
+      out.push({ date: s.date, name: s.name, memo: s.memo || '', src: s.src || 'previous' });
+    });
+    hiclassScheduleSeed().forEach(function(s){
+      var key = s.date + '|' + s.name;
+      if (seen[key]){
+        out.forEach(function(x){ if (x.date === s.date && x.name === s.name) x.src = 'hiclass'; });
+        return;
+      }
+      seen[key] = 1;
+      out.push(s);
+    });
     rows.forEach(function(r){
       var ymd = String(r.AA_YMD);
       var iso = ymd.slice(0, 4) + '-' + ymd.slice(4, 6) + '-' + ymd.slice(6, 8);
       var key = iso + '|' + r.EVENT_NM;
       if (seen[key]) return;
       seen[key] = 1;
-      out.push({ date: iso, name: r.EVENT_NM, memo: r.EVENT_CNTNT || '' });
+      out.push({ date: iso, name: r.EVENT_NM, memo: r.EVENT_CNTNT || '', src: 'neis' });
     });
-    // 내장 학사일정과 합쳐서 빠지는 일정이 없도록
-    NEIS_SCHEDULE.forEach(function(s){
-      var key = s.date + '|' + s.name;
-      if (seen[key]) return;
-      seen[key] = 1;
-      out.push({ date: s.date, name: s.name, memo: s.memo || '' });
-    });
-    out.sort(function(a, b){ return a.date < b.date ? -1 : 1; });
+    out.sort(function(a, b){ return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
     State.neisSchedule = out;
     State.neisUpdated = isoDate(new Date()) + ' ' + pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes());
     save();
