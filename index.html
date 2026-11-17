@@ -3908,7 +3908,6 @@ function hiclassMealDays(){
   if (!Object.keys(out).length) HICLASS.mealDays.forEach(function(d){ out[d] = 1; });
   return out;
 }
-function scheduleSource(){ return State.scheduleSrc || 'hiclass'; }
 function hiclassScheduleSeed(){
   return HICLASS_SCHEDULE.map(function(s){ return { date: s.date, name: s.name, memo: s.memo || '', src: 'hiclass' }; });
 }
