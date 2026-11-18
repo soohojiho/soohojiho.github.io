@@ -1,0 +1,22 @@
+{
+  "name": "오운완 운동일지",
+  "short_name": "오운완",
+  "description": "매일의 유산소·근력 운동을 기록하고 카톡으로 공유하는 운동일지",
+  "lang": "ko-KR",
+  "dir": "ltr",
+  "start_url": "/workout/",
+  "scope": "/workout/",
+  "id": "/workout/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

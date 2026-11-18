@@ -1,5 +1,5 @@
 /* 수호&지호 가족대시보드 — 오프라인 캐시 (앱처럼 쓰기) */
-const CACHE = 'suho-jiho-dashboard-v13';
+const CACHE = 'suho-jiho-dashboard-v14';
 const ASSETS = [
   './',
   './index.html',
@@ -31,6 +31,10 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+
+  // /workout/ (오운완 운동일지)은 자체 서비스 워커(workout/sw.js)가 맡는다.
+  // 여기서 가로채면 오프라인 시 가족대시보드 index.html이 대신 나가므로 손대지 않고 통과시킨다.
+  if (url.pathname === '/workout' || url.pathname.startsWith('/workout/')) return;
 
   if (req.mode === 'navigate') {
     event.respondWith(

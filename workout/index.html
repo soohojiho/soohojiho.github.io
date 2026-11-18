@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>오운완 운동일지</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="오운완" />
+  <meta name="description" content="매일의 유산소·근력 운동을 기록하는 오운완 운동일지" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0f172a',
+            card: '#1e293b',
+            cardHover: '#334155',
+            accent: '#3b82f6',
+            accentHover: '#2563eb',
+            cardio: '#10b981',
+            strength: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .row-grid { display: grid; align-items: center; gap: 0.25rem; }
+    .row-cardio { grid-template-columns: 1.25rem 0.75rem 1fr 1fr 1fr 1fr 0.875rem; }
+    .row-strength { grid-template-columns: 1.25rem 0.75rem 1fr 1fr 0.875rem; }
+    .set-input {
+      width: 100%; min-width: 0; padding: 0.3rem 0.15rem; border-radius: 0.375rem;
+      background: rgba(2, 6, 23, 0.65); border: 1px solid #334155;
+      text-align: center; font-size: 0.75rem; line-height: 1rem; color: #f8fafc;
+      font-variant-numeric: tabular-nums;
+    }
+    .set-input:focus { outline: none; border-color: #3b82f6; background: rgba(2, 6, 23, 0.9); }
+    .set-input::placeholder { color: #475569; }
+    .set-input::-webkit-input-placeholder { color: #475569; }
+    .modal-open { display: flex !important; }
+    .timer-done { animation: timerPulse 0.8s ease-in-out 4; }
+    @keyframes timerPulse {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0); }
+      50% { box-shadow: inset 0 0 0 3px rgba(239, 68, 68, 0.75); }
+    }
+    .toast-in { animation: toastIn 0.22s ease-out; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-28 select-none">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+    <div class="max-w-lg mx-auto flex items-center justify-between">
+      <div class="min-w-0 flex-1 pr-2">
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2 whitespace-nowrap">
+          <span>🏋️ 오운완 운동일지</span>
+        </h1>
+        <p id="selectedDateLabel" class="text-xs text-slate-400 mt-0.5 truncate"></p>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="copySummary()" title="카톡 공유용 복사" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 active:scale-95 transition whitespace-nowrap">
+          📋 복사
+        </button>
+        <button onclick="openBackupModal()" title="백업 및 복원" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 active:scale-95 transition whitespace-nowrap">
+          💾 백업
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto px-4 pt-4 space-y-4">
+
+    <!-- Date Strip Calendar -->
+    <section class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700/60">
+      <div class="flex items-center justify-between mb-2 px-1">
+        <button onclick="shiftWeek(-7)" class="text-xs text-slate-400 hover:text-white px-2 py-1">◀ 이전 주</button>
+        <button onclick="goToday()" class="text-xs font-semibold text-blue-400 hover:text-blue-300 px-2 py-1">오늘로 이동</button>
+        <button onclick="shiftWeek(7)" class="text-xs text-slate-400 hover:text-white px-2 py-1">다음 주 ▶</button>
+      </div>
+      <div id="weekStrip" class="grid grid-cols-7 gap-1 text-center"></div>
+    </section>
+
+    <!-- Summary Dashboard -->
+    <section class="grid grid-cols-3 gap-2">
+      <div id="cardCardio" class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60">
+        <div class="text-[11px] text-slate-400">유산소 시간 / 거리</div>
+        <div class="mt-1 flex items-baseline gap-1">
+          <span id="statCardioMin" class="text-base font-bold text-emerald-400">0</span>
+          <span class="text-xs text-slate-400">분</span>
+          <span class="text-xs text-slate-500">/</span>
+          <span id="statCardioDist" class="text-sm font-semibold text-emerald-300">0.0</span>
+          <span class="text-[11px] text-slate-400">km</span>
+        </div>
+      </div>
+      <div id="cardStrength" class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60">
+        <div class="text-[11px] text-slate-400">근력 총 볼륨</div>
+        <div class="mt-1 flex items-baseline gap-1">
+          <span id="statStrengthVol" class="text-base font-bold text-violet-400">0</span>
+          <span class="text-xs text-slate-400">kg</span>
+        </div>
+      </div>
+      <div id="cardMonth" class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/60">
+        <div class="text-[11px] text-slate-400">이번 달 출석</div>
+        <div class="mt-1 flex items-baseline gap-1">
+          <span id="statMonthDays" class="text-base font-bold text-blue-400">0</span>
+          <span class="text-xs text-slate-400">일</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Action Bar: Add Exercise & Routine Presets -->
+    <section class="flex gap-2">
+      <button onclick="openAddModal()" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-semibold text-sm shadow-lg shadow-blue-900/30 transition flex items-center justify-center gap-1.5">
+        <span>＋ 종목 추가</span>
+      </button>
+      <button onclick="openPresetModal()" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-[0.99] text-slate-200 font-medium text-sm border border-slate-700 transition">
+        📂 루틴 불러오기
+      </button>
+    </section>
+
+    <!-- Exercise List -->
+    <section id="exerciseList" class="space-y-3"></section>
+
+  </main>
+
+  <!-- Fixed Bottom Rest Timer -->
+  <div id="timerBar" class="fixed bottom-0 inset-x-0 z-30 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-4 py-2.5">
+    <div class="max-w-lg mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-medium text-slate-400">⏱️ 휴식 타이머</span>
+        <span id="timerDisplay" class="text-xl font-mono font-bold text-amber-400">01:00</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button onclick="adjustTimer(-15)" class="px-2 py-1 rounded bg-slate-800 text-xs text-slate-300 border border-slate-700">-15s</button>
+        <button onclick="adjustTimer(15)" class="px-2 py-1 rounded bg-slate-800 text-xs text-slate-300 border border-slate-700">+15s</button>
+        <button id="timerToggleBtn" onclick="toggleTimer()" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs">시작</button>
+        <button onclick="resetTimer()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs border border-slate-700">리셋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Exercise Modal -->
+  <div id="addModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">운동 종목 추가</h2>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <!-- Mode Selector -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-800 p-1 rounded-xl">
+        <button id="modeBtnCardio" onclick="setAddMode('cardio')" class="py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition">
+          🏃 유산소 (시간·속도·경사)
+        </button>
+        <button id="modeBtnStrength" onclick="setAddMode('strength')" class="py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
+          🏋️ 근력 (무게·횟수)
+        </button>
+      </div>
+
+      <div>
+        <label class="block text-xs text-slate-400 mb-1">종목 이름</label>
+        <input id="exerciseNameInput" type="text" placeholder="예: 트레드밀 인클라인 걷기" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-500" />
+      </div>
+
+      <!-- Quick Suggestions -->
+      <div>
+        <div class="text-[11px] text-slate-400 mb-1.5">빠른 선택</div>
+        <div id="quickChips" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
+      <button onclick="confirmAddExercise()" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm">
+        추가하기
+      </button>
+    </div>
+  </div>
+
+  <!-- Routine Preset Modal -->
+  <div id="presetModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">루틴 템플릿 & 저장</h2>
+        <button onclick="closePresetModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-xs font-semibold text-slate-400">기본 추천 루틴</div>
+        <button onclick="applyPreset('cardio_incline')" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700">
+          <div class="text-sm font-bold text-emerald-400">🏃 유산소 인클라인 & 인터벌 루틴</div>
+          <div class="text-xs text-slate-400 mt-0.5">트레드밀 3구간(경사 12% 걷기 10분 ×2 + 경사 8% 마무리) · 약 30분</div>
+        </button>
+        <button onclick="applyPreset('strength_upper')" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700">
+          <div class="text-sm font-bold text-violet-400">🏋️ 상체 근력 루틴</div>
+          <div class="text-xs text-slate-400 mt-0.5">벤치프레스 · 랫풀다운 · 숄더프레스 · 바벨로우 (각 3세트)</div>
+        </button>
+        <button onclick="applyPreset('strength_lower')" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700">
+          <div class="text-sm font-bold text-violet-400">🦵 하체 & 코어 루틴</div>
+          <div class="text-xs text-slate-400 mt-0.5">스쿼트 · 레그프레스 · 런지 · 플랭크 (각 3세트)</div>
+        </button>
+      </div>
+
+      <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-xs font-semibold text-slate-400">내 커스텀 루틴</div>
+        <div id="customRoutineList" class="space-y-2"></div>
+        <div class="flex gap-2 pt-1">
+          <input id="routineNameInput" type="text" placeholder="루틴 이름 (예: 월요일 상체)" class="flex-1 min-w-0 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs focus:outline-none focus:border-blue-500" />
+          <button onclick="saveCurrentAsRoutine()" class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white whitespace-nowrap">
+            현재 운동 저장
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500">지금 선택한 날짜의 운동을 루틴으로 저장해 두면 다음에 한 번에 불러올 수 있어요.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup / Restore Modal -->
+  <div id="backupModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white">백업 & 복원</h2>
+        <button onclick="closeBackupModal()" class="text-slate-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="text-xs text-slate-400">
+        기록은 이 기기 브라우저에 저장돼요. 기기를 바꾸거나 브라우저를 지우기 전에 백업해 두세요.
+        <span id="backupSummary" class="block mt-1 text-slate-500"></span>
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-xs font-semibold text-slate-400">내보내기</div>
+        <div class="flex gap-2">
+          <button onclick="exportBackup()" class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">
+            💾 JSON 파일로 저장
+          </button>
+          <button onclick="copyBackupJson()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold">
+            📋 JSON 텍스트 복사
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-xs font-semibold text-slate-400">복원</div>
+        <label class="block w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-dashed border-slate-600 text-slate-300 text-xs font-semibold text-center cursor-pointer">
+          📁 JSON 파일 선택
+          <input id="backupFileInput" type="file" accept="application/json,.json,text/plain" class="hidden" onchange="handleBackupFile(this)" />
+        </label>
+        <textarea id="backupPasteArea" rows="4" placeholder="또는 백업 JSON을 여기에 붙여넣으세요" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px] font-mono focus:outline-none focus:border-blue-500"></textarea>
+        <button onclick="restoreFromPaste()" class="w-full py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold">
+          붙여넣은 데이터로 복원
+        </button>
+      </div>
+
+      <div class="border-t border-slate-800 pt-3">
+        <button onclick="resetAllData()" class="w-full py-2.5 rounded-xl bg-red-900/40 hover:bg-red-900/60 border border-red-800/60 text-red-300 text-xs font-bold">
+          ⚠️ 전체 데이터 초기화
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ===================================================================
+     오운완 운동일지 — 데이터/상태
+     localStorage 키: owunwan.v1
+       { version, selected, records: { 'YYYY-MM-DD': [exercise] },
+         routines: [ { id, name, exercises, savedAt } ], timer: { seconds } }
+     exercise: { id, name, type: 'cardio'|'strength', sets: [set] }
+     cardio set:   { id, min, speed, incline, dist, distManual, done }
+     strength set: { id, weight, reps, done }
+     =================================================================== */
+  var STORE_KEY = 'owunwan.v1';
+  var DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+  var state = null;
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function ymd(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function parseYmd(s) {
+    var p = String(s || '').split('-');
+    var d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    if (isNaN(d.getTime())) d = new Date();
+    return d;
+  }
+  function todayStr() { return ymd(new Date()); }
+  function uid() { return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3); }
+  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtInt(n) { return (Math.round(n * 10) / 10).toLocaleString('ko-KR'); }
+  function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+  function fmt2(n) { return (Math.round(n * 100) / 100).toString(); }
+
+  function defaultState() {
+    return { version: 1, selected: todayStr(), records: {}, routines: [], timer: { seconds: 60 } };
+  }
+
+  function loadState() {
+    var s = defaultState();
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          s.version = 1;
+          s.records = (parsed.records && typeof parsed.records === 'object') ? parsed.records : {};
+          s.routines = Array.isArray(parsed.routines) ? parsed.routines : [];
+          s.timer = (parsed.timer && typeof parsed.timer === 'object') ? parsed.timer : { seconds: 60 };
+          s.selected = (typeof parsed.selected === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(parsed.selected)) ? parsed.selected : todayStr();
+        }
+      }
+    } catch (e) {
+      console.warn('[owunwan] 저장된 기록을 읽지 못했습니다', e);
+    }
+    // 형태 보정
+    Object.keys(s.records).forEach(function (k) {
+      if (!Array.isArray(s.records[k])) delete s.records[k];
+    });
+    var tsec = Number(s.timer.seconds);
+    s.timer.seconds = (isFinite(tsec) && tsec >= 5 && tsec <= 3600) ? Math.round(tsec) : 60;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s.selected)) s.selected = todayStr();
+    return s;
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    } catch (e) {
+      toast('⚠️ 저장 공간이 부족해 저장하지 못했어요', 'error');
+      console.warn('[owunwan] 저장 실패', e);
+    }
+  }
+
+  /* ---------------- 기록 접근 ---------------- */
+  function getEx(dateKey) {
+    var arr = state.records[dateKey];
+    return Array.isArray(arr) ? arr : [];
+  }
+  function ensureEx(dateKey) {
+    if (!Array.isArray(state.records[dateKey])) state.records[dateKey] = [];
+    return state.records[dateKey];
+  }
+  function findEx(id) {
+    var list = getEx(state.selected);
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+  function distOf(s) {
+    if (num(s.dist) > 0) return num(s.dist);
+    var m = num(s.min), v = num(s.speed);
+    return (m > 0 && v > 0) ? (m * v / 60) : 0;
+  }
+  function emptyCardioSet(done) {
+    return { id: uid(), min: '', speed: '', incline: '', dist: '', distManual: false, done: done !== false };
+  }
+  function emptyStrengthSet(done) {
+    return { id: uid(), weight: '', reps: '', done: done !== false };
+  }
+
+  /* ---------------- 날짜 이동 ---------------- */
+  function selectDate(dateKey) {
+    state.selected = dateKey;
+    save();
+    render();
+  }
+  function shiftWeek(days) {
+    var d = parseYmd(state.selected);
+    d.setDate(d.getDate() + days);
+    selectDate(ymd(d));
+  }
+  function goToday() { selectDate(todayStr()); }
+
+  /* ---------------- 렌더 ---------------- */
+  function render() {
+    renderDateLabel();
+    renderWeek();
+    renderStats();
+    renderList();
+  }
+
+  function renderDateLabel() {
+    var el = document.getElementById('selectedDateLabel');
+    if (!el) return;
+    var d = parseYmd(state.selected);
+    var now = new Date();
+    var head = (d.getFullYear() === now.getFullYear())
+      ? (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + DAY_KO[d.getDay()] + ')'
+      : d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + ' (' + DAY_KO[d.getDay()] + ')';
+    var label = head;
+    if (state.selected === todayStr()) label += ' · 오늘';
+    var exs = getEx(state.selected);
+    var c = 0, s = 0;
+    exs.forEach(function (ex) { if (ex.type === 'cardio') c++; else s++; });
+    if (c || s) {
+      var bits = [];
+      if (c) bits.push('유산소 ' + c);
+      if (s) bits.push('근력 ' + s);
+      label += ' · ' + bits.join(' · ');
+    } else {
+      label += ' · 기록 없음';
+    }
+    el.textContent = label;
+  }
+
+  function renderWeek() {
+    var strip = document.getElementById('weekStrip');
+    if (!strip) return;
+    var sel = parseYmd(state.selected);
+    var offsets = (sel.getDay() + 6) % 7;              // 월요일 시작
+    var monday = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate() - offsets);
+    var todayK = todayStr();
+    var html = '';
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      var key = ymd(d);
+      var isSel = key === state.selected;
+      var isToday = key === todayK;
+      var count = getEx(key).length;
+      var base = 'relative py-1.5 rounded-xl transition active:scale-95 ';
+      var look = isSel
+        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40'
+        : (isToday ? 'bg-slate-900/70 text-blue-300 border border-blue-500/40' : 'bg-slate-900/40 text-slate-300 hover:bg-slate-700/60');
+      var dowColor = isSel ? 'text-blue-100' : (d.getDay() === 0 ? 'text-red-300/80' : (d.getDay() === 6 ? 'text-blue-300/80' : 'text-slate-500'));
+      var dot = count > 0
+        ? '<span class="inline-flex items-center justify-center h-1.5 ' + (count > 1 ? 'px-1.5 rounded-full' : 'w-1.5 rounded-full') + ' ' + (isSel ? 'bg-white' : 'bg-emerald-400') + '">' + (count > 1 ? '<span class="text-[8px] font-bold text-slate-900 leading-none">' + count + '</span>' : '') + '</span>'
+        : '<span class="w-1.5 h-1.5"></span>';
+      html += '<button onclick="selectDate(\'' + key + '\')" aria-label="' + key + '" aria-current="' + (isSel ? 'date' : 'false') + '" class="' + base + look + '">'
+        + '<div class="text-[10px] ' + dowColor + ' leading-none">' + DAY_KO[d.getDay()] + '</div>'
+        + '<div class="text-sm font-bold leading-tight mt-0.5">' + d.getDate() + '</div>'
+        + '<div class="h-1.5 mt-1 flex items-center justify-center">' + dot + '</div>'
+        + '</button>';
+    }
+    strip.innerHTML = html;
+  }
+
+  function calcTotals(dateKey) {
+    var exs = getEx(dateKey);
+    var t = { min: 0, dist: 0, vol: 0, cardioEx: 0, strengthEx: 0, undoneCardio: 0, undoneStrength: 0, doneSets: 0 };
+    exs.forEach(function (ex) {
+      if (ex.type === 'cardio') {
+        t.cardioEx++;
+        ex.sets.forEach(function (s) {
+          var m = num(s.min), km = distOf(s);
+          if (s.done) { t.min += m; t.dist += km; t.doneSets++; }
+          else if (m > 0 || km > 0) t.undoneCardio++;
+        });
+      } else {
+        t.strengthEx++;
+        ex.sets.forEach(function (s) {
+          var v = num(s.weight) * num(s.reps);
+          if (s.done) { t.vol += v; t.doneSets++; }
+          else if (v > 0) t.undoneStrength++;
+        });
+      }
+    });
+    return t;
+  }
+
+  function renderStats() {
+    var t = calcTotals(state.selected);
+    var minEl = document.getElementById('statCardioMin');
+    var distEl = document.getElementById('statCardioDist');
+    var volEl = document.getElementById('statStrengthVol');
+    var monthEl = document.getElementById('statMonthDays');
+
+    if (minEl) minEl.textContent = t.min > 0 ? String(Math.round(t.min)) : '0';
+    if (distEl) distEl.textContent = fmt1(t.dist);
+    if (volEl) volEl.textContent = t.vol > 0 ? fmtInt(t.vol) : '0';
+
+    var d = parseYmd(state.selected);
+    var prefix = d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+    var days = 0;
+    Object.keys(state.records).forEach(function (k) {
+      if (k.indexOf(prefix) === 0 && getEx(k).length > 0) days++;
+    });
+    if (monthEl) monthEl.textContent = String(days);
+
+    hintCard('cardCardio', t.undoneCardio, '유산소 시간·거리 합계는 완료 체크한 세트 기준이에요. 미완료 세트 ' + t.undoneCardio + '개는 빠져 있어요.');
+    hintCard('cardStrength', t.undoneStrength, '근력 볼륨은 완료 체크한 세트의 무게×횟수 합계예요. 미완료 세트 ' + t.undoneStrength + '개는 빠져 있어요.');
+    var monthCard = document.getElementById('cardMonth');
+    if (monthCard) monthCard.title = (d.getMonth() + 1) + '월에 기록이 있는 날 수예요 (기록 1개 이상).';
+  }
+
+  function hintCard(id, undone, tip) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (undone > 0) {
+      el.classList.add('ring-1', 'ring-amber-500/30');
+      el.title = tip;
+    } else {
+      el.classList.remove('ring-1', 'ring-amber-500/30');
+      el.title = tip;
+    }
+  }
+
+  function renderList() {
+    var listEl = document.getElementById('exerciseList');
+    if (!listEl) return;
+    var exs = getEx(state.selected);
+    if (!exs.length) {
+      listEl.innerHTML =
+        '<div class="rounded-2xl border border-dashed border-slate-700 px-4 py-8 text-center">'
+        + '<div class="text-3xl">🏋️</div>'
+        + '<p class="text-sm font-semibold text-slate-300 mt-2">이 날의 기록이 없어요</p>'
+        + '<p class="text-xs text-slate-500 mt-1 leading-relaxed">＋ 종목 추가로 하나씩 기록하거나<br>📂 루틴 불러오기로 한 번에 시작해 보세요.</p>'
+        + '</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < exs.length; i++) html += exerciseCardHTML(exs[i], i);
+    listEl.innerHTML = html;
+  }
+
+  function prevHintHTML(ex) {
+    if (ex.type !== 'strength') return '';
+    var target = String(ex.name || '').replace(/\s+/g, '').toLowerCase();
+    if (!target) return '';
+    var keys = Object.keys(state.records).filter(function (k) { return k < state.selected; }).sort().reverse();
+    for (var i = 0; i < keys.length; i++) {
+      var list = getEx(keys[i]);
+      for (var j = 0; j < list.length; j++) {
+        var p = list[j];
+        if (p.type !== 'strength') continue;
+        if (String(p.name || '').replace(/\s+/g, '').toLowerCase() !== target) continue;
+        var parts = [];
+        p.sets.forEach(function (s) {
+          if (num(s.weight) > 0 && num(s.reps) > 0) parts.push(num(s.weight) + 'kg×' + num(s.reps));
+        });
+        if (!parts.length) continue;
+        var d = parseYmd(keys[i]);
+        return '<p class="text-[11px] text-slate-400 mt-1 leading-snug flex items-start gap-1">'
+          + '<span class="text-amber-400 shrink-0">↺</span>'
+          + '<span>지난번 ' + (d.getMonth() + 1) + '/' + d.getDate() + ' · ' + esc(parts.join(', ')) + '</span></p>';
+      }
+    }
+    return '';
+  }
+
+  function exerciseCardHTML(ex, idx) {
+    var isC = ex.type === 'cardio';
+    var badge = isC
+      ? '<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold shrink-0">유산소</span>'
+      : '<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/30 font-semibold shrink-0">근력</span>';
+
+    var total = 0;
+    ex.sets.forEach(function (s) {
+      if (!s.done) return;
+      total += isC ? num(s.min) : num(s.weight) * num(s.reps);
+    });
+    var totalTxt = isC
+      ? (total > 0 ? '⏱ ' + Math.round(total) + '분' : '')
+      : (total > 0 ? fmtInt(total) + 'kg' : '');
+
+    var head = isC
+      ? '<div class="row-grid row-cardio text-[9px] text-slate-500 mb-1 px-0"><span></span><span class="text-center">#</span><span class="text-center">분</span><span class="text-center">km/h</span><span class="text-center">경사%</span><span class="text-center">km</span><span></span></div>'
+      : '<div class="row-grid row-strength text-[9px] text-slate-500 mb-1 px-0"><span></span><span class="text-center">#</span><span class="text-center">무게 kg</span><span class="text-center">횟수 회</span><span></span></div>';
+
+    var rows = '';
+    for (var i = 0; i < ex.sets.length; i++) {
+      rows += isC ? cardioRowHTML(ex, ex.sets[i], i) : strengthRowHTML(ex, ex.sets[i], i);
+    }
+
+    return '<article class="bg-slate-800/80 rounded-2xl border border-slate-700/60 overflow-hidden" data-ex="' + esc(ex.id) + '">'
+      + '<div class="flex items-start justify-between gap-2 px-3 pt-3">'
+      + '<div class="min-w-0 flex-1">'
+      + '<div class="flex items-center gap-1.5">' + badge
+      + '<h3 class="text-sm font-bold text-white truncate">' + esc(ex.name) + '</h3></div>'
+      + prevHintHTML(ex)
+      + '</div>'
+      + '<div class="flex items-center gap-2 shrink-0">'
+      + (totalTxt ? '<span class="text-[11px] font-semibold ' + (isC ? 'text-emerald-300' : 'text-violet-300') + '">' + totalTxt + '</span>' : '')
+      + '<button onclick="removeExercise(\'' + ex.id + '\')" title="종목 삭제" class="w-7 h-7 rounded-lg bg-slate-900/50 text-slate-500 hover:text-red-400 text-xs flex items-center justify-center">🗑</button>'
+      + '</div></div>'
+      + '<div class="px-3 pt-2">' + head + '<div class="space-y-1">' + rows + '</div></div>'
+      + '<div class="px-3 py-2.5">'
+      + '<button onclick="addSet(\'' + ex.id + '\')" class="w-full py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700/70">+ 세트 추가</button>'
+      + '</div></article>';
+  }
+
+  function checkBtn(ex, s) {
+    return '<button onclick="toggleSet(\'' + ex.id + '\',\'' + s.id + '\')" aria-label="세트 완료" aria-pressed="' + (s.done ? 'true' : 'false') + '" class="w-5 h-5 rounded-md border flex items-center justify-center text-[10px] font-bold leading-none transition '
+      + (s.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-600 text-transparent hover:border-slate-400') + '">✓</button>';
+  }
+
+  function setInput(ex, s, field, placeholder, extra) {
+    var val = s[field] == null ? '' : s[field];
+    var idAttr = field === 'dist' ? ' id="dist-' + s.id + '"' : '';
+    return '<input' + idAttr + ' type="number" inputmode="decimal" step="' + (extra && extra.step ? extra.step : '0.1') + '" min="0" enterkeyhint="done"'
+      + ' value="' + esc(val) + '" placeholder="' + placeholder + '" aria-label="' + placeholder + '" onfocus="this.select()"'
+      + ' onchange="setVal(\'' + ex.id + '\',\'' + s.id + '\',\'' + field + '\',this.value)"'
+      + ' class="set-input" />';
+  }
+
+  function cardioRowHTML(ex, s, i) {
+    return '<div class="row-grid row-cardio' + (s.done ? '' : ' opacity-70') + '">'
+      + checkBtn(ex, s)
+      + '<span class="text-[10px] text-slate-500 text-center">' + (i + 1) + '</span>'
+      + setInput(ex, s, 'min', '분')
+      + setInput(ex, s, 'speed', '속도')
+      + setInput(ex, s, 'incline', '%', { step: '1' })
+      + setInput(ex, s, 'dist', 'km')
+      + '<button onclick="removeSet(\'' + ex.id + '\',\'' + s.id + '\')" aria-label="세트 삭제" class="w-3.5 text-slate-600 hover:text-red-400 text-[11px] leading-none text-center">✕</button>'
+      + '</div>';
+  }
+
+  function strengthRowHTML(ex, s, i) {
+    return '<div class="row-grid row-strength' + (s.done ? '' : ' opacity-70') + '">'
+      + checkBtn(ex, s)
+      + '<span class="text-[10px] text-slate-500 text-center">' + (i + 1) + '</span>'
+      + setInput(ex, s, 'weight', 'kg')
+      + setInput(ex, s, 'reps', '회', { step: '1' })
+      + '<button onclick="removeSet(\'' + ex.id + '\',\'' + s.id + '\')" aria-label="세트 삭제" class="w-3.5 text-slate-600 hover:text-red-400 text-[11px] leading-none text-center">✕</button>'
+      + '</div>';
+  }
+
+  /* ---------------- 세트 / 종목 편집 ---------------- */
+  function setVal(exId, setId, field, value) {
+    var ex = findEx(exId);
+    if (!ex) return;
+    var s = null;
+    for (var i = 0; i < ex.sets.length; i++) if (ex.sets[i].id === setId) s = ex.sets[i];
+    if (!s) return;
+    var v = String(value == null ? '' : value).trim();
+    if (v !== '' && !isFinite(parseFloat(v))) v = '';
+    if (v !== '' && parseFloat(v) < 0) v = String(Math.abs(parseFloat(v)));
+
+    if (ex.type === 'cardio') {
+      if (field === 'dist') {
+        s.dist = v;
+        s.distManual = v !== '';
+      } else {
+        s[field] = v;
+        if (!s.distManual) {
+          var m = num(s.min), sp = num(s.speed);
+          s.dist = (m > 0 && sp > 0) ? fmt2(m * sp / 60) : '';
+          var distInput = document.getElementById('dist-' + s.id);
+          if (distInput && document.activeElement !== distInput) distInput.value = s.dist;
+        }
+      }
+    } else {
+      s[field] = v;
+    }
+    save();
+    renderStats();
+    var card = document.querySelector('[data-ex="' + exId + '"]');
+    if (card) {
+      var totalEl = card.querySelector('.exercise-total');
+      // 카드 우측 합계는 다음 렌더에서 갱신 (입력 중 포커스 유지)
+    }
+    renderDateLabel();
+  }
+
+  function toggleSet(exId, setId) {
+    var ex = findEx(exId);
+    if (!ex) return;
+    for (var i = 0; i < ex.sets.length; i++) {
+      if (ex.sets[i].id === setId) {
+        ex.sets[i].done = !ex.sets[i].done;
+        if (ex.sets[i].done && navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
+      }
+    }
+    save();
+    render();
+  }
+
+  function addSet(exId) {
+    var ex = findEx(exId);
+    if (!ex) return;
+    var last = ex.sets[ex.sets.length - 1];
+    var s;
+    if (ex.type === 'cardio') {
+      s = emptyCardioSet(false);
+      if (last) { s.speed = last.speed; s.incline = last.incline; s.min = last.min; }
+      if (!s.distManual) {
+        var m = num(s.min), sp = num(s.speed);
+        s.dist = (m > 0 && sp > 0) ? fmt2(m * sp / 60) : '';
+      }
+    } else {
+      s = emptyStrengthSet(false);
+      if (last) { s.weight = last.weight; s.reps = last.reps; }
+    }
+    ex.sets.push(s);
+    save();
+    render();
+  }
+
+  function removeSet(exId, setId) {
+    var ex = findEx(exId);
+    if (!ex) return;
+    if (ex.sets.length <= 1) {
+      toast('세트가 하나뿐이에요. 종목을 지우려면 🗑 버튼을 눌러 주세요');
+      return;
+    }
+    ex.sets = ex.sets.filter(function (s) { return s.id !== setId; });
+    save();
+    render();
+  }
+
+  function removeExercise(exId) {
+    var ex = findEx(exId);
+    if (!ex) return;
+    if (!confirm('「' + ex.name + '」 종목을 삭제할까요?\n입력한 세트 기록도 함께 지워집니다.')) return;
+    ensureEx(state.selected).splice(ensureEx(state.selected).indexOf(ex), 1);
+    if (!getEx(state.selected).length) delete state.records[state.selected];
+    save();
+    render();
+    toast('종목을 삭제했어요');
+  }
+
+  /* ---------------- 종목 추가 모달 ---------------- */
+  var addMode = 'cardio';
+  var QUICK = {
+    cardio: ['트레드밀 인클라인 걷기', '러닝', '실내 자전거', '로잉머신', '스텝퍼', '줄넘기', '천국의 계단', '수영', '등산'],
+    strength: ['벤치프레스', '스쿼트', '데드리프트', '랫풀다운', '숄더프레스', '바벨로우', '레그프레스', '런지', '덤벨컬', '플랭크']
+  };
+
+  function openAddModal() {
+    addMode = 'cardio';
+    var inp = document.getElementById('exerciseNameInput');
+    if (inp) inp.value = '';
+    setAddMode('cardio');
+    openModal('addModal');
+    setTimeout(function () { var i2 = document.getElementById('exerciseNameInput'); if (i2) i2.focus(); }, 60);
+  }
+  function closeAddModal() { closeModal('addModal'); }
+
+  function setAddMode(mode) {
+    addMode = (mode === 'strength') ? 'strength' : 'cardio';
+    var bc = document.getElementById('modeBtnCardio');
+    var bs = document.getElementById('modeBtnStrength');
+    if (bc && bs) {
+      if (addMode === 'cardio') {
+        bc.className = 'py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition';
+        bs.className = 'py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
+      } else {
+        bs.className = 'py-2 rounded-lg text-xs font-bold bg-violet-600 text-white transition';
+        bc.className = 'py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
+      }
+    }
+    var inp = document.getElementById('exerciseNameInput');
+    if (inp) inp.placeholder = addMode === 'cardio' ? '예: 트레드밀 인클라인 걷기' : '예: 벤치프레스';
+    renderQuickChips();
+  }
+
+  function renderQuickChips() {
+    var box = document.getElementById('quickChips');
+    if (!box) return;
+    var chips = QUICK[addMode] || [];
+    var color = addMode === 'cardio'
+      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/20'
+      : 'bg-violet-500/10 border-violet-500/30 text-violet-200 hover:bg-violet-500/20';
+    var html = '';
+    chips.forEach(function (name) {
+      var safe = esc(name).replace(/'/g, '&#39;');
+      html += '<button onclick="pickChip(this)" data-name="' + safe + '" class="px-2.5 py-1.5 rounded-lg border text-[11px] font-medium active:scale-95 transition ' + color + '">' + esc(name) + '</button>';
+    });
+    box.innerHTML = html;
+  }
+
+  function pickChip(btn) {
+    var name = btn.getAttribute('data-name') || '';
+    var inp = document.getElementById('exerciseNameInput');
+    if (inp) { inp.value = name; inp.focus(); }
+  }
+
+  function confirmAddExercise() {
+    var inp = document.getElementById('exerciseNameInput');
+    var name = inp ? inp.value.trim() : '';
+    if (!name) {
+      toast('종목 이름을 입력해 주세요');
+      if (inp) inp.focus();
+      return;
+    }
+    var ex = {
+      id: uid(),
+      name: name.slice(0, 40),
+      type: addMode,
+      sets: [addMode === 'cardio' ? emptyCardioSet(true) : emptyStrengthSet(true)]
+    };
+    ensureEx(state.selected).push(ex);
+    save();
+    closeAddModal();
+    render();
+    toast('✅ ' + ex.name + ' 추가 · 완료 체크하면 합계에 들어가요');
+  }
+
+  /* ---------------- 루틴 프리셋 ---------------- */
+  var PRESETS = {
+    cardio_incline: {
+      name: '🏃 유산소 인클라인 & 인터벌 루틴',
+      items: [
+        { name: '트레드밀 인클라인 걷기 (웜업)', type: 'cardio', sets: [{ min: '5', speed: '4.5', incline: '5' }] },
+        { name: '트레드밀 인클라인 인터벌', type: 'cardio', sets: [{ min: '10', speed: '5.5', incline: '12' }, { min: '10', speed: '5.5', incline: '12' }] },
+        { name: '트레드밀 마무리 걷기', type: 'cardio', sets: [{ min: '5', speed: '4.5', incline: '8' }] }
+      ]
+    },
+    strength_upper: {
+      name: '🏋️ 상체 근력 루틴',
+      items: [
+        { name: '벤치프레스', type: 'strength', sets: [{ weight: '60', reps: '10' }, { weight: '60', reps: '10' }, { weight: '60', reps: '8' }] },
+        { name: '랫풀다운', type: 'strength', sets: [{ weight: '45', reps: '12' }, { weight: '45', reps: '12' }, { weight: '45', reps: '10' }] },
+        { name: '숄더프레스', type: 'strength', sets: [{ weight: '30', reps: '10' }, { weight: '30', reps: '10' }, { weight: '30', reps: '8' }] },
+        { name: '바벨로우', type: 'strength', sets: [{ weight: '40', reps: '10' }, { weight: '40', reps: '10' }, { weight: '40', reps: '10' }] }
+      ]
+    },
+    strength_lower: {
+      name: '🦵 하체 & 코어 루틴',
+      items: [
+        { name: '스쿼트', type: 'strength', sets: [{ weight: '80', reps: '8' }, { weight: '80', reps: '8' }, { weight: '80', reps: '6' }] },
+        { name: '레그프레스', type: 'strength', sets: [{ weight: '120', reps: '12' }, { weight: '120', reps: '12' }, { weight: '120', reps: '12' }] },
+        { name: '런지', type: 'strength', sets: [{ weight: '20', reps: '12' }, { weight: '20', reps: '12' }, { weight: '20', reps: '12' }] },
+        { name: '플랭크', type: 'strength', sets: [{ weight: '', reps: '60' }, { weight: '', reps: '60' }, { weight: '', reps: '60' }] }
+      ]
+    }
+  };
+
+  function openPresetModal() {
+    renderCustomRoutines();
+    openModal('presetModal');
+  }
+  function closePresetModal() { closeModal('presetModal'); }
+
+  function applyPreset(key) {
+    var preset = PRESETS[key];
+    if (!preset) return;
+    var added = 0;
+    preset.items.forEach(function (item) {
+      var sets;
+      if (item.type === 'cardio') {
+        sets = item.sets.map(function (s) {
+          var set = emptyCardioSet(false);
+          set.min = String(s.min || '');
+          set.speed = String(s.speed || '');
+          set.incline = String(s.incline || '');
+          var m = num(set.min), sp = num(set.speed);
+          set.dist = (m > 0 && sp > 0) ? fmt2(m * sp / 60) : '';
+          return set;
+        });
+      } else {
+        sets = item.sets.map(function (s) {
+          var set = emptyStrengthSet(false);
+          set.weight = String(s.weight || '');
+          set.reps = String(s.reps || '');
+          return set;
+        });
+      }
+      ensureEx(state.selected).push({ id: uid(), name: item.name, type: item.type, sets: sets });
+      added++;
+    });
+    save();
+    closePresetModal();
+    render();
+    toast('📂 ' + preset.name + ' · ' + added + '종목 불러옴 (세트 완료 체크하면 합계 반영)');
+  }
+
+  function renderCustomRoutines() {
+    var box = document.getElementById('customRoutineList');
+    if (!box) return;
+    var routines = Array.isArray(state.routines) ? state.routines : [];
+    if (!routines.length) {
+      box.innerHTML = '<p class="text-[11px] text-slate-500">저장된 커스텀 루틴이 아직 없어요.</p>';
+      return;
+    }
+    var html = '';
+    routines.forEach(function (r) {
+      var n = Array.isArray(r.exercises) ? r.exercises.length : 0;
+      html += '<div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-800 border border-slate-700">'
+        + '<div class="min-w-0 flex-1">'
+        + '<div class="text-xs font-bold text-white truncate">' + esc(r.name) + '</div>'
+        + '<div class="text-[10px] text-slate-500">' + n + '종목</div>'
+        + '</div>'
+        + '<button onclick="applyCustomRoutine(\'' + r.id + '\')" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold whitespace-nowrap">불러오기</button>'
+        + '<button onclick="deleteCustomRoutine(\'' + r.id + '\')" aria-label="루틴 삭제" class="w-7 h-7 rounded-lg bg-slate-900/60 text-slate-500 hover:text-red-400 text-xs">🗑</button>'
+        + '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function saveCurrentAsRoutine() {
+    var inp = document.getElementById('routineNameInput');
+    var name = inp ? inp.value.trim() : '';
+    var exs = getEx(state.selected);
+    if (!exs.length) { toast('먼저 오늘 운동을 기록해 주세요'); return; }
+    if (!name) {
+      var d = parseYmd(state.selected);
+      name = (d.getMonth() + 1) + '/' + d.getDate() + ' 루틴';
+    }
+    var copy = JSON.parse(JSON.stringify(exs));
+    state.routines.unshift({ id: uid(), name: name.slice(0, 30), exercises: copy, savedAt: new Date().toISOString() });
+    if (state.routines.length > 30) state.routines.length = 30;
+    if (inp) inp.value = '';
+    save();
+    renderCustomRoutines();
+    toast('💾 「' + name + '」 루틴으로 저장했어요');
+  }
+
+  function applyCustomRoutine(id) {
+    var r = null;
+    (state.routines || []).forEach(function (x) { if (x.id === id) r = x; });
+    if (!r || !Array.isArray(r.exercises)) return;
+    var added = 0;
+    r.exercises.forEach(function (ex) {
+      var sets = (ex.sets || []).map(function (s) {
+        var n = (ex.type === 'cardio') ? emptyCardioSet(false) : emptyStrengthSet(false);
+        if (ex.type === 'cardio') {
+          n.min = String(s.min || ''); n.speed = String(s.speed || ''); n.incline = String(s.incline || '');
+          n.dist = String(s.dist || ''); n.distManual = !!s.distManual;
+        } else {
+          n.weight = String(s.weight || ''); n.reps = String(s.reps || '');
+        }
+        return n;
+      });
+      if (!sets.length) sets = [ex.type === 'cardio' ? emptyCardioSet(false) : emptyStrengthSet(false)];
+      ensureEx(state.selected).push({ id: uid(), name: ex.name || '운동', type: ex.type === 'cardio' ? 'cardio' : 'strength', sets: sets });
+      added++;
+    });
+    save();
+    closePresetModal();
+    render();
+    toast('📂 「' + r.name + '」 ' + added + '종목 불러옴');
+  }
+
+  function deleteCustomRoutine(id) {
+    var r = null;
+    (state.routines || []).forEach(function (x) { if (x.id === id) r = x; });
+    if (!r) return;
+    if (!confirm('「' + r.name + '」 루틴을 삭제할까요?')) return;
+    state.routines = state.routines.filter(function (x) { return x.id !== id; });
+    save();
+    renderCustomRoutines();
+    toast('루틴을 삭제했어요');
+  }
+
+  /* ---------------- 카톡 공유용 요약 ---------------- */
+  function summaryText(dateKey) {
+    var d = parseYmd(dateKey);
+    var lines = [];
+    lines.push('🏋️ 오운완 운동일지');
+    lines.push('📅 ' + d.getFullYear() + '.' + pad2(d.getMonth() + 1) + '.' + pad2(d.getDate()) + ' (' + DAY_KO[d.getDay()] + ')');
+    var exs = getEx(dateKey);
+    if (!exs.length) {
+      lines.push('');
+      lines.push('아직 기록이 없어요. 오늘도 오운완! 💪');
+      return lines.join('\n');
+    }
+    var t = calcTotals(dateKey);
+    lines.push('');
+
+    var cardio = exs.filter(function (e) { return e.type === 'cardio'; });
+    if (cardio.length) {
+      lines.push('🏃 유산소 · ' + Math.round(t.min) + '분 · ' + fmt1(t.dist) + 'km');
+      cardio.forEach(function (ex) {
+        var doneSets = ex.sets.filter(function (s) { return s.done; });
+        var use = doneSets.length ? doneSets : [];
+        var parts = [];
+        use.forEach(function (s) {
+          var seg = '';
+          if (num(s.min) > 0) seg += num(s.min) + '분';
+          if (num(s.speed) > 0) seg += (seg ? ' ' : '') + num(s.speed) + 'km/h';
+          if (num(s.incline) > 0) seg += ' 경사' + num(s.incline) + '%';
+          if (distOf(s) > 0) seg += (seg ? ' · ' : '') + fmt1(distOf(s)) + 'km';
+          if (seg) parts.push(seg);
+        });
+        lines.push('· ' + ex.name + (parts.length ? ' — ' + parts.join(' / ') : ' (미완료)'));
+      });
+    }
+
+    var strength = exs.filter(function (e) { return e.type === 'strength'; });
+    if (strength.length) {
+      if (cardio.length) lines.push('');
+      lines.push('🏋️ 근력 · 총 볼륨 ' + fmtInt(t.vol) + 'kg');
+      strength.forEach(function (ex) {
+        var doneSets = ex.sets.filter(function (s) { return s.done; });
+        var parts = doneSets.map(function (s) {
+          var w = num(s.weight), r = num(s.reps);
+          if (w > 0 && r > 0) return w + 'kg×' + r;
+          if (r > 0) return r + '회';
+          if (w > 0) return w + 'kg';
+          return '';
+        }).filter(function (x) { return x; });
+        lines.push('· ' + ex.name + (parts.length ? ' ' + parts.join(' / ') : ' (미완료)'));
+      });
+    }
+    lines.push('');
+    lines.push('✅ 오운완! 💪');
+    return lines.join('\n');
+  }
+
+  function copySummary() {
+    var text = summaryText(state.selected);
+    copyText(text).then(function (ok) {
+      toast(ok ? '📋 오늘 운동 요약을 복사했어요 · 카톡에 붙여넣기!' : '복사에 실패했어요. 백업 → JSON 텍스트 복사를 이용해 주세요', ok ? 'ok' : 'error');
+    });
+  }
+
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { resolve(true); }).catch(function () { resolve(legacyCopy(text)); });
+        return;
+      }
+      resolve(legacyCopy(text));
+    });
+  }
+
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* ---------------- 백업 / 복원 ---------------- */
+  function openBackupModal() {
+    var sum = document.getElementById('backupSummary');
+    if (sum) {
+      var days = Object.keys(state.records).filter(function (k) { return getEx(k).length > 0; }).length;
+      sum.textContent = '기록 ' + days + '일 · 커스텀 루틴 ' + (state.routines || []).length + '개';
+    }
+    var ta = document.getElementById('backupPasteArea');
+    if (ta) ta.value = '';
+    openModal('backupModal');
+  }
+  function closeBackupModal() { closeModal('backupModal'); }
+
+  function backupPayload() {
+    return {
+      app: 'owunwan',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      records: state.records,
+      routines: state.routines,
+      timer: state.timer
+    };
+  }
+
+  function exportBackup() {
+    try {
+      var json = JSON.stringify(backupPayload(), null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = '오운완-운동일지-백업-' + todayStr() + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1500);
+      toast('💾 백업 파일을 내려받았어요');
+    } catch (e) {
+      toast('백업 파일을 만들지 못했어요', 'error');
+    }
+  }
+
+  function copyBackupJson() {
+    var json = JSON.stringify(backupPayload());
+    copyText(json).then(function (ok) {
+      toast(ok ? '📋 백업 JSON을 복사했어요 (메모장·카톡 나에게 보내기)' : '복사 실패 · 파일로 저장을 이용해 주세요', ok ? 'ok' : 'error');
+    });
+  }
+
+  function handleBackupFile(input) {
+    var file = input && input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var ta = document.getElementById('backupPasteArea');
+      if (ta) ta.value = String(reader.result || '');
+      applyRestore(String(reader.result || ''), file.name);
+      input.value = '';
+    };
+    reader.onerror = function () { toast('파일을 읽지 못했어요', 'error'); };
+    reader.readAsText(file);
+  }
+
+  function restoreFromPaste() {
+    var ta = document.getElementById('backupPasteArea');
+    applyRestore(ta ? ta.value : '', '붙여넣은 데이터');
+  }
+
+  function applyRestore(text, label) {
+    var parsed = null;
+    try { parsed = JSON.parse(String(text || '').trim()); } catch (e) { parsed = null; }
+    if (!parsed || typeof parsed !== 'object' || !parsed.records || typeof parsed.records !== 'object') {
+      toast('복원할 수 있는 백업 데이터가 아니에요', 'error');
+      return;
+    }
+    var days = Object.keys(parsed.records).filter(function (k) { return Array.isArray(parsed.records[k]) && parsed.records[k].length; }).length;
+    if (!confirm('현재 기록을 ' + label + ' 기록으로 바꿀까요?\n백업에 담긴 기록 ' + days + '일로 대체됩니다.')) return;
+    var restored = defaultState();
+    restored.records = parsed.records;
+    restored.routines = Array.isArray(parsed.routines) ? parsed.routines : [];
+    restored.timer = (parsed.timer && typeof parsed.timer === 'object') ? parsed.timer : { seconds: 60 };
+    restored.selected = state.selected;
+    Object.keys(restored.records).forEach(function (k) {
+      if (!Array.isArray(restored.records[k])) delete restored.records[k];
+    });
+    state = restored;
+    var tsec = Number(state.timer.seconds);
+    state.timer.seconds = (isFinite(tsec) && tsec >= 5 && tsec <= 3600) ? Math.round(tsec) : 60;
+    timerTotal = state.timer.seconds;
+    timerLeft = timerTotal;
+    save();
+    closeBackupModal();
+    render();
+    renderTimer();
+    toast('♻️ ' + days + '일 기록을 복원했어요');
+  }
+
+  function resetAllData() {
+    if (!confirm('모든 운동 기록과 루틴을 지웁니다.\n정말 초기화할까요?')) return;
+    if (!confirm('되돌릴 수 없어요. 한 번 더 확인합니다.\n정말 전체 삭제할까요?')) return;
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    state = defaultState();
+    timerTotal = state.timer.seconds;
+    timerLeft = timerTotal;
+    save();
+    closeBackupModal();
+    render();
+    renderTimer();
+    toast('전체 데이터를 초기화했어요');
+  }
+
+  /* ---------------- 모달 / 토스트 ---------------- */
+  function openModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('hidden');
+    el.classList.remove('modal-open');
+    if (!document.querySelector('.modal-open')) document.body.style.overflow = '';
+  }
+
+  var toastTimer = null;
+  function toast(msg, kind) {
+    var el = document.getElementById('toastBox');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toastBox';
+      document.body.appendChild(el);
+    }
+    var color = kind === 'error'
+      ? 'bg-red-950/95 border-red-700/70 text-red-100'
+      : 'bg-slate-800/97 border-slate-600/80 text-slate-100';
+    el.className = 'fixed left-1/2 -translate-x-1/2 top-16 z-[60] w-[calc(100%-2rem)] max-w-sm px-4 py-3 rounded-xl border shadow-xl text-xs font-medium text-center leading-relaxed toast-in ' + color;
+    el.textContent = msg;
+    el.style.display = 'block';
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.style.display = 'none'; }, 2600);
+  }
+
+  /* ---------------- 휴식 타이머 ---------------- */
+  var timerTotal = 60;
+  var timerLeft = 60;
+  var timerId = null;
+  var timerRunning = false;
+
+  function renderTimer() {
+    var disp = document.getElementById('timerDisplay');
+    if (disp) disp.textContent = pad2(Math.floor(Math.max(0, timerLeft) / 60)) + ':' + pad2(Math.max(0, timerLeft) % 60);
+    var btn = document.getElementById('timerToggleBtn');
+    if (btn) {
+      btn.textContent = timerRunning ? '일시정지' : '시작';
+      btn.className = timerRunning
+        ? 'px-3 py-1.5 rounded-lg bg-slate-700 text-white font-bold text-xs border border-slate-600'
+        : 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs';
+    }
+  }
+
+  function adjustTimer(delta) {
+    timerLeft = Math.max(5, Math.min(3600, timerLeft + delta));
+    if (!timerRunning) {
+      timerTotal = timerLeft;
+      state.timer = state.timer || {};
+      state.timer.seconds = timerTotal;
+      save();
+    }
+    renderTimer();
+  }
+
+  function toggleTimer() {
+    if (timerRunning) { pauseTimer(); return; }
+    if (timerLeft <= 0) timerLeft = timerTotal;
+    resumeAudio();
+    timerRunning = true;
+    var bar = document.getElementById('timerBar');
+    if (bar) bar.classList.remove('timer-done');
+    timerId = setInterval(function () {
+      timerLeft--;
+      if (timerLeft <= 0) {
+        timerLeft = 0;
+        renderTimer();
+        finishTimer();
+        return;
+      }
+      renderTimer();
+    }, 1000);
+    renderTimer();
+  }
+
+  function pauseTimer() {
+    timerRunning = false;
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    renderTimer();
+  }
+
+  function resetTimer() {
+    pauseTimer();
+    timerLeft = timerTotal;
+    var bar = document.getElementById('timerBar');
+    if (bar) bar.classList.remove('timer-done');
+    renderTimer();
+  }
+
+  function finishTimer() {
+    timerRunning = false;
+    if (timerId) { clearInterval(timerId); timerId = null; }
+    renderTimer();
+    var bar = document.getElementById('timerBar');
+    if (bar) {
+      bar.classList.remove('timer-done');
+      void bar.offsetWidth;
+      bar.classList.add('timer-done');
+    }
+    playBeep();
+    if (navigator.vibrate) { try { navigator.vibrate([180, 90, 180, 90, 320]); } catch (e) {} }
+    toast('⏰ 휴식 끝! 다음 세트 가자 💪');
+  }
+
+  var audioCtx = null;
+  function resumeAudio() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended' && audioCtx.resume) audioCtx.resume();
+    } catch (e) {}
+  }
+
+  function playBeep() {
+    try {
+      resumeAudio();
+      if (!audioCtx) return;
+      var now = audioCtx.currentTime;
+      [0, 0.28, 0.56].forEach(function (offset, i) {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(i === 2 ? 1180 : 880, now + offset);
+        gain.gain.setValueAtTime(0.0001, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.32, now + offset + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.24);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.26);
+      });
+    } catch (e) {}
+  }
+
+  /* ---------------- 시작 ---------------- */
+  function boot() {
+    state = loadState();
+    timerTotal = state.timer.seconds;
+    timerLeft = timerTotal;
+    if (state.selected !== todayStr() && !getEx(state.selected).length) {
+      // 처음 방문이거나 비어 있는 과거 날짜가 저장돼 있으면 오늘로 (기록이 있는 날짜는 그대로 유지)
+      if (!Object.keys(state.records).length) state.selected = todayStr();
+    }
+    render();
+    renderTimer();
+    window.addEventListener('beforeunload', function () { if (timerRunning) save(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        ['addModal', 'presetModal', 'backupModal'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && !el.classList.contains('hidden')) closeModal(id);
+        });
+      }
+    });
+  }
+
+  boot();
+  </script>
+
+  <script>
+  /* 홈 화면에 추가(PWA) + 오프라인 캐시 — /workout/ 범위 전용 서비스 워커 */
+  (function () {
+    if (!('serviceWorker' in navigator)) return;
+    var h = location.hostname;
+    var ok = location.protocol === 'https:' || h === 'localhost' || h === '127.0.0.1';
+    if (!ok) return;
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function () {});
+    });
+  })();
+  </script>
+</body>
+</html>
