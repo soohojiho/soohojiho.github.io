@@ -2155,19 +2155,22 @@ function recordGrowth(m, date, height, weight){
   if (w !== null && (isNaN(w) || w <= 0)) w = null;
   if (h === null && w === null) return false;
   g.history = g.history.filter(function(x){ return x.date !== date; });
-  g.history.push({ date: date, height: h, weight: w });
+  g.history.push({ date: date, height: h, weight: w, updatedAt: new Date().toISOString() });
   g.history.sort(growthSortDesc);
   var l = g.history[0];
   g.date = l.date; g.height = l.height; g.weight = l.weight;
+  touchMember(m);
   return true;
 }
 function deleteGrowth(m, date){
   if (!m) return;
   var g = memberGrowth(m);
+  syncMarkDeleted('growth', m.id + '|' + smDay(date));
   g.history = g.history.filter(function(x){ return x.date !== (date || ''); });
   g.history.sort(growthSortDesc);
   var l = g.history[0];
   g.date = l ? l.date : ''; g.height = l ? l.height : null; g.weight = l ? l.weight : null;
+  touchMember(m);
   save();
   renderAll();
   if (modalOpen()) openGrowthModal(m.id);
@@ -2853,7 +2856,7 @@ function syncCardHTML(info){
         '<button class="btn ghost" data-action="sync-pull">⬇ 지금 가져오기</button>' : '') +
     '</div>' +
     syncMetaHTML() +
-    '<p class="muted" style="font-size:11px;line-height:1.6">태블릿 · 엄마 폰 · 아빠 폰에서 같은 토큰을 한 번씩 넣으면 기록이 자동으로 맞춰져요. 화면을 보고 있는 동안에는 <b>15초마다</b> 다른 기기 기록을 조용히 확인해요. 토큰은 그 기기 브라우저에만 저장되고 사이트 파일에는 남지 않아요.</p>' +
+    '<p class="muted" style="font-size:11px;line-height:1.6">태블릿 · 엄마 폰 · 아빠 폰에서 같은 토큰을 한 번씩 넣으면 기록이 자동으로 맞춰져요. 올릴 때는 <b>다른 기기 기록과 항목별로 합쳐서</b> 올리기 때문에 예방접종·생년월일·급식·퀘스트 같은 기록이 지워지지 않아요. 화면을 보고 있는 동안에는 <b>15초마다</b> 다른 기기 기록을 조용히 확인해요. 토큰은 그 기기 브라우저에만 저장되고 사이트 파일에는 남지 않아요.</p>' +
   '</div>';
 }
 function renderSyncUI(){
@@ -2880,6 +2883,527 @@ function syncSetStatus(status, msg){
   Sync.status = status;
   if (msg !== undefined) Sync.msg = msg;
   renderSyncUI();
+}
+
+/* =========================================================
+   기기 동기화 — 항목별 병합
+   ---------------------------------------------------------
+   올리기 전에 GitHub의 최신 dashboard-data.json과 이 기기 기록을
+   항목별로 합칩니다. 예전 기기나 아침 스캔이 비워 둔 칸(예방접종·
+   생년월일·급식·학사일정)이 최신 기록을 지우지 못하게 하려는 것입니다.
+   지운 항목은 deleted[...] 시각(tombstone)으로 남겨 되살아나지 않게 하고,
+   항목의 updatedAt이 삭제 시각보다 뒤면 그 기기에서 고친 것으로 봅니다.
+   ========================================================= */
+/* ==== SYNC-MERGE BEGIN ==== */
+var SM_TOMBSTONE_DAYS = 120;
+function smIsObj(v){ return !!v && typeof v === 'object' && !Array.isArray(v); }
+function smClone(v){
+  if (v === undefined) return undefined;
+  try { return JSON.parse(JSON.stringify(v)); } catch(e){ return null; }
+}
+function smArr(v){ return Array.isArray(v) ? v : []; }
+function smStr(v){ return (v === undefined || v === null) ? '' : String(v); }
+/* 값이 '채워져 있다'의 기준 — 빈 문자열·빈 배열·빈 객체는 빈 칸으로 봅니다 */
+function smFilled(v){
+  if (v === undefined || v === null) return false;
+  if (typeof v === 'string') return v.replace(/\s+/g, '') !== '';
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === 'object') return Object.keys(v).length > 0;
+  return true;
+}
+function smTime(v){
+  if (v === undefined || v === null || v === '') return 0;
+  if (typeof v === 'number') return v > 100000000000 ? v : 0;
+  var s = String(v).trim();
+  var t = Date.parse(s);
+  if (!isNaN(t) && t > 0) return t;
+  var m = s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4] || 0), Number(m[5] || 0)).getTime();
+  return 0;
+}
+function smDay(v){
+  var m = smStr(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? m[1] + '-' + m[2] + '-' + m[3] : '';
+}
+/* 키 순서에 흔들리지 않는 비교용 문자열 */
+function smStable(v){
+  if (v === undefined) return 'null';
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)){
+    var a = [];
+    for (var i = 0; i < v.length; i++) a.push(smStable(v[i]));
+    return '[' + a.join(',') + ']';
+  }
+  var ks = Object.keys(v).sort(), out = [];
+  for (var j = 0; j < ks.length; j++) out.push(JSON.stringify(ks[j]) + ':' + smStable(v[ks[j]]));
+  return '{' + out.join(',') + '}';
+}
+function smNewerStamp(a, b){
+  var at = smTime(a), bt = smTime(b);
+  if (bt > at) return b;
+  if (at > bt) return a;
+  if (smFilled(b) && !smFilled(a)) return b;
+  return smFilled(a) ? a : (smFilled(b) ? b : '');
+}
+
+/* ---- 삭제 표시(tombstone) ---- */
+function smTombMap(deleted, coll){
+  if (!smIsObj(deleted)) return {};
+  if (!smIsObj(deleted[coll])) deleted[coll] = {};
+  return deleted[coll];
+}
+/* 지운 기록인가 — 그 뒤에 그 기기에서 고친 항목이면 살립니다 */
+function smTombHas(tomb, key, item){
+  if (!tomb) return false;
+  var t = smTime(tomb[key]);
+  if (!t) return false;
+  if (smTime(item && item.updatedAt) > t){ delete tomb[key]; return false; }
+  return true;
+}
+function smMergeTombstones(a, b){
+  var out = {};
+  [a, b].forEach(function(src){
+    if (!smIsObj(src)) return;
+    Object.keys(src).forEach(function(coll){
+      var m = src[coll];
+      if (!smIsObj(m)) return;
+      var dst = out[coll] || (out[coll] = {});
+      Object.keys(m).forEach(function(key){
+        var t = smTime(m[key]);
+        if (!t) return;
+        if (!dst[key] || smTime(dst[key]) < t) dst[key] = m[key];
+      });
+    });
+  });
+  return out;
+}
+function smPruneTombstones(deleted, nowIso, days){
+  if (!smIsObj(deleted)) return {};
+  var cut = smTime(nowIso || new Date().toISOString()) - (days || SM_TOMBSTONE_DAYS) * 86400000;
+  Object.keys(deleted).forEach(function(coll){
+    var m = deleted[coll];
+    if (!smIsObj(m)){ delete deleted[coll]; return; }
+    Object.keys(m).forEach(function(key){ if (!smTime(m[key]) || smTime(m[key]) < cut) delete m[key]; });
+    if (!Object.keys(m).length) delete deleted[coll];
+  });
+  return deleted;
+}
+
+/* ---- 예방접종·검진 ---- */
+function smMergeHealthValue(a, b){
+  if (!smIsObj(a) && !smIsObj(b)) return smFilled(b) ? smClone(b) : smClone(a);
+  if (!smIsObj(a)) return smClone(b);
+  if (!smIsObj(b)) return smClone(a);
+  var ad = !!a.done, bd = !!b.done, pick;
+  if (ad !== bd) pick = ad ? a : b;                       // 완료 표시는 지우지 않습니다
+  else if (ad && bd){
+    var af = smFilled(a.date), bf = smFilled(b.date);
+    if (af !== bf) pick = af ? a : b;
+    else pick = smTime(b.at || b.updatedAt) > smTime(a.at || a.updatedAt) ? b : a;
+  } else pick = smTime(b.at || b.updatedAt) > smTime(a.at || a.updatedAt) ? b : a;
+  var out = smClone(pick) || {};
+  if (!smFilled(out.date)){ if (smFilled(a.date)) out.date = a.date; else if (smFilled(b.date)) out.date = b.date; }
+  if (!smFilled(out.src)){ if (smFilled(a.src)) out.src = a.src; else if (smFilled(b.src)) out.src = b.src; }
+  if (smFilled(a.date) && smFilled(b.date) && smStr(a.date) !== smStr(b.date)){
+    out.date = smStr(a.date) < smStr(b.date) ? a.date : b.date;   // 이른 날짜 = 실제 접종일
+  }
+  return out;
+}
+function smMergeHealth(rh, lh){
+  var R = smIsObj(rh) ? rh : {}, L = smIsObj(lh) ? lh : {};
+  var out = {}, mids = {}, keys = [];
+  Object.keys(R).forEach(function(k){ if (!mids[k]){ mids[k] = 1; keys.push(k); } });
+  Object.keys(L).forEach(function(k){ if (!mids[k]){ mids[k] = 1; keys.push(k); } });
+  keys.forEach(function(mid){
+    var a = R[mid], b = L[mid];
+    if (!smIsObj(a)){ out[mid] = smClone(b); return; }
+    if (!smIsObj(b)){ out[mid] = smClone(a); return; }
+    var dst = out[mid] = {}, ids = {}, order = [];
+    Object.keys(a).forEach(function(k){ if (!ids[k]){ ids[k] = 1; order.push(k); } });
+    Object.keys(b).forEach(function(k){ if (!ids[k]){ ids[k] = 1; order.push(k); } });
+    order.forEach(function(id){
+      var v = smMergeHealthValue(a[id], b[id]);
+      if (v === undefined || v === null) return;
+      if (!smIsObj(v) && !smFilled(v)) return;
+      dst[id] = v;
+    });
+  });
+  return out;
+}
+
+/* ---- 가족 구성원 · 퀘스트 · 성장 ---- */
+/* 이 기기(b)가 더 최신인가 — 하루 초기화 날짜, 그다음 updatedAt */
+function smNewerMember(a, b){
+  var ad = smDay(a && a.lastReset), bd = smDay(b && b.lastReset);
+  if (ad !== bd) return bd > ad;
+  return smTime(b && b.updatedAt) >= smTime(a && a.updatedAt);
+}
+function smMergeQuests(rq, lq, mid, localNewer, tomb){
+  var out = [], pos = {};
+  function add(q, preferLocal){
+    if (!smIsObj(q)) return;
+    var qid = smStr(q.id) || ('~' + smStr(q.text));
+    if (smTombHas(tomb, mid + '|' + qid, q)) return;
+    if (pos[qid] === undefined){ pos[qid] = out.length; out.push(smClone(q)); return; }
+    var cur = out[pos[qid]];
+    var prefer = preferLocal;
+    var cu = smTime(cur.updatedAt), nu = smTime(q.updatedAt);
+    if (cu || nu) prefer = nu >= cu;
+    if (prefer){
+      var merged = smClone(q);
+      if (!smFilled(merged.text) && smFilled(cur.text)) merged.text = cur.text;
+      if (!smFilled(merged.cat) && smFilled(cur.cat)) merged.cat = cur.cat;
+      out[pos[qid]] = merged;
+    } else if (!smFilled(cur.text) && smFilled(q.text)) cur.text = q.text;
+  }
+  smArr(rq).forEach(function(q){ add(q, false); });
+  smArr(lq).forEach(function(q){ add(q, localNewer); });
+  /* 기기마다 새로 깔린 같은 내용의 퀘스트는 하나로 합칩니다 */
+  var dedup = [], byText = {};
+  out.forEach(function(q){
+    var key = smStr(q.cat) + '|' + smStr(q.text).replace(/\s+/g, ' ').trim();
+    if (!smFilled(q.text) || byText[key] === undefined){ if (smFilled(q.text)) byText[key] = dedup.length; dedup.push(q); return; }
+    var cur = dedup[byText[key]];
+    if (q.done) cur.done = true;
+    if (smTime(q.updatedAt) > smTime(cur.updatedAt)) cur.updatedAt = q.updatedAt;
+  });
+  return dedup;
+}
+function smMergeGrowth(rg, lg, mid, tomb, localNewer){
+  var R = smIsObj(rg) ? rg : {}, L = smIsObj(lg) ? lg : {};
+  var byDate = {}, order = [];
+  function add(g, preferLocal){
+    if (!smIsObj(g)) return;
+    var d = smDay(g.date);
+    if (!d) return;
+    if (smTombHas(tomb, mid + '|' + d, g)) return;
+    var h = (g.height === undefined || g.height === null || g.height === '') ? null : Number(g.height);
+    var w = (g.weight === undefined || g.weight === null || g.weight === '') ? null : Number(g.weight);
+    if (h !== null && isNaN(h)) h = null;
+    if (w !== null && isNaN(w)) w = null;
+    var cur = byDate[d];
+    if (!cur){
+      var rec = { date: d, height: h, weight: w };
+      if (g.updatedAt) rec.updatedAt = g.updatedAt;
+      byDate[d] = rec; order.push(d); return;
+    }
+    var prefer = preferLocal;
+    var cu = smTime(cur.updatedAt), nu = smTime(g.updatedAt);
+    if (cu || nu) prefer = nu >= cu;
+    if (prefer){
+      if (h !== null) cur.height = h;
+      if (w !== null) cur.weight = w;
+      if (g.updatedAt) cur.updatedAt = g.updatedAt;
+    } else {
+      if (cur.height === null && h !== null) cur.height = h;
+      if (cur.weight === null && w !== null) cur.weight = w;
+    }
+  }
+  smArr(R.history).forEach(function(g){ add(g, false); });
+  smArr(L.history).forEach(function(g){ add(g, localNewer); });
+  var hist = order.map(function(d){ return byDate[d]; });
+  hist.sort(function(x, y){ return x.date < y.date ? 1 : (x.date > y.date ? -1 : 0); });
+  var out = { height: null, weight: null, date: '', history: hist };
+  if (hist.length){
+    out.date = hist[0].date;
+    out.height = (hist[0].height === undefined ? null : hist[0].height);
+    out.weight = (hist[0].weight === undefined ? null : hist[0].weight);
+  } else {
+    var both = [localNewer ? L : R, localNewer ? R : L];
+    out.height = smFirstFilled(both, 'height');
+    out.weight = smFirstFilled(both, 'weight');
+    out.date = smFirstFilled(both, 'date');
+  }
+  return out;
+}
+function smFirstFilled(list, key){
+  for (var i = 0; i < list.length; i++){
+    var v = list[i] ? list[i][key] : null;
+    if (smFilled(v)) return v;
+  }
+  return (key === 'date') ? '' : null;
+}
+function smMergeMember(r, l, deleted){
+  var localNewer = smNewerMember(r, l);
+  var m = smClone(localNewer ? l : r) || {};
+  m.id = smStr(r.id) || smStr(l.id);
+  ['name', 'label', 'partner', 'level', 'xp', 'lastReset', 'hatchedDate'].forEach(function(k){
+    if (!smFilled(m[k])){ if (smFilled(r[k])) m[k] = r[k]; else if (smFilled(l[k])) m[k] = l[k]; }
+  });
+  /* 생년월일 — 비어 있는 쪽이 채워진 쪽을 지우지 않습니다 */
+  var rb = smStr(r.birth).trim(), lb = smStr(l.birth).trim();
+  var rAt = smTime(r.birthAt), lAt = smTime(l.birthAt);
+  if (rb || lb){
+    if (rb && lb && rb !== lb){
+      if (lAt !== rAt) m.birth = lAt > rAt ? lb : rb;
+      else m.birth = localNewer ? lb : rb;
+    } else m.birth = rb || lb;
+    m.birthAt = new Date(Math.max(rAt, lAt) || 0).toISOString();
+    if (!rAt && !lAt) delete m.birthAt;
+  } else {
+    m.birth = '';
+  }
+  /* 도감은 합칩니다 */
+  var caught = [], seen = {};
+  smArr(r.caught).concat(smArr(l.caught)).forEach(function(id){
+    var n = Number(id);
+    if (isNaN(n) || seen[n]) return;
+    seen[n] = 1; caught.push(n);
+  });
+  caught.sort(function(a, b){ return a - b; });
+  if (caught.length || smArr(r.caught).length || smArr(l.caught).length) m.caught = caught;
+  m.quests = smMergeQuests(r.quests, l.quests, m.id, localNewer, smTombMap(deleted, 'quests'));
+  m.growth = smMergeGrowth(r.growth, l.growth, m.id, smTombMap(deleted, 'growth'), localNewer);
+  var stamp = [r.updatedAt, l.updatedAt].filter(function(x){ return smTime(x); });
+  if (stamp.length) m.updatedAt = smNewerStamp(stamp[0], stamp[stamp.length - 1]);
+  return m;
+}
+function smMergeMembers(R, L, deleted){
+  var order = [], byId = {};
+  smArr(R).forEach(function(m){
+    if (!smIsObj(m) || !smStr(m.id)) return;
+    if (!byId[m.id]) order.push(m.id);
+    byId[m.id] = smClone(m);
+  });
+  smArr(L).forEach(function(m){
+    if (!smIsObj(m) || !smStr(m.id)) return;
+    if (!byId[m.id]){ order.push(m.id); byId[m.id] = smClone(m); return; }
+    byId[m.id] = smMergeMember(byId[m.id], m, deleted);
+  });
+  return order.map(function(id){ return byId[id]; });
+}
+
+/* ---- 목록(일정·D-Day·장바구니·학원·일기·공지·준비물) ---- */
+function smMergeItem(cur, item, preferLocal){
+  var prefer = preferLocal;
+  var cu = smTime(cur.updatedAt), nu = smTime(item.updatedAt);
+  if (cu || nu) prefer = nu >= cu;
+  if (prefer){
+    var merged = smClone(item);
+    Object.keys(cur).forEach(function(f){
+      if (!smFilled(merged[f]) && smFilled(cur[f])) merged[f] = smClone(cur[f]);
+    });
+    return merged;
+  }
+  Object.keys(item).forEach(function(f){
+    if (!smFilled(cur[f]) && smFilled(item[f])) cur[f] = smClone(item[f]);
+  });
+  return cur;
+}
+function smMergeList(R, L, coll, deleted){
+  var tomb = smTombMap(deleted, coll);
+  var out = [], pos = {};
+  function add(it, preferLocal){
+    if (!smIsObj(it)) return;
+    var id = smStr(it.id);
+    if (!id) id = '~' + smStable(it);      // id가 없는 예전 기록도 잃지 않습니다
+    if (smTombHas(tomb, id, it)) return;
+    if (pos[id] === undefined){ pos[id] = out.length; out.push(smClone(it)); return; }
+    out[pos[id]] = smMergeItem(out[pos[id]], it, preferLocal);
+  }
+  smArr(R).forEach(function(it){ add(it, false); });
+  smArr(L).forEach(function(it){ add(it, true); });
+  return out;
+}
+function smDedupe(list, keyFn){
+  var out = [], pos = {};
+  smArr(list).forEach(function(it){
+    var key = smStr(keyFn(it));
+    if (!key || pos[key] === undefined){
+      if (key) pos[key] = out.length;
+      out.push(it);
+      return;
+    }
+    var cur = out[pos[key]];
+    Object.keys(it).forEach(function(f){ if (!smFilled(cur[f]) && smFilled(it[f])) cur[f] = smClone(it[f]); });
+    if (smTime(it.updatedAt) > smTime(cur.updatedAt)) cur.updatedAt = it.updatedAt;
+  });
+  return out;
+}
+function smMergePreps(R, L, deleted){
+  var base = smMergeList(R, L, 'preps', deleted);
+  var out = [], pos = {};
+  base.forEach(function(p){
+    var key = smStr(p.title);
+    if (!key || pos[key] === undefined){
+      if (key) pos[key] = out.length;
+      out.push(p);
+      return;
+    }
+    var cur = out[pos[key]], items = [], seen = {};
+    smArr(cur.items).forEach(function(it){
+      var t = smStr(it && it.t);
+      if (!t || seen[t]) return;
+      seen[t] = 1; items.push({ t: t, done: !!(it && it.done) });
+    });
+    smArr(p.items).forEach(function(it){
+      var t = smStr(it && it.t);
+      if (!t) return;
+      if (!seen[t]){ seen[t] = 1; items.push({ t: t, done: !!(it && it.done) }); return; }
+      if (it && it.done){ for (var i = 0; i < items.length; i++){ if (items[i].t === t) items[i].done = true; } }
+    });
+    cur.items = items;
+    if (!smFilled(cur.due) && smFilled(p.due)) cur.due = p.due;
+  });
+  return out;
+}
+
+/* ---- 급식·학사일정 ---- */
+function smMergeMap(R, L, localNewer){
+  var r = smIsObj(R) ? R : {}, l = smIsObj(L) ? L : {};
+  var out = {}, keys = {}, order = [];
+  Object.keys(r).forEach(function(k){ if (!keys[k]){ keys[k] = 1; order.push(k); } });
+  Object.keys(l).forEach(function(k){ if (!keys[k]){ keys[k] = 1; order.push(k); } });
+  order.forEach(function(k){
+    var rv = r[k], lv = l[k], pick;
+    if (!smFilled(lv)) pick = rv;
+    else if (!smFilled(rv)) pick = lv;
+    else pick = localNewer ? lv : rv;      // 같은 날짜는 더 최근에 받아 온 쪽, 지우지는 않습니다
+    if (pick === undefined) return;
+    out[k] = smClone(pick);
+  });
+  return out;
+}
+function smMergeSchedule(R, L, localNewer){
+  var out = [], pos = {};
+  function add(s, preferLocal){
+    if (!smIsObj(s)) return;
+    var key = smStr(s.date) + '|' + smStr(s.name);
+    if (key === '|') return;
+    if (pos[key] === undefined){
+      pos[key] = out.length;
+      out.push({ date: s.date, name: s.name, memo: smStr(s.memo), src: s.src || '' });
+      if (s.updatedAt) out[pos[key]].updatedAt = s.updatedAt;
+      return;
+    }
+    var cur = out[pos[key]];
+    var prefer = preferLocal;
+    var cu = smTime(cur.updatedAt), nu = smTime(s.updatedAt);
+    if (cu || nu) prefer = nu >= cu;
+    if (prefer){
+      if (smFilled(s.memo)) cur.memo = s.memo;
+      if (smFilled(s.src)) cur.src = s.src;
+    } else {
+      if (!smFilled(cur.memo) && smFilled(s.memo)) cur.memo = s.memo;
+      if (!smFilled(cur.src) && smFilled(s.src)) cur.src = s.src;
+    }
+  }
+  smArr(R).forEach(function(s){ add(s, false); });
+  smArr(L).forEach(function(s){ add(s, true); });
+  out.sort(function(a, b){ return smStr(a.date) < smStr(b.date) ? -1 : (smStr(a.date) > smStr(b.date) ? 1 : 0); });
+  return out;
+}
+
+/* ---- 설정 · 시간표 · 통화방 · 날씨 ---- */
+function smMergeSettings(R, L){
+  var r = smIsObj(R) ? R : {}, l = smIsObj(L) ? L : {};
+  var out = smClone(r) || {};
+  Object.keys(l).forEach(function(k){ if (smFilled(l[k]) || !smFilled(out[k])) out[k] = smClone(l[k]); });
+  if (smIsObj(r.school) || smIsObj(l.school)){
+    var s = smClone(r.school) || {}, ls = smIsObj(l.school) ? l.school : {};
+    Object.keys(ls).forEach(function(k){ if (smFilled(ls[k]) || !smFilled(s[k])) s[k] = ls[k]; });
+    Object.keys(s).forEach(function(k){ if (!smFilled(s[k]) && smFilled(ls[k])) s[k] = ls[k]; });
+    out.school = s;
+  }
+  return out;
+}
+function smMergeTt(R, L, localNewer){
+  var r = smIsObj(R) ? R : {}, l = smIsObj(L) ? L : {};
+  var out = smClone(r) || {};
+  Object.keys(l).forEach(function(name){
+    var lc = l[name], rc = out[name];
+    if (!smIsObj(lc)){ if (!smIsObj(rc)) out[name] = smClone(lc); return; }
+    if (!smIsObj(rc)){ out[name] = smClone(lc); return; }
+    var conf = smClone(rc);
+    if (smFilled(lc.label)) conf.label = lc.label;
+    if (smArr(lc.rows).length) conf.rows = lc.rows.slice();
+    conf.data = smIsObj(conf.data) ? conf.data : {};
+    var ld = smIsObj(lc.data) ? lc.data : {};
+    Object.keys(ld).forEach(function(day){
+      var rv = conf.data[day], lv = ld[day];
+      if (!Array.isArray(lv)) return;
+      var rFilled = Array.isArray(rv) && rv.filter(function(x){ return smFilled(x); }).length > 0;
+      if (!rFilled || localNewer) conf.data[day] = smClone(lv);
+    });
+    out[name] = conf;
+  });
+  return out;
+}
+function smMergeCall(R, L){
+  var r = smIsObj(R) ? R : {}, l = smIsObj(L) ? L : {};
+  var out = smClone(r) || {};
+  if (smFilled(l.room)) out.room = l.room;
+  if (!smFilled(out.room)) out.room = 'soohojiho-family';
+  delete out.role;      // 통화 역할은 기기마다 달라요
+  return out;
+}
+function smNewerWeather(R, L){
+  if (!smIsObj(L)) return smIsObj(R) ? smClone(R) : null;
+  if (!smIsObj(R)) return smClone(L);
+  return smTime(L.at) >= smTime(R.at) ? smClone(L) : smClone(R);
+}
+
+/* ---- 전체 병합 ---- */
+function mergeFamilyData(remoteData, localData, nowIso){
+  var now = nowIso || new Date().toISOString();
+  var R = smIsObj(remoteData) ? smClone(remoteData) : {};
+  var L = smIsObj(localData) ? smClone(localData) : {};
+  var deleted = smMergeTombstones(R.deleted, L.deleted);
+  var out = smClone(R) || {};
+  Object.keys(L).forEach(function(k){
+    if (!Object.prototype.hasOwnProperty.call(out, k)) out[k] = smClone(L[k]);
+  });
+
+  var localTtNewer = smTime(L.ttUpdated) > smTime(R.ttUpdated);
+  var localMealNewer = smTime(L.mealUpdated) >= smTime(R.mealUpdated);
+  var localSchoolNewer = smTime(L.schoolUpdated) >= smTime(R.schoolUpdated);
+
+  out.settings = smMergeSettings(R.settings, L.settings);
+  out.tt = smMergeTt(R.tt, L.tt, localTtNewer);
+  if (smFilled(L.ttUpdated) && (localTtNewer || !smFilled(R.ttUpdated))) out.ttUpdated = L.ttUpdated;
+  out.call = smMergeCall(R.call, L.call);
+
+  out.members = smMergeMembers(R.members, L.members, deleted);
+  out.health = smMergeHealth(R.health, L.health);
+
+  out.meals = smMergeMap(R.meals, L.meals, localMealNewer);
+  out.mealSource = smMergeMap(R.mealSource, L.mealSource, localMealNewer);
+  out.mealUpdated = smNewerStamp(R.mealUpdated, L.mealUpdated);
+  out.schoolSchedule = smMergeSchedule(R.schoolSchedule, L.schoolSchedule, localSchoolNewer);
+  out.schoolUpdated = smNewerStamp(R.schoolUpdated, L.schoolUpdated);
+
+  out.events = smMergeList(R.events, L.events, 'events', deleted);
+  out.ddays = smMergeList(R.ddays, L.ddays, 'ddays', deleted);
+  out.wishes = smMergeList(R.wishes, L.wishes, 'wishes', deleted);
+  out.academies = smMergeList(R.academies, L.academies, 'academies', deleted);
+  out.diary = smMergeList(R.diary, L.diary, 'diary', deleted);
+  out.notices = smDedupe(smMergeList(R.notices, L.notices, 'notices', deleted), function(n){ return smStr(n.date) + '|' + smStr(n.title); });
+  out.preps = smMergePreps(R.preps, L.preps, deleted);
+
+  out.weather = smNewerWeather(R.weather, L.weather);
+
+  if (R.hiclassSeeded || L.hiclassSeeded) out.hiclassSeeded = true;
+  if (!smFilled(out.version)) out.version = smFilled(L.version) ? L.version : (smFilled(R.version) ? R.version : 1);
+  out.deleted = smPruneTombstones(deleted, now, SM_TOMBSTONE_DAYS);
+  out.updatedAt = now;
+  return out;
+}
+/* ==== SYNC-MERGE END ==== */
+
+/* 지운 항목은 시각을 남겨, 다음 병합에서 되살아나지 않게 해요 */
+function syncMarkDeleted(coll, key){
+  if (!State) return;
+  if (!smIsObj(State.deleted)) State.deleted = {};
+  if (!smIsObj(State.deleted[coll])) State.deleted[coll] = {};
+  State.deleted[coll][smStr(key)] = new Date().toISOString();
+}
+function stampItem(obj){
+  if (obj && typeof obj === 'object' && !Array.isArray(obj)) obj.updatedAt = new Date().toISOString();
+  return obj;
+}
+function touchMember(m){
+  if (m && typeof m === 'object') m.updatedAt = new Date().toISOString();
+  return m;
 }
 
 /* ---- 주고받기 ---- */
@@ -2997,6 +3521,42 @@ function syncCheck(){
       throw err;
     });
 }
+/* 원격 최신 파일 — { meta, env, data } (없으면 data:null) */
+function syncReadRemote(){
+  return syncRemoteMeta().then(function(meta){
+    if (!meta) return { meta: null, env: null, data: null };
+    return syncDecodeMeta(meta).then(function(env){
+      return { meta: meta, env: env, data: (env && env.data) ? env.data : env };
+    });
+  });
+}
+/* 병합 결과를 이 기기에도 반영해요 (다른 기기에만 있던 기록이 사라지지 않고 보이도록) */
+function syncApplyMergedData(data, nowIso){
+  if (!smIsObj(data) || !State) return false;
+  var before = smStable(State);
+  Sync.applying = true;
+  try {
+    normalizeState(smClone(data));
+    var changed = (before !== smStable(State));
+    if (nowIso) State.updatedAt = nowIso;
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(State)); } catch(e){}
+    if (changed && !syncTypingBusy()) renderAll();
+    return changed;
+  } finally {
+    Sync.applying = false;
+  }
+}
+function syncEnvelopeFor(data, nowIso){
+  var now = nowIso || new Date().toISOString();
+  return JSON.stringify({
+    app: 'suho-jiho-family-dashboard', schema: 1,
+    updatedAt: now,
+    device: (Sync.cfg && Sync.cfg.deviceId) || '',
+    deviceName: (Sync.cfg && Sync.cfg.deviceName) || deviceLabel(),
+    savedAt: now,
+    data: data
+  });
+}
 function syncPush(opts){
   opts = opts || {};
   if (!syncConfigured()){
@@ -3010,46 +3570,64 @@ function syncPush(opts){
   }
   if (Sync.busy){ Sync.queue = true; return Promise.resolve(false); }
   Sync.busy = true;
-  syncSetStatus('busy', opts.manual ? '이 기기 기록을 올리는 중…' : '자동으로 올리는 중…');
-  var body = {
-    message: '가족 대시보드 동기화 · ' + ((Sync.cfg.deviceName || deviceLabel())) + ' · ' + new Date().toISOString(),
-    content: b64encodeUtf8(syncEnvelope()),
-    branch: Sync.cfg.branch || 'main'
-  };
-  return syncRemoteMeta()
-    .then(function(meta){
-      if (meta && meta.sha) body.sha = meta.sha;
-      return syncFetch(syncFileUrl(), { method: 'PUT', headers: syncHeaders(), body: JSON.stringify(body) });
-    })
-    .then(function(res){
-      if (!res.ok){
-        var ePut = new Error(syncErrorText(res.status, '올리지 못했어요 (HTTP ' + res.status + ')'));
-        ePut.status = res.status;
-        throw ePut;
-      }
-      return res.json().then(function(j){ return j; }, function(){ return null; });
-    })
-    .then(function(j){
-      // 방금 올린 파일은 확인할 필요 없어요 (15초 자동 확인이 되돌려 받지 않도록)
-      if (j && j.content && j.content.sha) Sync.remoteSha = j.content.sha;
-      Sync.etag = '';
+  var tries = 0, maxTries = 4;
+  syncSetStatus('busy', opts.manual ? '이 기기 기록을 다른 기기 기록과 합쳐 올리는 중…' : '자동으로 합쳐 올리는 중…');
+
+  /* 1) 원격 최신본을 받고 2) 이 기기 기록과 항목별로 병합한 뒤 3) 병합본을 올립니다.
+     sha가 바뀌었으면(409·422) 최신본을 다시 받아 재병합·재시도해요. */
+  function attempt(){
+    tries += 1;
+    return syncReadRemote().then(function(rem){
+      var now = new Date().toISOString();
+      var merged = mergeFamilyData(rem.data, syncDataForUpload(), now);
+      syncApplyMergedData(merged, now);
+      var body = {
+        message: '가족 대시보드 동기화 · ' + ((Sync.cfg.deviceName || deviceLabel())) + ' · ' + now,
+        content: b64encodeUtf8(syncEnvelopeFor(syncDataForUpload(), now)),
+        branch: Sync.cfg.branch || 'main'
+      };
+      if (rem.meta && rem.meta.sha) body.sha = rem.meta.sha;
+      return syncFetch(syncFileUrl(), { method: 'PUT', headers: syncHeaders(), body: JSON.stringify(body) })
+        .then(function(res){
+          if (!res.ok){
+            var ePut = new Error(syncErrorText(res.status, '올리지 못했어요 (HTTP ' + res.status + ')'));
+            ePut.status = res.status;
+            throw ePut;
+          }
+          return res.json().then(function(j){ return j; }, function(){ return null; });
+        })
+        .then(function(j){
+          // 방금 올린 파일은 확인할 필요 없어요 (15초 자동 확인이 되돌려 받지 않도록)
+          Sync.remoteSha = (j && j.content && j.content.sha) ? j.content.sha : '';
+          Sync.etag = '';
+          return true;
+        });
+    });
+  }
+  function retryOrFail(err){
+    if (err && (err.status === 409 || err.status === 422) && tries < maxTries){
+      syncSetStatus('busy', '다른 기기가 먼저 올렸어요. 최신 기록을 다시 합치는 중…');
+      return new Promise(function(resolve){ window.setTimeout(resolve, 500 * tries + 200); })
+        .then(attempt)
+        .catch(retryOrFail);
+    }
+    throw err;
+  }
+
+  return attempt()
+    .catch(retryOrFail)
+    .then(function(){
       Sync.busy = false;
       Sync.lastSync = new Date().toISOString();
       Sync.cfg.lastSync = Sync.lastSync;
       syncSaveCfg();
-      syncSetStatus('ok', '이 기기 기록을 GitHub에 올렸어요.');
-      if (opts.manual) toast('GitHub에 올렸어요 ⬆️', 'ok');
+      syncSetStatus('ok', '다른 기기 기록과 합쳐 GitHub에 올렸어요.');
+      if (opts.manual) toast('다른 기기 기록과 합쳐 올렸어요 ⬆️', 'ok');
       if (Sync.queue){ Sync.queue = false; window.setTimeout(function(){ syncPush({}); }, 900); }
       return true;
     })
     .catch(function(err){
       Sync.busy = false;
-      // 다른 기기가 먼저 올려 sha가 바뀐 경우(409) 한 번만 자동 재시도
-      if (err && err.status === 409 && !opts._retry){
-        syncSetStatus('busy', '다른 기기 기록을 반영해 다시 올리는 중…');
-        window.setTimeout(function(){ syncPush({ manual: !!opts.manual, _retry: true }); }, 1500);
-        return false;
-      }
       var msg = (err && err.message) ? err.message : syncNetworkText();
       if (!/[\u3131-\ud7a3]/.test(msg)) msg = syncNetworkText();
       syncSetStatus('err', msg);
@@ -3865,6 +4443,8 @@ function toggleQuest(mid, qid){
   m.quests.forEach(function(x){ if (x.id === qid) q = x; });
   if (!q) return;
   q.done = !q.done;
+  stampItem(q);
+  touchMember(m);
   if (q.done){
     var leveled = addXp(m, q.points);
     if (leveled) toast('🎉 ' + partnerName(m) + ' Lv.' + m.level + ' 달성!', 'ok', 2600);
@@ -3919,6 +4499,7 @@ function pickDexPartner(mid, pid){
   var nm = KANTO[pid-1];
   if (!window.confirm(nm + '(으)로 파트너를 바꿀까요?')) return;
   m.partner = Number(pid);
+  touchMember(m);
   save();
   toast('🤝 파트너가 ' + nm + '로 바뀌었어요!', 'ok');
   renderAll();
@@ -3975,6 +4556,7 @@ function hatchEgg(mid, btn){
     var pick = pool[Math.floor(Math.random() * pool.length)];
     m.caught.push(pick);
     m.hatchedDate = todayISO();
+    touchMember(m);
     var leveled = addXp(m, 20);
     save();
     var stage = $('#eggStage');
@@ -4017,6 +4599,7 @@ function resetDay(mid){
   m.quests.forEach(function(q){ q.done = false; });
   m.hatchedDate = '';
   m.lastReset = todayISO();
+  touchMember(m);
   save();
   toast('🌅 ' + m.name + '의 하루를 새로 시작해요!', 'ok');
   renderAll();
@@ -4300,6 +4883,7 @@ function setTtValue(mname, day, rowIdx, val){
   if (!conf.data[day]) conf.data[day] = conf.rows.map(function(){ return ''; });
   while (conf.data[day].length < conf.rows.length) conf.data[day].push('');
   conf.data[day][rowIdx] = val;
+  State.ttUpdated = new Date().toISOString();
   save();
   closeModal();
   renderTimetable();
@@ -4582,6 +5166,7 @@ function compressImage(file, cb){
 function saveDiary(form){
   var el = form.elements;
   var id = form.getAttribute('data-id');
+  var nowStamp = new Date().toISOString();
   var data = {
     date: el.date.value,
     owner: el.owner.value,
@@ -4596,10 +5181,12 @@ function saveDiary(form){
       if (d.id === id){
         d.date = data.date; d.owner = data.owner; d.mood = data.mood;
         d.title = data.title; d.text = data.text; d.image = data.image;
+        d.updatedAt = nowStamp;
       }
     });
   } else {
     data.id = uid('d');
+    data.updatedAt = nowStamp;
     State.diary.push(data);
   }
   saveNow();
@@ -4629,6 +5216,7 @@ function openDiaryView(id){
 
 function deleteDiary(id){
   if (!window.confirm('이 일기를 삭제할까요? 되돌릴 수 없어요.')) return;
+  syncMarkDeleted('diary', id);
   State.diary = State.diary.filter(function(d){ return d.id !== id; });
   saveNow();
   closeModal();
@@ -6772,6 +7360,7 @@ function bindEvents(){
         cur.done = !cur.done;
         if (cur.done && !cur.date) cur.date = todayISO();
         if (!cur.done) cur.date = '';
+        cur.at = new Date().toISOString();
         hs[hid] = cur;
         save(); renderGrowth();
         toast(cur.done ? '완료로 표시했어요 ✅' : '완료 표시를 해제했어요');
@@ -6795,20 +7384,23 @@ function bindEvents(){
       case 'event-edit': openEventModal(null, el.getAttribute('data-id')); break;
       case 'event-del': {
         if (!window.confirm('이 일정을 삭제할까요?')) return;
+        syncMarkDeleted('events', el.getAttribute('data-id'));
         State.events = State.events.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); closeModal(); renderAll(); toast('일정을 삭제했어요');
         break;
       }
       case 'dday-del': {
+        syncMarkDeleted('ddays', el.getAttribute('data-id'));
         State.ddays = State.ddays.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); renderAll(); break;
       }
       case 'wish-toggle': {
         var w = findById(State.wishes, el.getAttribute('data-id'));
-        if (w){ w.done = !w.done; save(); renderWishlist(); }
+        if (w){ w.done = !w.done; stampItem(w); save(); renderWishlist(); }
         break;
       }
       case 'wish-del': {
+        syncMarkDeleted('wishes', el.getAttribute('data-id'));
         State.wishes = State.wishes.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); renderWishlist(); break;
       }
@@ -6816,7 +7408,9 @@ function bindEvents(){
       case 'q-del': {
         if (deviceModeLocked()){ kidLockToast(); break; }
         var m = memberById(el.getAttribute('data-mid'));
+        syncMarkDeleted('quests', m.id + '|' + el.getAttribute('data-qid'));
         m.quests = m.quests.filter(function(q){ return q.id !== el.getAttribute('data-qid'); });
+        touchMember(m);
         save(); renderAll(); break;
       }
       case 'egg': openEgg(el.getAttribute('data-mid')); break;
@@ -6827,6 +7421,7 @@ function bindEvents(){
       case 'dex-open-modal': openDex(el.getAttribute('data-mid')); break;
       case 'acad-del': {
         if (!window.confirm('이 수업을 삭제할까요?')) return;
+        syncMarkDeleted('academies', el.getAttribute('data-id'));
         State.academies = State.academies.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); renderAcademyGrid(); renderDayPanel(); toast('수업을 삭제했어요');
         break;
@@ -6849,6 +7444,7 @@ function bindEvents(){
       case 'diary-del': deleteDiary(el.getAttribute('data-id')); break;
       case 'diary-img-clear': pendingImage = ''; renderDiaryImagePreview(); break;
       case 'notice-del': {
+        syncMarkDeleted('notices', el.getAttribute('data-id'));
         State.notices = State.notices.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); renderSchool(); break;
       }
@@ -6857,6 +7453,7 @@ function bindEvents(){
         if (p){
           var all = p.items.every(function(i){ return i.done; });
           p.items.forEach(function(i){ i.done = !all; });
+          stampItem(p);
           save(); renderSchool();
         }
         break;
@@ -6866,11 +7463,13 @@ function bindEvents(){
         if (pp){
           var idx = Number(el.getAttribute('data-idx'));
           if (pp.items[idx]) pp.items[idx].done = !pp.items[idx].done;
+          stampItem(pp);
           save(); renderSchool();
         }
         break;
       }
       case 'prep-del': {
+        syncMarkDeleted('preps', el.getAttribute('data-id'));
         State.preps = State.preps.filter(function(x){ return x.id !== el.getAttribute('data-id'); });
         save(); renderSchool(); break;
       }
@@ -6908,8 +7507,9 @@ function bindEvents(){
       m.quests.push({
         id: uid('q'),
         cat: df === 'qadd2' ? f.getAttribute('data-cat') : 'quest',
-        text: text, points: Number(pt.value), done: false
+        text: text, points: Number(pt.value), done: false, updatedAt: new Date().toISOString()
       });
+      touchMember(m);
       txtInput.value = '';
       save(); renderAll();
       toast('퀘스트를 추가했어요', 'ok');
@@ -6981,9 +7581,10 @@ function bindEvents(){
       if (!data.title || !data.date) return;
       if (eid){
         var ev = findById(State.events, eid);
-        if (ev){ ev.title = data.title; ev.date = data.date; ev.time = data.time; ev.owner = data.owner; ev.cat = data.cat; ev.memo = data.memo; }
+        if (ev){ ev.title = data.title; ev.date = data.date; ev.time = data.time; ev.owner = data.owner; ev.cat = data.cat; ev.memo = data.memo; stampItem(ev); }
       } else {
         data.id = uid('e');
+        data.updatedAt = new Date().toISOString();
         State.events.push(data);
       }
       save(); closeModal();
@@ -7011,7 +7612,7 @@ function bindEvents(){
       var title = $('#ddayTitle').value.trim();
       var date = $('#ddayDate').value;
       if (!title || !date) return;
-      State.ddays.push({ id: uid('dd'), title: title, date: date });
+      State.ddays.push({ id: uid('dd'), title: title, date: date, updatedAt: new Date().toISOString() });
       $('#ddayTitle').value = '';
       save(); renderAll();
       toast('D-Day를 추가했어요 ⏳', 'ok');
@@ -7022,7 +7623,7 @@ function bindEvents(){
       e.preventDefault();
       var item = $('#wishItem').value.trim();
       if (!item) return;
-      State.wishes.push({ id: uid('w'), item: item, who: $('#wishWho').value, memo: $('#wishMemo').value.trim(), done: false });
+      State.wishes.push({ id: uid('w'), item: item, who: $('#wishWho').value, memo: $('#wishMemo').value.trim(), done: false, updatedAt: new Date().toISOString() });
       $('#wishItem').value = ''; $('#wishMemo').value = '';
       save(); renderWishlist();
       toast('장바구니에 담았어요 🛒', 'ok');
@@ -7035,7 +7636,8 @@ function bindEvents(){
       if (!nm) return;
       State.academies.push({
         id: uid('a'), name: nm, who: $('#acadWho').value, day: $('#acadDay').value,
-        start: $('#acadStart').value, end: $('#acadEnd').value, place: $('#acadPlace').value.trim()
+        start: $('#acadStart').value, end: $('#acadEnd').value, place: $('#acadPlace').value.trim(),
+        updatedAt: new Date().toISOString()
       });
       $('#acadName').value = ''; $('#acadPlace').value = '';
       save(); renderAcademyGrid(); renderDayPanel();
@@ -7047,7 +7649,7 @@ function bindEvents(){
       e.preventDefault();
       var nt = $('#noticeTitle').value.trim();
       if (!nt) return;
-      State.notices.push({ id: uid('n'), title: nt, date: $('#noticeDate').value || todayISO(), memo: $('#noticeMemo').value.trim(), sample: false });
+      State.notices.push({ id: uid('n'), title: nt, date: $('#noticeDate').value || todayISO(), memo: $('#noticeMemo').value.trim(), sample: false, updatedAt: new Date().toISOString() });
       $('#noticeTitle').value = ''; $('#noticeMemo').value = '';
       save(); renderSchool();
       toast('공지를 추가했어요 📢', 'ok');
@@ -7060,7 +7662,7 @@ function bindEvents(){
       if (!pt2) return;
       State.preps.push({
         id: uid('p'), title: pt2, due: $('#prepDue').value || '',
-        items: [{ t: pt2, done: false }], sample: false
+        items: [{ t: pt2, done: false }], sample: false, updatedAt: new Date().toISOString()
       });
       $('#prepTitle').value = '';
       save(); renderSchool();
@@ -7088,7 +7690,7 @@ function bindEvents(){
     var mb = t.getAttribute('data-mbirth');
     if (mb){
       var mmb = memberById(mb);
-      if (mmb){ mmb.birth = t.value || ''; save(); renderGrowth(); toast(mmb.birth ? '생년월일을 저장했어요. 백분위가 정확해져요 📏' : '생년월일을 비웠어요'); }
+      if (mmb){ mmb.birth = t.value || ''; mmb.birthAt = new Date().toISOString(); touchMember(mmb); save(); renderGrowth(); toast(mmb.birth ? '생년월일을 저장했어요. 백분위가 정확해져요 📏' : '생년월일을 비웠어요'); }
       return;
     }
     var hd = t.getAttribute('data-hdate-hid');
@@ -7096,7 +7698,7 @@ function bindEvents(){
       var hdm = memberById(t.getAttribute('data-hdate-mid'));
       if (hdm){
         var hst = healthState(hdm);
-        hst[hd] = { done: true, date: t.value || todayISO() };
+        hst[hd] = { done: true, date: t.value || todayISO(), at: new Date().toISOString() };
         save(); renderGrowth();
       }
       return;
@@ -7115,6 +7717,7 @@ function bindEvents(){
       var m = memberById(mid);
       if (mf === 'partner'){ m.partner = Number(t.value); }
       else { m[mf] = t.value; }
+      touchMember(m);
       save(); renderAll();
       return;
     }
