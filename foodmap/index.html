@@ -141,6 +141,8 @@ main{flex:1;min-height:0;position:relative}
 .pp .pp-ops{display:flex;gap:5px;margin-top:7px;border-top:1px solid var(--line);padding-top:8px}
 .pp .pp-ops button{border:1px solid var(--line);background:#fff;border-radius:8px;height:27px;padding:0 9px;font-size:11.5px;font-weight:800;color:#475569}
 .leaflet-container{font-family:inherit}
+#map.picking .leaflet-marker-icon{pointer-events:none!important}
+#map.picking{cursor:crosshair}
 .leaflet-control-attribution{font-size:9.5px!important}
 
 /* ---------- 시트 / 모달 ---------- */
@@ -756,6 +758,7 @@ function startPick(){
   hideSheet();
   setView('map');
   Map.pick = true;
+  $('#map').classList.add('picking');
   $('#pickBanner').classList.remove('hidden');
   if(c) Map.obj.setView([c.lat,c.lng], Math.max(Map.obj.getZoom(),14));
   else if(navigator.geolocation){
@@ -768,6 +771,7 @@ function startPick(){
 function setPickedCoord(lat,lng){
   setCoord({lat:lat,lng:lng});
   Map.pick = false;
+  $('#map').classList.remove('picking');
   $('#pickBanner').classList.add('hidden');
   clearPickMarker();
   pickTempMarker = L.marker([lat,lng], {icon:L.divIcon({className:'pin-wrap',html:'<div class="pin good"><i>📍</i></div>',iconSize:[32,32],iconAnchor:[16,30]})}).addTo(Map.obj);
@@ -776,6 +780,7 @@ function setPickedCoord(lat,lng){
 }
 function cancelPick(){
   Map.pick = false;
+  $('#map').classList.remove('picking');
   $('#pickBanner').classList.add('hidden');
   $('#sheet').classList.remove('hidden');
 }
