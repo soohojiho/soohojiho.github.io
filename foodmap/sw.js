@@ -1,6 +1,6 @@
 /* 내 전국 맛집·휴게소 지도 — /foodmap/ 범위 전용 오프라인 캐시
    루트(가족대시보드) 서비스 워커와는 scope가 분리되어 서로 간섭하지 않습니다. */
-const CACHE = 'my-foodmap-v1';
+const CACHE = 'my-foodmap-v2';
 const SCOPE_PATH = '/foodmap/';
 const CORE = [
   './',

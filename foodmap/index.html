@@ -183,6 +183,8 @@ textarea.inp{height:auto;min-height:76px;padding:10px 12px;resize:vertical;line-
 .geo-results button{text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.4}
 .geo-results button b{display:block;font-size:12.5px;margin-bottom:1px}
 .geo-results button span{color:#94a3b8}
+.geo-results .note{margin:0 0 6px}
+.linkbtn{border:0;background:none;color:#c2410c;font-weight:800;padding:0 0 0 2px;font-size:11.5px;text-decoration:underline}
 .sheet-actions{display:flex;gap:8px;margin-top:14px;position:sticky;bottom:-4px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 22%);padding-top:10px}
 .sheet-actions .btn{flex:1;justify-content:center;height:46px;font-size:14px}
 .sync-state{display:flex;align-items:center;gap:8px;font-size:12.5px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:14px}
@@ -264,9 +266,10 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:14px 0}
 /* ============================================================
    기본 상수
    ============================================================ */
-var APP_VERSION = 'v1.0';
+var APP_VERSION = 'v1.1';
 var DATA_KEY = 'my_foodmap_v1';
 var CFG_KEY  = 'my_foodmap_cfg_v1';
+var KAKAO_KEY = 'my_foodmap_kakao_key_v1';
 
 var TYPES = {
   good:{label:'맛집', emoji:'👍', color:'#16a34a'},
@@ -615,6 +618,8 @@ function initMap(){
 }
 
 function pinDim(){ return window.innerWidth < 560 ? 26 : 32; }
+/* 뾰족한 끝(모서리)이 회전 후 아래로 0.707*d 만큼 내려오므로 중심(d/2)보다 조금 더 내린 지점을 기준으로 잡는다 */
+function pinAnchorY(d){ return Math.round(d*1.18); }
 function pinIcon(it, active){
   var t = TYPES[it.type] || TYPES.good;
   var cls = it.type + (active?' active':'');
@@ -622,7 +627,7 @@ function pinIcon(it, active){
   return L.divIcon({
     className:'pin-wrap',
     html:'<div class="pin '+cls+'" style="width:'+d+'px;height:'+d+'px"><i>'+t.emoji+'</i></div>',
-    iconSize:[d,d], iconAnchor:[d/2, d-2], popupAnchor:[0,-(d-4)]
+    iconSize:[d,d], iconAnchor:[d/2, pinAnchorY(d)], popupAnchor:[0, -Math.round(d*1.36)]
   });
 }
 
@@ -673,7 +678,6 @@ function openOnMap(id){
    추가 · 수정 시트
    ============================================================ */
 var Editing = {id:null};
-var Geo = {last:0, results:[]};
 
 function findFirstFocus(){
   var el = $('#fName');
@@ -778,7 +782,7 @@ function setPickedCoord(lat,lng){
   $('#map').classList.remove('picking');
   $('#pickBanner').classList.add('hidden');
   clearPickMarker();
-  pickTempMarker = L.marker([lat,lng], {icon:L.divIcon({className:'pin-wrap',html:'<div class="pin good"><i>📍</i></div>',iconSize:[32,32],iconAnchor:[16,30]})}).addTo(Map.obj);
+  placeTempPin(lat,lng);
   $('#sheet').classList.remove('hidden');
   toast('위치를 찍었어요 · ' + lat.toFixed(4) + ', ' + lng.toFixed(4), 'ok');
 }
@@ -789,33 +793,166 @@ function cancelPick(){
   $('#sheet').classList.remove('hidden');
 }
 
-/* 주소 검색 (OpenStreetMap Nominatim) */
-function geocode(){
+/* ============================================================
+   장소·주소 검색 — 카카오 로컬 우선, 키가 없으면 OpenStreetMap
+   ============================================================ */
+var Geo = {last:0, results:[]};
+
+var REGION_HINTS = [
+  [/부산/, '부산'],
+  [/경남|경상남|울산/, '경남/울산'],
+  [/대구|경북|경상북/, '대구/경북'],
+  [/서울|경기|인천/, '서울/경기/인천'],
+  [/강원/, '강원'],
+  [/충북|충남|충청|대전|세종/, '충청/대전/세종'],
+  [/전북|전남|전라|광주/, '전라/광주'],
+  [/제주/, '제주']
+];
+function regionFromAddress(addr){
+  var a = String(addr||'').slice(0, 10);
+  for(var i=0;i<REGION_HINTS.length;i++) if(REGION_HINTS[i][0].test(a)) return REGION_HINTS[i][1];
+  return '';
+}
+function kakaoKey(){ return (Kakao.key||'').trim(); }
+function kakaoSearchURL(kind, q){
+  return 'https://dapi.kakao.com/v2/local/search/' + kind + '.json?query=' + encodeURIComponent(q) +
+    '&size=' + (kind==='keyword' ? 6 : 4);
+}
+function kakaoGet(kind, q){
+  return fetch(kakaoSearchURL(kind, q), {
+    headers:{'Authorization':'KakaoAK ' + kakaoKey(), 'Accept':'application/json'}
+  }).then(function(r){
+    if(r.status===401) throw new Error('카카오 키가 올바르지 않아요 (401)');
+    if(r.status===403) throw new Error('카카오 앱에서 카카오맵(로컬) API 사용 설정을 켜 주세요 (403)');
+    if(r.status===429) throw new Error('카카오 호출 한도를 넘었어요 (429)');
+    if(!r.ok) throw new Error('카카오 검색 오류 ' + r.status);
+    return r.json();
+  });
+}
+function kakaoPlace(d){
+  var road = d.road_address_name || '', jibun = d.address_name || '';
+  return {title:d.place_name || road || jibun, addr:road || jibun,
+          cat:d.category_name || '', lat:Number(d.y), lng:Number(d.x), name:d.place_name || ''};
+}
+function kakaoAddr(d){
+  var ra = (d.road_address && d.road_address.address_name) || '';
+  var bn = (d.road_address && d.road_address.building_name) || '';
+  var an = d.address_name || '';
+  return {title:bn || ra || an, addr:ra || an, cat:'주소', lat:Number(d.y), lng:Number(d.x), name:''};
+}
+function mergeKakao(places, addrs){
+  var out = [], seenTitle = {}, seenAddr = {};
+  function titleKey(r){ return r.title + '@' + r.lat.toFixed(5) + ',' + r.lng.toFixed(5); }
+  function addrKey(r){ return (r.addr||'') + '@' + r.lat.toFixed(5) + ',' + r.lng.toFixed(5); }
+  (places||[]).forEach(function(d){
+    var r = kakaoPlace(d), k = titleKey(r);
+    if(seenTitle[k]) return;
+    seenTitle[k] = 1; seenAddr[addrKey(r)] = 1;
+    out.push(r);
+  });
+  (addrs||[]).forEach(function(d){
+    var r = kakaoAddr(d), k = titleKey(r), ak = addrKey(r);
+    if(seenTitle[k] || seenAddr[ak]) return;
+    seenTitle[k] = 1; seenAddr[ak] = 1;
+    out.push(r);
+  });
+  return out;
+}
+function mapNominatim(r){
+  var dn = r.display_name || '';
+  return {title:r.name || dn.split(',')[0] || dn, addr:dn, cat:'',
+          lat:parseFloat(r.lat), lng:parseFloat(r.lon), name:''};
+}
+
+function renderGeoResults(list, prefix){
+  var box = $('#geoResults');
+  box.classList.remove('hidden');
+  var head = prefix || '';
+  if(!list || !list.length){
+    box.innerHTML = head + '<div class="note" style="margin:0">찾지 못했어요. <b>도로명 주소</b>나 <b>상호명</b>을 조금 다르게 적어 보거나, <b>지도에서 핀 찍기</b>를 써 주세요.</div>';
+    return;
+  }
+  box.innerHTML = head + list.map(function(r,i){
+    return '<button type="button" data-geo="'+i+'"><b>'+esc(r.title)+'</b><span>'+
+      esc([r.addr, r.cat].filter(Boolean).join(' · '))+'</span></button>';
+  }).join('');
+}
+function fallbackNote(){
+  return '<div class="note" style="margin:0 0 6px">카카오 키를 설정하면 가게 이름으로 정확히 검색돼요. '+
+    '<button type="button" class="linkbtn" data-open-settings="1">설정 바로 열기</button></div>';
+}
+function placeTempPin(lat, lng){
+  clearPickMarker();
+  if(!Map.obj) return;
+  var d = pinDim();
+  pickTempMarker = L.marker([lat, lng], {icon:L.divIcon({
+    className:'pin-wrap',
+    html:'<div class="pin good" style="width:'+d+'px;height:'+d+'px"><i>📍</i></div>',
+    iconSize:[d,d], iconAnchor:[d/2, pinAnchorY(d)], popupAnchor:[0, -Math.round(d*1.36)]
+  })}).addTo(Map.obj);
+}
+function applyGeoResult(r){
+  if(!r || !isFinite(r.lat) || !isFinite(r.lng)) return;
+  setCoord({lat:r.lat, lng:r.lng});
+  var addr = r.addr || r.title || '';
+  if(addr) $('#fAddress').value = addr;
+  if(!($('#fName').value||'').trim() && r.name) $('#fName').value = r.name;
+  var reg = regionFromAddress(addr);
+  if(reg) $('#fRegion').value = reg;
+  setView('map');
+  if(Map.obj){
+    Map.obj.invalidateSize();
+    Map.obj.setView([r.lat, r.lng], 16, {animate:true});
+  }
+  placeTempPin(r.lat, r.lng);
+  $('#geoResults').innerHTML = '<div class="note" style="margin:0">'+
+    (reg ? '<b>'+esc(reg)+'</b> · ' : '') +
+    '위치를 <b>'+r.lat.toFixed(4)+', '+r.lng.toFixed(4)+'</b> 로 잡았어요. 저장을 누르면 지도에 핀이 생겨요.</div>';
+}
+
+function searchPlaces(forceOSM){
   var q = ($('#fAddress').value || '').trim();
-  if(!q){ toast('주소나 장소 이름을 먼저 적어 주세요'); return; }
+  if(!q){ toast('주소나 가게 이름을 먼저 적어 주세요'); return; }
+  var box = $('#geoResults');
+  box.classList.remove('hidden');
+
+  if(kakaoKey() && !forceOSM){
+    box.innerHTML = '<div class="note" style="margin:0">카카오에서 가게 이름·주소를 찾는 중…</div>';
+    var kw = kakaoGet('keyword', q).then(function(d){ return {ok:true, doc:d}; }, function(e){ return {ok:false, err:e}; });
+    var ad = kakaoGet('address', q).then(function(d){ return {ok:true, doc:d}; }, function(e){ return {ok:false, err:e}; });
+    Promise.all([kw, ad]).then(function(res){
+      var a = res[0], b = res[1];
+      if(!a.ok && !b.ok) throw (a.err || b.err);
+      var places = (a.ok && a.doc && a.doc.documents) || [];
+      var addrs  = (b.ok && b.doc && b.doc.documents) || [];
+      Geo.results = mergeKakao(places, addrs);
+      renderGeoResults(Geo.results);
+    }).catch(function(e){
+      Geo.results = [];
+      box.innerHTML = '<div class="note" style="margin:0">카카오 검색이 안 돼요 ('+esc(e.message)+'). '+
+        '키와 앱의 <b>카카오맵(로컬) API 사용 설정</b>을 확인해 주세요.<br>'+
+        '<button type="button" class="linkbtn" data-open-settings="1">설정 바로 열기</button> '+
+        '<button type="button" class="linkbtn" data-osm="1">OpenStreetMap으로 찾기</button></div>';
+    });
+    return;
+  }
+
   var t = Date.now();
   if(t - Geo.last < 1100){ toast('잠깐만요, 1초에 한 번씩 찾을 수 있어요'); return; }
   Geo.last = t;
-  var box = $('#geoResults');
-  box.classList.remove('hidden');
-  box.innerHTML = '<div class="note" style="margin:0">주소를 찾는 중…</div>';
+  var note = fallbackNote();
+  box.innerHTML = note + '<div class="note" style="margin:0">주소를 찾는 중…</div>';
   fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(q), {
     headers:{'Accept':'application/json'}
   }).then(function(r){
     if(!r.ok) throw new Error('검색에 실패했어요 ('+r.status+')');
     return r.json();
   }).then(function(list){
-    if(!list || !list.length){
-      box.innerHTML = '<div class="note" style="margin:0">찾지 못했어요. <b>도로명 주소</b>나 <b>상호명</b>을 조금 다르게 적어 보거나, 아래 <b>지도에서 핀 찍기</b>를 써 주세요.</div>';
-      return;
-    }
-    Geo.results = list;
-    box.innerHTML = list.map(function(r,i){
-      return '<button data-geo="'+i+'"><b>'+esc(r.name || (r.display_name||'').split(',')[0])+'</b>'+
-        '<span>'+esc(r.display_name||'')+'</span></button>';
-    }).join('');
+    Geo.results = (list||[]).map(mapNominatim);
+    renderGeoResults(Geo.results, note);
   }).catch(function(e){
-    box.innerHTML = '<div class="note" style="margin:0">주소 검색이 안 돼요('+esc(e.message)+'). <b>지도에서 핀 찍기</b>로 위치를 지정할 수 있어요.</div>';
+    Geo.results = [];
+    box.innerHTML = note + '<div class="note" style="margin:0">주소 검색이 안 돼요('+esc(e.message)+'). <b>지도에서 핀 찍기</b>로 위치를 지정할 수 있어요.</div>';
   });
 }
 
@@ -1152,9 +1289,84 @@ function renderSyncBox(){
   txt.innerHTML = '<b>'+m[1]+'</b><span>'+ (Sync.lastSync ? '마지막 ' + dayLabel(Sync.lastSync) : m[2]) +'</span>';
 }
 
+/* ---------- 카카오 장소검색 키 (이 기기에만) ---------- */
+var Kakao = {key:''};
+function loadKakaoKey(){
+  try{ Kakao.key = (localStorage.getItem(KAKAO_KEY)||'').trim(); }
+  catch(e){ Kakao.key = ''; }
+}
+function saveKakaoKey(k){
+  Kakao.key = String(k||'').trim();
+  try{
+    if(Kakao.key) localStorage.setItem(KAKAO_KEY, Kakao.key);
+    else localStorage.removeItem(KAKAO_KEY);
+  }catch(e){}
+}
+function renderKakaoBox(state, sub){
+  var box = $('#kakaoState');
+  if(!box) return;
+  var k = box.querySelector('.k'), txt = box.querySelector('.txt');
+  if(!k || !txt) return;
+  var map = {
+    ok:   ['ok',   '카카오 검색 연결됨', '가게 이름·주소를 카카오에서 찾아요'],
+    pass: ['ok',   '키 확인됨', '저장을 누르면 이 기기에 저장돼요'],
+    busy: ['busy', '확인 중…', '카카오에 시험 검색을 보내는 중'],
+    err:  ['err',  '확인 필요', '키나 REST API 사용 설정을 확인해 주세요'],
+    local:['',     '설정 안 함', '주소 검색은 OpenStreetMap으로 찾아요']
+  };
+  var m = map[state] || map.local;
+  k.className = 'k ' + m[0];
+  txt.innerHTML = '<b>'+esc(m[1])+'</b><span>'+esc(sub || m[2])+'</span>';
+}
+function testKakao(){
+  var key = ($('#fKakaoKey').value || '').trim();
+  if(!key){ toast('REST API 키를 먼저 붙여넣어 주세요'); $('#fKakaoKey').focus(); return; }
+  renderKakaoBox('busy');
+  $('#btnSaveKakao').disabled = true;
+  fetch('https://dapi.kakao.com/v2/local/search/keyword.json?query=' + encodeURIComponent('서울역') + '&size=1', {
+    headers:{'Authorization':'KakaoAK ' + key, 'Accept':'application/json'}
+  }).then(function(r){
+    if(r.status===401) throw new Error('키가 올바르지 않아요 (401)');
+    if(r.status===403) throw new Error('카카오 앱에서 카카오맵(로컬) API 사용 설정을 켜 주세요 (403)');
+    if(r.status===429) throw new Error('호출 한도를 넘었어요 (429)');
+    if(!r.ok) throw new Error('카카오 오류 ' + r.status);
+    return r.json();
+  }).then(function(d){
+    var docs = (d && d.documents) || [];
+    var nm = docs.length ? (docs[0].place_name || '서울역') : '서울역';
+    renderKakaoBox('pass', '카카오에서 “' + nm + '”을(를) 찾았어요 (' + docs.length + '건) · 저장을 누르면 적용돼요');
+    $('#btnSaveKakao').disabled = false;
+  }).catch(function(e){
+    renderKakaoBox('err', e.message);
+    $('#btnSaveKakao').disabled = false;
+  });
+}
+function saveKakao(){
+  var key = ($('#fKakaoKey').value || '').trim();
+  saveKakaoKey(key);
+  $('#btnClearKakao').classList.toggle('hidden', !Kakao.key);
+  if(Kakao.key){
+    renderKakaoBox('ok');
+    toast('카카오 검색을 켰어요 · 가게 이름으로 찾을 수 있어요', 'ok');
+  }else{
+    renderKakaoBox('local');
+    toast('키가 비어 있어요 · 주소 검색은 OpenStreetMap으로 찾아요');
+  }
+}
+function clearKakao(){
+  saveKakaoKey('');
+  $('#fKakaoKey').value = '';
+  $('#btnClearKakao').classList.add('hidden');
+  renderKakaoBox('local');
+  toast('카카오 키를 지웠어요');
+}
+
 function openSettings(){
   $('#fToken').value = Sync.token || '';
   $('#fAuto').checked = !!Sync.auto;
+  $('#fKakaoKey').value = Kakao.key || '';
+  $('#btnClearKakao').classList.toggle('hidden', !Kakao.key);
+  renderKakaoBox(Kakao.key ? 'ok' : 'local');
   $('#btnForget').classList.toggle('hidden', !Sync.token);
   var hint = $('#tokenHint');
   var existing = '';
@@ -1278,17 +1490,16 @@ function bind(){
     var v = Number(b.getAttribute('data-v'));
     setRating(getRating()===v ? 0 : v);
   });
-  $('#btnGeo').addEventListener('click', geocode);
-  $('#fAddress').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); geocode(); } });
+  $('#btnGeo').addEventListener('click', function(){ searchPlaces(false); });
+  $('#fAddress').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); searchPlaces(false); } });
   $('#geoResults').addEventListener('click', function(e){
+    var open = e.target.closest('[data-open-settings]');
+    if(open){ openSettings(); return; }
+    var osm = e.target.closest('[data-osm]');
+    if(osm){ searchPlaces(true); return; }
     var b = e.target.closest('[data-geo]');
     if(!b) return;
-    var r = Geo.results[Number(b.getAttribute('data-geo'))];
-    if(!r) return;
-    setCoord({lat:parseFloat(r.lat), lng:parseFloat(r.lon)});
-    if(r.display_name) $('#fAddress').value = r.display_name;
-    $('#geoResults').innerHTML = '<div class="note" style="margin:0">위치를 <b>'+Number(r.lat).toFixed(4)+', '+Number(r.lon).toFixed(4)+'</b> 로 잡았어요. 저장을 누르면 지도에 핀이 생겨요.</div>';
-    if(Map.obj){ Map.obj.setView([parseFloat(r.lat), parseFloat(r.lon)], 15); }
+    applyGeoResult(Geo.results[Number(b.getAttribute('data-geo'))]);
   });
   $('#btnPick').addEventListener('click', startPick);
   $('#pickCancel').addEventListener('click', cancelPick);
@@ -1304,6 +1515,10 @@ function bind(){
   $('#settingsSheet').addEventListener('click', function(e){ if(e.target===$('#settingsSheet')) $('#settingsSheet').classList.add('hidden'); });
   $('#btnSettingsClose').addEventListener('click', function(){ $('#settingsSheet').classList.add('hidden'); });
   $('#btnTestToken').addEventListener('click', testConnection);
+  $('#btnTestKakao').addEventListener('click', testKakao);
+  $('#btnSaveKakao').addEventListener('click', saveKakao);
+  $('#btnClearKakao').addEventListener('click', clearKakao);
+  $('#fKakaoKey').addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); testKakao(); } });
   $('#btnSaveToken').addEventListener('click', function(){
     Sync.token = ($('#fToken').value||'').trim();
     Sync.auto = $('#fAuto').checked;
@@ -1355,6 +1570,7 @@ function registerSW(){
 function boot(){
   Data = loadData();
   loadCfg();
+  loadKakaoKey();
   bind();
   renderAll();
   $('#stats').innerHTML = '불러오는 중…';
@@ -1452,10 +1668,10 @@ else boot();
       </label>
     </div>
 
-    <label class="field"><span>주소·위치 검색</span>
-      <input class="inp" id="fAddress" type="text" placeholder="예: 부산 서구 암남동 620-24" maxlength="140">
+    <label class="field"><span>주소·가게 이름 검색</span>
+      <input class="inp" id="fAddress" type="text" placeholder="예: 암남공원 조개구이 / 부산 서구 암남동 620-24" maxlength="140">
       <div class="chips" style="padding:8px 0 0">
-        <button type="button" class="btn ghost" id="btnGeo" style="height:34px;font-size:12.5px">🔎 주소로 찾기</button>
+        <button type="button" class="btn ghost" id="btnGeo" style="height:34px;font-size:12.5px">🔎 주소·가게 이름으로 찾기</button>
         <button type="button" class="btn ghost" id="btnPick" style="height:34px;font-size:12.5px">🗺️ 지도에서 핀 찍기</button>
       </div>
     </label>
@@ -1485,6 +1701,21 @@ else boot();
     <div class="sheet-grab"></div>
     <h2>설정 · 백업</h2>
     <p class="lead">내 폰·내 기기 백업/동기화 (비공개 저장소)</p>
+
+    <label class="field"><span>카카오 장소·주소 검색 (REST API 키)</span>
+      <input class="inp" id="fKakaoKey" type="password" placeholder="REST API 키 (JavaScript 키 아님)" autocomplete="off" spellcheck="false">
+    </label>
+    <div class="sync-state" id="kakaoState">
+      <span class="k"></span>
+      <div class="txt"><b>설정 안 함</b><span>주소 검색은 OpenStreetMap으로 찾아요</span></div>
+    </div>
+    <div class="grid2">
+      <button class="btn ghost" id="btnTestKakao">연결 확인</button>
+      <button class="btn primary" id="btnSaveKakao">저장</button>
+    </div>
+    <button class="btn danger block hidden" id="btnClearKakao" style="margin-bottom:12px">키 지우기</button>
+    <p class="note">developers.kakao.com → 내 애플리케이션 → 앱 키 → <b>REST API 키</b>를 붙여넣으세요. 키는 이 기기 브라우저에만 저장되고 어디에도 올라가지 않아요.</p>
+    <hr class="sep">
 
     <div class="sync-state" id="connState">
       <span class="k"></span>
@@ -1522,7 +1753,7 @@ else boot();
     <p class="note">
       <b>내 기록은 공개되지 않아요.</b> 추가·수정한 맛집/메모는 이 기기 브라우저에 먼저 저장되고, 토큰을 넣으면 내 비공개 저장소의
       <b>foodmap-data.json</b> 에만 백업돼요. 지도 페이지(공개 주소)에는 아무 기록도 올라가지 않습니다.<br><br>
-      지도·주소 검색은 OpenStreetMap(© OpenStreetMap 기여자)을 써요.
+      지도·주소 검색은 카카오 로컬(키를 넣었을 때) 또는 OpenStreetMap(© OpenStreetMap 기여자)을 써요.
     </p>
 
     <div class="sheet-actions">
