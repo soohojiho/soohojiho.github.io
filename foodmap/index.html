@@ -77,7 +77,7 @@ main{flex:1;min-height:0;position:relative}
 #map{position:absolute;inset:0;background:#e9eef4}
 #boardView{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 12px 40px}
 
-.map-overlay{position:absolute;right:12px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:600}
+.map-overlay{position:absolute;right:12px;bottom:40px;display:flex;flex-direction:column;gap:8px;z-index:600}
 .pill{height:38px;padding:0 13px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.96);box-shadow:var(--shadow);font-size:12.5px;font-weight:800;display:inline-flex;align-items:center;gap:6px}
 .pick-banner{position:absolute;left:12px;right:12px;top:12px;z-index:700;background:#111827;color:#fff;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:13px;font-weight:700}
 .pick-banner button{margin-left:auto;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:8px;height:28px;padding:0 10px;font-size:12px;font-weight:800}
@@ -124,6 +124,7 @@ main{flex:1;min-height:0;position:relative}
 .pin-wrap{background:transparent;border:0}
 .pin{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:grid;place-items:center;border:2px solid #fff;box-shadow:0 3px 9px rgba(15,23,42,.32)}
 .pin i{transform:rotate(45deg);font-size:13px;line-height:1;font-style:normal}
+@media(max-width:560px){.pin i{font-size:11px}}
 .pin.good{background:linear-gradient(180deg,#22c55e,#15803d)}
 .pin.bad{background:linear-gradient(180deg,#ef4444,#b91c1c)}
 .pin.rest{background:linear-gradient(180deg,#3b82f6,#1d4ed8)}
@@ -591,14 +592,15 @@ function initMap(){
     Map.obj.invalidateSize();
     return;
   }
-  Map.obj = L.map('map', {zoomControl:true, attributionControl:true, minZoom:5, maxZoom:18})
-    .setView([36.3,127.7], window.innerWidth<760 ? 6 : 7);
+  Map.obj = L.map('map', {zoomControl:true, attributionControl:true, minZoom:4.5, maxZoom:18, zoomSnap:0.25, zoomDelta:0.5})
+    .setView([36.1,127.9], window.innerWidth<760 ? 6.25 : 6.75);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom:19,
     attribution:'&copy; OpenStreetMap 기여자'
   }).addTo(Map.obj);
   Map.layer = L.layerGroup().addTo(Map.obj);
-  Map.obj.fitBounds(KOREA_BOUNDS, {padding:[10,10]});
+  setTimeout(fitToData, 180);
+  window.addEventListener('load', function(){ if(Map.obj && !Map.userMoved){ setTimeout(fitToData, 120); } });
   Map.obj.on('click', function(e){
     if(!Map.pick) return;
     setPickedCoord(e.latlng.lat, e.latlng.lng);
@@ -606,14 +608,29 @@ function initMap(){
   $('#mapLoading').classList.add('hidden');
 }
 
+function pinDim(){ return window.innerWidth < 560 ? 26 : 32; }
 function pinIcon(it, active){
   var t = TYPES[it.type] || TYPES.good;
   var cls = it.type + (active?' active':'');
+  var d = pinDim();
   return L.divIcon({
     className:'pin-wrap',
-    html:'<div class="pin '+cls+'"><i>'+t.emoji+'</i></div>',
-    iconSize:[32,32], iconAnchor:[16,30], popupAnchor:[0,-28]
+    html:'<div class="pin '+cls+'" style="width:'+d+'px;height:'+d+'px"><i>'+t.emoji+'</i></div>',
+    iconSize:[d,d], iconAnchor:[d/2, d-2], popupAnchor:[0,-(d-4)]
   });
+}
+
+function dataBounds(){
+  var pts = Data.items.filter(hasCoord).map(function(it){ return [it.lat, it.lng]; });
+  if(!pts.length) return null;
+  return L.latLngBounds(pts);
+}
+function fitToData(){
+  if(!Map.obj) return;
+  Map.obj.invalidateSize();
+  var b = dataBounds();
+  if(b) Map.obj.fitBounds(b, {padding:[window.innerWidth<560 ? 26 : 40, window.innerWidth<560 ? 26 : 40], maxZoom:13});
+  else Map.obj.fitBounds(KOREA_BOUNDS, {padding:[10,10]});
 }
 
 function renderMarkers(){
@@ -681,9 +698,11 @@ function openSheet(id){
   $('#sheet').classList.remove('hidden');
   findFirstFocus();
 }
+function hideSheet(){ $('#sheet').classList.add('hidden'); }
 function closeSheet(){
-  $('#sheet').classList.add('hidden');
+  hideSheet();
   Editing.id = null;
+  clearPickMarker();
 }
 
 function setType(t){
@@ -727,9 +746,14 @@ function getCoord(){
 
 /* 지도에서 핀 찍기 */
 var pickTempMarker = null;
+function clearPickMarker(){
+  if(pickTempMarker && Map.obj){ Map.obj.removeLayer(pickTempMarker); }
+  pickTempMarker = null;
+}
 function startPick(){
+  clearPickMarker();
   var c = getCoord();
-  closeSheet();
+  hideSheet();
   setView('map');
   Map.pick = true;
   $('#pickBanner').classList.remove('hidden');
@@ -745,7 +769,7 @@ function setPickedCoord(lat,lng){
   setCoord({lat:lat,lng:lng});
   Map.pick = false;
   $('#pickBanner').classList.add('hidden');
-  if(pickTempMarker){ Map.obj.removeLayer(pickTempMarker); }
+  clearPickMarker();
   pickTempMarker = L.marker([lat,lng], {icon:L.divIcon({className:'pin-wrap',html:'<div class="pin good"><i>📍</i></div>',iconSize:[32,32],iconAnchor:[16,30]})}).addTo(Map.obj);
   $('#sheet').classList.remove('hidden');
   toast('위치를 찍었어요 · ' + lat.toFixed(4) + ', ' + lng.toFixed(4), 'ok');
@@ -766,7 +790,7 @@ function geocode(){
   var box = $('#geoResults');
   box.classList.remove('hidden');
   box.innerHTML = '<div class="note" style="margin:0">주소를 찾는 중…</div>';
-  fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=ko&q=' + encodeURIComponent(q), {
+  fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=ko&countrycodes=kr&q=' + encodeURIComponent(q), {
     headers:{'Accept':'application/json'}
   }).then(function(r){
     if(!r.ok) throw new Error('검색에 실패했어요 ('+r.status+')');
@@ -1217,7 +1241,11 @@ function bind(){
     if(Sync.state==='busy') return;
     pullRemote(false);
   });
-  $('#btnFit').addEventListener('click', function(){ if(Map.obj) Map.obj.fitBounds(KOREA_BOUNDS, {padding:[10,10]}); });
+  $('#btnFit').addEventListener('click', function(){
+    if(!Map.obj) return;
+    Map.userMoved = true;
+    Map.obj.fitBounds(KOREA_BOUNDS, {padding:[10,10]});
+  });
   $('#btnLocate').addEventListener('click', function(){
     if(!navigator.geolocation) return toast('이 브라우저는 위치를 못 찾아요');
     toast('내 위치를 찾는 중…');
@@ -1249,10 +1277,7 @@ function bind(){
     var r = Geo.results[Number(b.getAttribute('data-geo'))];
     if(!r) return;
     setCoord({lat:parseFloat(r.lat), lng:parseFloat(r.lon)});
-    if(!$('#fAddress').value || true){
-      var nm = r.name || (r.display_name||'').split(',')[0] || '';
-      $('#fAddress').value = (nm ? nm + ' · ' : '') + (r.display_name||'');
-    }
+    if(r.display_name) $('#fAddress').value = r.display_name;
     $('#geoResults').innerHTML = '<div class="note" style="margin:0">위치를 <b>'+Number(r.lat).toFixed(4)+', '+Number(r.lon).toFixed(4)+'</b> 로 잡았어요. 저장을 누르면 지도에 핀이 생겨요.</div>';
     if(Map.obj){ Map.obj.setView([parseFloat(r.lat), parseFloat(r.lon)], 15); }
   });
