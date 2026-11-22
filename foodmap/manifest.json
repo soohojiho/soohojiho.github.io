@@ -1,0 +1,18 @@
+{
+  "name": "내 전국 맛집·휴게소 지도",
+  "short_name": "맛집지도",
+  "description": "전국 맛집·다신 안 갈 집·휴게소를 지도와 보드로 정리하는 나만의 지도",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f6f8",
+  "theme_color": "#f97316",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

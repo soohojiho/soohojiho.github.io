@@ -106,3 +106,10 @@
 - 포켓몬 이미지: [PokeAPI sprites](https://github.com/PokeAPI/sprites)
 
 네이버 날씨는 CORS 정책상 페이지에서 직접 호출할 수 없어, 같은 지역 실시간 날씨를 Open-Meteo로 받고 네이버 날씨로 이동하는 버튼을 제공합니다.
+
+## 내 맛집·휴게소 지도 (`/foodmap/`)
+
+- https://soohojiho.github.io/foodmap/ — 전국 맛집·다신 안 갈 집·휴게소를 지도와 지역별 보드로 정리하는 **개인용** 페이지입니다.
+- 지도는 Leaflet + OpenStreetMap, 위치 검색은 Nominatim을 씁니다.
+- 기록은 **그 기기의 브라우저(localStorage)** 에 저장되고, 원하면 설정에서 GitHub 토큰을 넣어 비공개 저장소 `soohojiho/Family-board`의 **`foodmap-data.json`** 에만 백업·동기화합니다. (`dashboard-data.json`과 완전히 분리)
+- **맛집·메모 같은 개인 기록은 이 공개 저장소에 커밋되지 않습니다.** 사이트에는 기본 휴게소 24곳과 사용법 예시 2건만 들어 있습니다.
